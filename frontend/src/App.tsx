@@ -1,10 +1,15 @@
-function App() {
+import Navbar from "./Layouts/NavbarAndFooter/Navbar";
+import { Footer } from "./Layouts/NavbarAndFooter/Footer";
+import { HomePage } from "./Layouts/HomePage/HomePage";
 
-  return (
-    <>
-      <h1>Home Page</h1>
-    </>
-  )
+function App() {
+    return (
+        <div>
+            <Navbar />
+            <HomePage />
+            <Footer />
+        </div>
+    );
 }
 
-export default App
+export default App;
