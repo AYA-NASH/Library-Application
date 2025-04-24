@@ -45,9 +45,12 @@ export const SearchBooksPage = () => {
             setTotalPages(responseJson.page.totalPages);
 
             const loadedBooks: BookModel[] = [];
+
             for (const key in responseData) {
                 loadedBooks.push({
-                    id: responseData[key].id,
+                    id: responseData[key]._links.book.href.match(
+                        /\/(\d+)$/
+                    )?.[1],
                     title: responseData[key].title,
                     author: responseData[key].author,
                     description: responseData[key].description,

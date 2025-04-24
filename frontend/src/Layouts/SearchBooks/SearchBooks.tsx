@@ -1,8 +1,9 @@
 import { FC } from "react";
 import { BookModel } from "../../models/BookModel";
+import { Link } from "react-router-dom";
 
 export const SearchBooks: FC<{ book: BookModel }> = (props) => {
-    const { img, title, author, description } = { ...props.book };
+    const { id, img, title, author, description } = { ...props.book };
     return (
         <div className="card mt-3 shadow p-3 bg-body-rounded">
             <div className="row g-0">
@@ -52,9 +53,12 @@ export const SearchBooks: FC<{ book: BookModel }> = (props) => {
                 </div>
 
                 <div className="col-md-4 d-flex justify-content-center align-items-center">
-                    <a className="btn btn-md btn-dark text-white" href="#">
+                    <Link
+                        className="btn btn-md btn-dark text-white"
+                        to={`/checkout/${id}`}
+                    >
                         View Details
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
