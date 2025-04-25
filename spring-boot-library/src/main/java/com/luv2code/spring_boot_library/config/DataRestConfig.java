@@ -1,6 +1,7 @@
 package com.luv2code.spring_boot_library.config;
 
 import com.luv2code.spring_boot_library.entity.Book;
+import com.luv2code.spring_boot_library.entity.Review;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
@@ -17,7 +18,11 @@ public class DataRestConfig implements RepositoryRestConfigurer {
                                                      CorsRegistry cors) {
         HttpMethod[] unSupported = {HttpMethod.PUT, HttpMethod.DELETE, HttpMethod.POST, HttpMethod.PATCH};
 
+        config.exposeIdsFor(Book.class);
+        config.exposeIdsFor(Review.class);
+
         disableHttpMethods(config, Book.class, unSupported);
+        disableHttpMethods(config, Review.class, unSupported);
 
         cors.addMapping(config.getBasePath() + "/**")
                 .allowedOrigins(allowedOrigins);

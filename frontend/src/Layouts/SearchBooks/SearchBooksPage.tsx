@@ -31,7 +31,6 @@ export const SearchBooksPage = () => {
                 );
                 url = baseUrl + searchWithPage;
             }
-            console.log("Request Url:\n", url);
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -48,9 +47,7 @@ export const SearchBooksPage = () => {
 
             for (const key in responseData) {
                 loadedBooks.push({
-                    id: responseData[key]._links.book.href.match(
-                        /\/(\d+)$/
-                    )?.[1],
+                    id: responseData[key].id,
                     title: responseData[key].title,
                     author: responseData[key].author,
                     description: responseData[key].description,
