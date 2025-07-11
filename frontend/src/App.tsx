@@ -4,31 +4,44 @@ import { HomePage } from "./Layouts/HomePage/HomePage";
 import { Route, Routes } from "react-router-dom";
 import { SearchBooksPage } from "./Layouts/SearchBooks/SearchBooksPage";
 import { BookCheckoutPage } from "./Layouts/BookCheckoutPage/BookCheckoutPage";
-import { useNavigate } from "react-router-dom";
 
-import { AuthProvider } from "./Auth/AuthContext";
+import { AuthProvider, useAuth } from "./Auth/AuthContext";
 import LoginPage from "./Layouts/AuthPage/LoginPage";
 import SignupPage from "./Layouts/AuthPage/SignupPage";
 
 function App() {
-    const navigate = useNavigate();
+    return (
+        <AuthProvider>
+            <InnerApp />
+        </AuthProvider>
+    );
+}
+
+function InnerApp() {
+    const { alertMessage } = useAuth();
 
     return (
         <div className="d-flex flex-column min-vh-100">
             <Navbar />
+            {alertMessage && (
+                <div
+                    className="alert alert-warning text-center m-0 rounded-0"
+                    role="alert"
+                >
+                    {alertMessage}
+                </div>
+            )}
             <div className="flex-grow-1">
-                <AuthProvider>
-                    <Routes>
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/signup" element={<SignupPage />} />
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/search" element={<SearchBooksPage />} />
-                        <Route
-                            path="/checkout/:bookId"
-                            element={<BookCheckoutPage />}
-                        />
-                    </Routes>
-                </AuthProvider>
+                <Routes>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/search" element={<SearchBooksPage />} />
+                    <Route
+                        path="/checkout/:bookId"
+                        element={<BookCheckoutPage />}
+                    />
+                </Routes>
             </div>
             <Footer />
         </div>

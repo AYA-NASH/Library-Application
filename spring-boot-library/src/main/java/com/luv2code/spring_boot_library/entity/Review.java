@@ -2,7 +2,7 @@ package com.luv2code.spring_boot_library.entity;
 
 import jakarta.persistence.*;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;

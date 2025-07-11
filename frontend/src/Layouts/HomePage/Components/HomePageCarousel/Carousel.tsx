@@ -6,15 +6,16 @@ import { ReturnBook } from "./ReturnBook";
 import "./Carousel.css";
 import { SpinnerLoading } from "../../../Utils/SpinnerLoading";
 
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
 export const Carousel = () => {
     // const booksArr: [] = [book1, book2, book3];
     const [books, setBooks] = useState<BookModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [httpError, setHttpError] = useState(null);
-
     useEffect(() => {
         const fetchBooks = async () => {
-            const url: string = "http://localhost:8080/api/books?page=0&size=9";
+            const url: string = baseUrl + "/api/books?page=0&size=9";
             const response = await fetch(url);
 
             if (!response.ok) {

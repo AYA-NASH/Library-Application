@@ -33,6 +33,7 @@ public class JwtService {
 
         long now = System.currentTimeMillis();
         long expiration = now + 1000 * 60 * 60;
+        // long expiration = now + 1000 * 30;
 
         return Jwts.builder()
                 .claims()

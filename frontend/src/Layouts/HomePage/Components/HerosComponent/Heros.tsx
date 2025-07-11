@@ -1,6 +1,9 @@
+import { Link } from "react-router-dom";
+import { useAuth } from "../../../../Auth/AuthContext";
 import "./Heros.css";
 
 export const Heros = () => {
+    const { user } = useAuth();
     return (
         <div>
             <div className="d-none d-lg-block">
@@ -18,12 +21,22 @@ export const Heros = () => {
                                 skill or grow within one, we will be able to
                                 provide the top content for you.
                             </p>
-                            <a
+                            {!user ? 
+                                <Link
+                                    className="btn btn-dark btn-lg text-white"
+                                    to="/login"
+                                > 
+                                    Sign up
+                                </Link>
+                            :
+                                <Link
                                 className="btn btn-dark btn-lg text-white"
-                                href="#"
-                            >
-                                Sign up
-                            </a>
+                                to="/search"
+                                > 
+                                    Explore Top Books
+                                </Link>
+                            }
+                            
                         </div>
                     </div>
                 </div>
@@ -62,12 +75,20 @@ export const Heros = () => {
                                 skill or grow within one, we will be able to
                                 provide the top content for you.
                             </p>
-                            <a
-                                className="btn btn-dark btn-lg text-white"
-                                href="#"
-                            >
-                                Sign up
-                            </a>
+                            {!user ?
+                                <Link
+                                    className="btn btn-dark btn-lg text-white"
+                                    to="/login"
+                                >
+                                    Sign up
+                                </Link>
+                                :
+                                <Link
+                                    className="btn btn-dark btn-lg text-white"
+                                    to="/search"
+                                >
+                                    Explore Top Books
+                                </Link>}
                         </div>
                     </div>
 

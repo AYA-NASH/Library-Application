@@ -1,7 +1,7 @@
 package com.luv2code.spring_boot_library.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
