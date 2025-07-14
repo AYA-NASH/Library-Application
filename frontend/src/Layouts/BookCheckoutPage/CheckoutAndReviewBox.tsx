@@ -1,11 +1,31 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { BookModel } from "../../models/BookModel";
 import { Link } from "react-router-dom";
 
 export const CheckoutAndReviewBox: FC<{
     book: BookModel | undefined;
     mobile: boolean;
+    isAuthenticated: boolean;
+    isCheckedout: boolean;
+    currentLoansCount: number;
+    checkoutBook: any;
 }> = (props) => {
+
+    function buttonRender(){
+        if(props.isAuthenticated){
+            if(!props.isCheckedout && props.currentLoansCount < 5){
+                return (<button onClick={()=> props.checkoutBook()} className="btn btn-success btn-lg">Checkout</button>)
+            }
+            else if(props.isCheckedout){
+                return (<p><b>Book Checkedout. Enjoy!</b></p>)
+            }
+            else if(!props.isCheckedout){
+                return (<p className="text-danger">Too many books checkedout.</p>)
+            }
+        }
+        return (<Link to="/login" className="btn btn-success btn-lg">Sign in</Link>)
+    }
+
     return (
         <div
             className={
@@ -17,7 +37,7 @@ export const CheckoutAndReviewBox: FC<{
             <div className="card-body container">
                 <div className="mt-3">
                     <p>
-                        <b>0/5 </b>
+                        <b> {props.currentLoansCount} /5 </b>
                         books checked out
                     </p>
 
@@ -44,9 +64,7 @@ export const CheckoutAndReviewBox: FC<{
                     </div>
                 </div>
 
-                <Link to="/#" className="btn btn-success btn-lg">
-                    Sign in
-                </Link>
+                {buttonRender()}
 
                 <hr />
 

@@ -6,6 +6,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>;
     logout: (message?: string | null) => void;
     alertMessage: string | null;
+    token: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,6 +16,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState(() => {
         const storedUser = localStorage.getItem("user");
         return storedUser ? JSON.parse(storedUser) : null;
+    });
+
+    const [token, setToken] = useState(() => {
+        return localStorage.getItem("token");
     });
 
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -39,7 +44,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (response.ok) {
             const jsonResponse = await response.json();
 
-            setUser(user);
+            setUser(jsonResponse.user);
+            setToken(jsonResponse.token);
+
             localStorage.setItem("user", JSON.stringify(jsonResponse.user));
             localStorage.setItem("token", jsonResponse.token);
 
@@ -61,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, alertMessage }}>
+        <AuthContext.Provider value={{ user, token, login, logout, alertMessage }}>
             {children}
         </AuthContext.Provider>
     );
