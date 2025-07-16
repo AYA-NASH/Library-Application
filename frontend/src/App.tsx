@@ -8,6 +8,7 @@ import { BookCheckoutPage } from "./Layouts/BookCheckoutPage/BookCheckoutPage";
 import { AuthProvider, useAuth } from "./Auth/AuthContext";
 import LoginPage from "./Layouts/AuthPage/LoginPage";
 import SignupPage from "./Layouts/AuthPage/SignupPage";
+import { ReviewListPage } from "./Layouts/BookCheckoutPage/ReviewListPage/ReviewListPage";
 
 function App() {
     return (
@@ -41,6 +42,7 @@ function InnerApp() {
                         path="/checkout/:bookId"
                         element={<BookCheckoutPage />}
                     />
+                    <Route path="/reviewList/:bookId" element={<ReviewListPage/>}/>
                 </Routes>
             </div>
             <Footer />

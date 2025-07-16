@@ -51,11 +51,9 @@ public class UserService {
         if (auth.isAuthenticated()) {
             AppUser foundUser = userRepo.findByEmail(user.getEmail());
             String token = jwtService.generateToken(user.getEmail());
-
             LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
-                    foundUser.getEmail(),
-                    foundUser.getUsername());
-
+                    foundUser.getUsername(),
+                    foundUser.getEmail());
             return new LoginResponse(token, userInfo);
         }
 

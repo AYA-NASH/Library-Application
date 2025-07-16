@@ -7,6 +7,7 @@ import { CheckoutAndReviewBox } from "./CheckoutAndReviewBox";
 import { ReviewModel } from "../../models/ReviewModel";
 import { LatestReviews } from "./LatestReviews";
 import { useAuth } from "../../Auth/AuthContext";
+import ReviewRequestModel from "../../models/ReviewRequestModel";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -18,13 +19,19 @@ export const BookCheckoutPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [httpError, setHttpError] = useState(null);
 
+    // Review Sates:
     const [reviews, setReviews] = useState<ReviewModel[]>([]);
     const [totalStars, setTotalStars] = useState(0);
     const [isLoadingReview, setIsLoadingReview] = useState(true);
 
+    const [isReviewLeft, setIsReviewLeft] = useState(false);
+    const [isLoadingUserReview, setIsLoadingUserReview] = useState(true);
+
+    // Checkedout state
     const [isBookCheckedout, setIsBookCheckedout] = useState(false);
     const [isLoadingCheckedout, setIsLoadingCheckedout] = useState(true);
 
+    // Current Loans Count States
     const [currentLoansCount, setCurrentLoansCount] = useState(0);
     const [isLoadingCurrentLoansCount, setIsLoadingCurrentLoansCount] = useState(true);
 
@@ -105,7 +112,7 @@ export const BookCheckoutPage = () => {
     }, [isBookCheckedout]);
 
     useEffect(() => {
-        const fetchBookReviews = async () => {
+        const fetchBookReviews = async () => {     
             const url: string = `http://localhost:8080/api/reviews/search/findByBookId?bookId=${bookId}`;
             const response = await fetch(url);
             if (!response.ok) {
@@ -148,7 +155,34 @@ export const BookCheckoutPage = () => {
             setIsLoadingReview(false);
             setHttpError(error.message);
         });
-    }, []);
+    }, [isReviewLeft]);
+
+    useEffect(()=>{
+        const fetchUserReviewBook = async ()=>{
+            if(isAuthenticated){
+                const url = baseUrl + `/api/reviews/secure/user/book?bookId=${bookId}`;
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers:{
+                        Authorization: "Bearer " + token,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if(!response.ok){
+                    throw Error("Something went wrong!");
+                }
+
+                const responseJson = await response.json();
+                setIsReviewLeft(responseJson)
+            }
+            setIsLoadingUserReview(false);
+        }
+        fetchUserReviewBook().catch((error:any)=>{
+            setIsLoadingUserReview(false);
+            setHttpError(error);
+        })
+    }, [isReviewLeft]);
 
     useEffect(()=>{
         fetchIsCheckedout()
@@ -182,7 +216,27 @@ export const BookCheckoutPage = () => {
         setIsBookCheckedout(true);
     }
 
-    if (isLoading || isLoadingReview || isLoadingCheckedout || isLoadingCurrentLoansCount) {
+    async function submitReview(starInput:number, reviewDescription: string) {
+        const reviewRequestModel = new ReviewRequestModel(Number(bookId), starInput, reviewDescription);
+        const url = baseUrl + "/api/reviews/secure"
+        const response = await fetch(url, {
+            method: 'POST', 
+            headers:{
+                Authorization: "Bearer "+ token,
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify(reviewRequestModel)
+        });
+
+        if(!response.ok){
+            throw Error("Something went wrong");
+        }
+
+        setIsReviewLeft(true);
+    }
+
+    if (isLoading || isLoadingReview || isLoadingCheckedout 
+        || isLoadingCurrentLoansCount || isLoadingUserReview) {
         return <SpinnerLoading />;
     }
 
@@ -230,6 +284,8 @@ export const BookCheckoutPage = () => {
                                         isCheckedout={isBookCheckedout}
                                         currentLoansCount={currentLoansCount}
                                         checkoutBook={checkoutBook}
+                                        isReviewLeft={isReviewLeft}
+                                        submitReview={submitReview}
                     />
 
                 </div>
@@ -272,6 +328,9 @@ export const BookCheckoutPage = () => {
                                         isCheckedout={isBookCheckedout}
                                         currentLoansCount={currentLoansCount}
                                         checkoutBook={checkoutBook}
+                                        isReviewLeft={isReviewLeft}
+                                        submitReview={submitReview}
+
                 />
                 <hr />
                 <LatestReviews

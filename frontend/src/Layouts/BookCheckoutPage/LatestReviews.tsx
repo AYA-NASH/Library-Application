@@ -24,7 +24,7 @@ export const LatestReviews: FC<{
                             <Link
                                 type="button"
                                 className="btn btn-dark btn-md text-white"
-                                to={""}
+                                to={`/reviewList/${props.bookId}`}
                             >
                                 Reach all Reviews
                             </Link>
