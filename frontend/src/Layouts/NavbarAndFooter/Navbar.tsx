@@ -41,7 +41,15 @@ function Navbar() {
                                     Search Books
                                 </Link>
                             </li>
+                        
+                            {user &&
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/shelf">
+                                        Shelf
+                                    </Link>
+                                </li>}
                         </ul>
+
                         <ul className="navbar-nav ms-auto">
                             <li className="nav-item m-1">
                             {!user ? (
