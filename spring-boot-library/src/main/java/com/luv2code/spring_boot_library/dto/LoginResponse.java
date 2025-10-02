@@ -17,5 +17,6 @@ public class LoginResponse {
     public static class UserInfo {
         private String username;
         private String email;
+        private String role;
     }
 }

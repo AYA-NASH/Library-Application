@@ -11,6 +11,8 @@ import SignupPage from "./Layouts/AuthPage/SignupPage";
 import { ReviewListPage } from "./Layouts/BookCheckoutPage/ReviewListPage/ReviewListPage";
 import RequireAuth from "./Auth/RquireAuth";
 import { ShelfPage } from "./Layouts/ShelfPage/ShelfPage";
+import { MessagesPage } from "./Layouts/MessagesPage/MessagesPage";
+import { ManageLibraryPage } from "./Layouts/ManageLibraryPage/ManageLibraryPage";
 
 function App() {
   return (
@@ -47,6 +49,22 @@ function InnerApp() {
             element={
               <RequireAuth>
                 <ShelfPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <RequireAuth>
+                <MessagesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth role="ADMIN">
+                <ManageLibraryPage />
               </RequireAuth>
             }
           />

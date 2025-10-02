@@ -47,7 +47,16 @@ function Navbar() {
                                     <Link className="nav-link" to="/shelf">
                                         Shelf
                                     </Link>
-                                </li>}
+                                </li>
+                            }
+
+                            {(user && user.role === 'ADMIN') &&
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/admin">
+                                        Admin
+                                    </Link>
+                                </li>
+                            }
                         </ul>
 
                         <ul className="navbar-nav ms-auto">

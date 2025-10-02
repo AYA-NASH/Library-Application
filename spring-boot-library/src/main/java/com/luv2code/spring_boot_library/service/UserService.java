@@ -50,10 +50,18 @@ public class UserService {
 
         if (auth.isAuthenticated()) {
             AppUser foundUser = userRepo.findByEmail(user.getEmail());
-            String token = jwtService.generateToken(user.getEmail());
+
+            if (foundUser == null) {
+                throw new RuntimeException("User not found after authentication");
+            }
+
+            String token = jwtService.generateToken(foundUser.getEmail(), foundUser.getRole());
+
             LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
                     foundUser.getUsername(),
-                    foundUser.getEmail());
+                    foundUser.getEmail(),
+                    foundUser.getRole()
+            );
             return new LoginResponse(token, userInfo);
         }
 
@@ -78,14 +86,20 @@ public class UserService {
                     user.setEmail(email);
                     user.setUsername(name);
                     user.setPassword("");
+                    user.setRole("USER");
                     userRepo.save(user);
                 }
 
-                String jwt = jwtService.generateToken(user.getEmail());
+                String jwt = jwtService.generateToken(user.getEmail(), user.getRole());
 
                 Map<String, Object> response = new HashMap<>();
                 response.put("token", jwt);
-                response.put("user", Map.of("email", user.getEmail(), "username", user.getUsername()));
+                response.put("user", Map.of(
+                        "email", user.getEmail(),
+                        "username", user.getUsername(),
+                        "role", user.getRole()
+                ));
+
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google token");

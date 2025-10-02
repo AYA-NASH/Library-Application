@@ -28,8 +28,9 @@ public class JwtService {
         }
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String role) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
 
         long now = System.currentTimeMillis();
         long expiration = now + 1000 * 60 * 60;
