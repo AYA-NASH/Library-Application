@@ -15,7 +15,7 @@ export const Carousel = () => {
     const [httpError, setHttpError] = useState(null);
     useEffect(() => {
         const fetchBooks = async () => {
-            const url: string = baseUrl + "/api/books?page=0&size=9";
+            const url: string = baseUrl + "/books?page=0&size=9";
             const response = await fetch(url);
 
             if (!response.ok) {

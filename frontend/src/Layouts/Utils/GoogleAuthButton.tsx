@@ -1,12 +1,13 @@
-// src/components/GoogleAuthButton.tsx
 import { GoogleLogin } from "@react-oauth/google";
+
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 const GoogleAuthButton = () => {
     const handleSuccess = async (credentialResponse) => {
         const token = credentialResponse.credential;
         console.log("Google Token:", token);
 
-        const response = await fetch("http://localhost:8080/google-login", {
+        const response = await fetch(`${baseUrl}/google-login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token }),

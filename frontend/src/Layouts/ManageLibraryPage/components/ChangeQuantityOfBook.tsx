@@ -2,34 +2,40 @@ import { useEffect, useState } from "react";
 import { BookModel } from "../../../models/BookModel";
 import { useAuth } from "../../../Auth/AuthContext";
 
-export const ChangeQuantityOfBook: React.FC<{book: BookModel, deleteBook: any}> = (props)=>{
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-    const {token} = useAuth();
+export const ChangeQuantityOfBook: React.FC<{
+    book: BookModel;
+    deleteBook: any;
+}> = (props) => {
+    const { token } = useAuth();
     const [quantity, setQuantity] = useState<number>(0);
     const [remaining, setRemaining] = useState<number>(0);
 
-    useEffect(()=>{
-        const fetchBookInState = ()=>{
+    useEffect(() => {
+        const fetchBookInState = () => {
             props.book.copies ? setQuantity(props.book.copies) : setQuantity(0);
-            props.book.copiesAvailable ? setRemaining(props.book.copiesAvailable) : setRemaining(0);
-        }
+            props.book.copiesAvailable
+                ? setRemaining(props.book.copiesAvailable)
+                : setRemaining(0);
+        };
 
         fetchBookInState();
     }, []);
 
-    async function increaseQuantity(){
-        const url = `http://localhost:8080/api/admin/secure/increase/book/quantity?bookId=${props.book.id}`;
+    async function increaseQuantity() {
+        const url = `${baseUrl}/admin/secure/increase/book/quantity?bookId=${props.book.id}`;
         const requestOptions = {
-            method: 'PUT',
+            method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        }
+                "Content-Type": "application/json",
+            },
+        };
 
         const quantityUpdateResponse = await fetch(url, requestOptions);
 
-        if(!quantityUpdateResponse.ok){
+        if (!quantityUpdateResponse.ok) {
             throw new Error("Something went wrong");
         }
 
@@ -37,84 +43,83 @@ export const ChangeQuantityOfBook: React.FC<{book: BookModel, deleteBook: any}> 
         setRemaining(remaining + 1);
     }
 
-    async function decreaseQuantity(){
-        const url = `http://localhost:8080/api/admin/secure/decrease/book/quantity?bookId=${props.book.id}`;
+    async function decreaseQuantity() {
+        const url = `${baseUrl}/admin/secure/decrease/book/quantity?bookId=${props.book.id}`;
         const requestOptions = {
-            method: 'PUT',
+            method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        }
+                "Content-Type": "application/json",
+            },
+        };
 
         const quantityUpdateResponse = await fetch(url, requestOptions);
 
-        if(!quantityUpdateResponse.ok){
+        if (!quantityUpdateResponse.ok) {
             throw new Error("Something went wrong");
         }
 
-        setQuantity(qt=> qt >= 0 ? qt - 1 : qt);
-        setRemaining(rem => rem >= 0 ? rem - 1 : rem);
+        setQuantity((qt) => (qt >= 0 ? qt - 1 : qt));
+        setRemaining((rem) => (rem >= 0 ? rem - 1 : rem));
     }
 
-    async function deleteBook(){
-        const url = `http://localhost:8080/api/admin/secure/delete/book?bookId=${props.book.id}`;
+    async function deleteBook() {
+        const url = `${baseUrl}/admin/secure/delete/book?bookId=${props.book.id}`;
         const requestOptions = {
-            method: 'DELETE',
+            method: "DELETE",
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        }
+                "Content-Type": "application/json",
+            },
+        };
 
         const updateResponse = await fetch(url, requestOptions);
 
-        if(!updateResponse.ok){
+        if (!updateResponse.ok) {
             throw new Error("Something went wrong");
         }
 
         props.deleteBook();
     }
 
-    return(
+    return (
         <div className="card mt-3 shadow p-3 mb-3 bg-body rounded">
             <div className="row g-0">
                 <div className="col-md-2">
                     <div className="d-none d-lg-block">
-                        {props.book.img ?
+                        {props.book.img ? (
                             <img
                                 src={props.book.img}
                                 width="123"
                                 height="196"
                                 alt="book"
                             />
-                        : 
+                        ) : (
                             <img
                                 src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
                                 width={123}
                                 height={196}
                                 alt="book"
                             />
-                        }
-                       
+                        )}
                     </div>
 
                     <div className="d-lg-none d-flex justify-content-center align-items-center">
-                        {props.book.img ?
+                        {props.book.img ? (
                             <img
                                 src={props.book.img}
                                 width="123"
                                 height="196"
                                 alt="book"
                             />
-                        : 
+                        ) : (
                             <img
                                 src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
                                 width={123}
                                 height={196}
                                 alt="book"
                             />
-                        }
+                        )}
                     </div>
                 </div>
 
@@ -128,24 +133,43 @@ export const ChangeQuantityOfBook: React.FC<{book: BookModel, deleteBook: any}> 
 
                 <div className="mt-3 col-md-4">
                     <div className="d-flex justify-content-center align-items-center">
-                        <p>Total Quantity: <b>{quantity}</b></p>
+                        <p>
+                            Total Quantity: <b>{quantity}</b>
+                        </p>
                     </div>
-                    
+
                     <div className="d-flex justify-content-center align-items-center">
-                        <p>Books Remaining: <b>{remaining}</b></p>
+                        <p>
+                            Books Remaining: <b>{remaining}</b>
+                        </p>
                     </div>
                 </div>
 
                 <div className="mt-3 col-md-1">
                     <div className="d-flex justify-content-start">
-                        <button className="m-1 btn btn-md btn-danger" onClick={deleteBook}> Delete </button>
+                        <button
+                            className="m-1 btn btn-md btn-danger"
+                            onClick={deleteBook}
+                        >
+                            {" "}
+                            Delete{" "}
+                        </button>
                     </div>
                 </div>
 
-                <button className="m-1 btn btn-md btn-dark text-white" onClick={increaseQuantity}>Add Quantity</button>
-                <button className="m-1 btn btn-md btn-warning" onClick={decreaseQuantity}>Decrease Quantity</button>
-
+                <button
+                    className="m-1 btn btn-md btn-dark text-white"
+                    onClick={increaseQuantity}
+                >
+                    Add Quantity
+                </button>
+                <button
+                    className="m-1 btn btn-md btn-warning"
+                    onClick={decreaseQuantity}
+                >
+                    Decrease Quantity
+                </button>
             </div>
         </div>
     );
-}
+};

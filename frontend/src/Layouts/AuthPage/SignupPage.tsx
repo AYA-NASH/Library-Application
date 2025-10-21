@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GoogleAuthButton from "../Utils/GoogleAuthButton";
 
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const SignupPage = () => {
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
@@ -21,7 +23,7 @@ const SignupPage = () => {
         }
 
         const newUser = { email, username, password };
-        const registerUrl = "http://localhost:8080/register";
+        const registerUrl = `${baseUrl}/register`;
         try {
             const response = await fetch(registerUrl, {
                 method: "POST",

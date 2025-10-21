@@ -41,8 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(HttpMethod.GET, "/**")
                         .permitAll()
-                        .requestMatchers("register", "login", "google-login")
-                        .permitAll()
+                        .requestMatchers("/api/register", "/api/login", "/api/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(

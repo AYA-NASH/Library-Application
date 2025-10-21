@@ -14,12 +14,12 @@ public class AdminController {
     private AdminService adminService;
 
     @Autowired
-    public AdminController(AdminService adminService){
+    public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
 
     @PutMapping("/secure/decrease/book/quantity")
-    public void decreaseBookQuantity(@RequestParam Long bookId) throws Exception{
+    public void decreaseBookQuantity(@RequestParam Long bookId) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
@@ -32,7 +32,7 @@ public class AdminController {
     }
 
     @PutMapping("/secure/increase/book/quantity")
-    public void increaseBookQuantity(@RequestParam Long bookId) throws Exception{
+    public void increaseBookQuantity(@RequestParam Long bookId) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
@@ -45,7 +45,7 @@ public class AdminController {
     }
 
     @PostMapping("/secure/add/book")
-    public void postBook(@RequestBody AddBookRequest addBookRequest) throws Exception{
+    public void postBook(@RequestBody AddBookRequest addBookRequest) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
@@ -58,7 +58,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/secure/delete/book")
-    public void deleteBook(@RequestParam Long bookId) throws Exception{
+    public void deleteBook(@RequestParam Long bookId) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));

@@ -4,7 +4,9 @@ import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { ChangeQuantityOfBook } from "./ChangeQuantityOfBook";
 
-export const ChangeQuantityOfBooks = ()=>{
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
+export const ChangeQuantityOfBooks = () => {
     const [books, setBooks] = useState<BookModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [httpError, setHttpError] = useState(null);
@@ -16,7 +18,9 @@ export const ChangeQuantityOfBooks = ()=>{
 
     useEffect(() => {
         const fetchBooks = async () => {
-            const url = `http://localhost:8080/api/books?page=${currentPage - 1}&size=${booksPerPage}`;
+            const url = `${baseUrl}/books?page=${
+                currentPage - 1
+            }&size=${booksPerPage}`;
 
             const response = await fetch(url);
 
@@ -76,26 +80,37 @@ export const ChangeQuantityOfBooks = ()=>{
         );
     }
 
-    return(
+    return (
         <div className="container mt-3">
-            {totalAmountOfBooks > 0 ?
+            {totalAmountOfBooks > 0 ? (
                 <>
                     <div className="mt-3">
                         <h3>Number of results: ({totalAmountOfBooks})</h3>
                     </div>
 
                     <p>
-                        {indexOfFirstBook + 1} to {lastItem} of {totalAmountOfBooks} items:
+                        {indexOfFirstBook + 1} to {lastItem} of{" "}
+                        {totalAmountOfBooks} items:
                     </p>
-                    {books.map(book=>(
-                        <ChangeQuantityOfBook book={book} key={book.id} deleteBook={deleteBook}/>
+                    {books.map((book) => (
+                        <ChangeQuantityOfBook
+                            book={book}
+                            key={book.id}
+                            deleteBook={deleteBook}
+                        />
                     ))}
                 </>
-                :
+            ) : (
                 <p> Add a book before changing the quantity </p>
-            }
+            )}
 
-            {totalPages > 0 && <Pagination currentPage={currentPage} totalPages={totalPages} paginate={paginate}/>}
+            {totalPages > 0 && (
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    paginate={paginate}
+                />
+            )}
         </div>
     );
-}
+};
