@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './ExploreTopBooks.css'
 
 export const ExploreTopBooks = ()=>{
@@ -7,7 +8,9 @@ export const ExploreTopBooks = ()=>{
                 <div >
                     <h1 className='display-5 fw-bold'>Find your next adventure</h1>
                     <p className='col-md-8 fs-4'>Where whould you like to go next?</p>
-                    <a type='button' className='btn btn-dark btn-lg text-white' href="#">Explore top books</a>
+                    <Link className='btn btn-dark btn-lg text-white' to={'search'}>
+                        Explore top books
+                    </Link>
                 </div>
             </div>
         </div>

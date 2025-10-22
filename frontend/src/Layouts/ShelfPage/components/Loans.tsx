@@ -19,6 +19,14 @@ export const Loans = () => {
 
     const [checkout, setCheckout] = useState(false);
 
+    
+    const [lateReturnMessage, setLateReturnMessage] = useState<string | null>(null);
+
+    const lateReturnMsg = () => {
+        setLateReturnMessage("You returned a late book. Please visit the Fees page to pay your fees before checking out new books.");
+        setTimeout(() => setLateReturnMessage(null), 5000); // auto-hide after 5s
+    };
+
     useEffect(() => {
         const fetchUserCurrentLoans = async () => {
             if (user) {
@@ -62,7 +70,11 @@ export const Loans = () => {
         );
     }
 
-    async function returnBook(bookId: number) {
+
+    async function returnBook(shelfCurrentLoan: ShelfCurrentLoans) {
+        const bookId = shelfCurrentLoan.book.id;
+        const isLate = shelfCurrentLoan.daysLeft < 0;
+
         const url = `${baseUrl}/books/secure/return?bookId=${bookId}`;
         const requestOptions = {
             method: "PUT",
@@ -79,6 +91,10 @@ export const Loans = () => {
         }
 
         setCheckout(!checkout);
+
+        if (isLate) {   
+            lateReturnMsg();
+        }
     }
 
     async function renewLoan(bookId: number) {
@@ -102,6 +118,11 @@ export const Loans = () => {
 
     return (
         <div>
+            {lateReturnMessage && (
+                <div className="alert alert-danger mt-3" role="alert">
+                    {lateReturnMessage}
+                </div>
+            )}
             {/* Desktop */}
             <div className="d-none d-lg-block mt-2">
                 {shelfCurrentLoans.length > 0 ? (

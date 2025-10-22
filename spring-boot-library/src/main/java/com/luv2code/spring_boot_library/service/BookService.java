@@ -31,27 +31,30 @@ public class BookService {
     private PaymentRepository paymentRepository;
 
     @Autowired
-    public BookService(BookRepository bookRepository, CheckoutRepository checkoutRepository, HistoryRepository historyRepository, PaymentRepository paymentService){
+    public BookService(BookRepository bookRepository, CheckoutRepository checkoutRepository, HistoryRepository historyRepository, PaymentRepository paymentRepository){
         this.bookRepository = bookRepository;
         this.checkoutRepository = checkoutRepository;
         this.historyRepository = historyRepository;
         this.paymentRepository = paymentRepository;
     }
 
-    public Book checkoutBook(String userEmail, Long bookId) throws Exception{
+    public Book checkoutBook (String userEmail, Long bookId) throws Exception {
+
         Optional<Book> book = bookRepository.findById(bookId);
+
         Checkout validateCheckout = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId);
 
-        if(book.isEmpty() || validateCheckout != null || book.get().getCopiesAvailable() <= 0){
-            throw new Exception("Book doesn't exist or already checked out by the user");
+        if (!book.isPresent() || validateCheckout != null || book.get().getCopiesAvailable() <= 0) {
+            throw new Exception("Book doesn't exist or already checked out by user");
         }
 
         List<Checkout> currentBooksCheckedOut = checkoutRepository.findCheckoutsByUserEmail(userEmail);
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         boolean bookNeedsReturned = false;
 
-        for(Checkout checkout: currentBooksCheckedOut){
+        for (Checkout checkout: currentBooksCheckedOut) {
             Date d1 = sdf.parse(checkout.getReturnDate());
             Date d2 = sdf.parse(LocalDate.now().toString());
 
@@ -59,7 +62,7 @@ public class BookService {
 
             double differenceInTime = time.convert(d1.getTime() - d2.getTime(), TimeUnit.MILLISECONDS);
 
-            if(differenceInTime < 0){
+            if (differenceInTime < 0) {
                 bookNeedsReturned = true;
                 break;
             }
@@ -67,12 +70,11 @@ public class BookService {
 
         Payment userPayment = paymentRepository.findByUserEmail(userEmail);
 
-        if((userPayment != null && userPayment.getAmount() > 0) ||
-                (userPayment != null && bookNeedsReturned)){
+        if ((userPayment != null && userPayment.getAmount() > 0) || (userPayment != null && bookNeedsReturned)) {
             throw new Exception("Outstanding fees");
         }
 
-        if(userPayment == null){
+        if (userPayment == null) {
             Payment payment = new Payment();
             payment.setAmount(00.00);
             payment.setUserEmail(userEmail);
@@ -141,16 +143,18 @@ public class BookService {
         return shelfCurrentLoansResponses;
     }
 
-    public void returnBook(String userEmail, Long bookId) throws Exception{
+    public void returnBook (String userEmail, Long bookId) throws Exception {
+
         Optional<Book> book = bookRepository.findById(bookId);
 
         Checkout validateCheckout = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId);
 
-        if(!book.isPresent() || validateCheckout == null){
-            throw new Exception("Book doesn't exist or not checked out by user");
+        if (!book.isPresent() || validateCheckout == null) {
+            throw new Exception("Book does not exist or not checked out by user");
         }
 
         book.get().setCopiesAvailable(book.get().getCopiesAvailable() + 1);
+
         bookRepository.save(book.get());
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -162,14 +166,15 @@ public class BookService {
 
         double differenceInTime = time.convert(d1.getTime() - d2.getTime(), TimeUnit.MILLISECONDS);
 
-        if(differenceInTime < 0){
-            Payment payment =  paymentRepository.findByUserEmail(userEmail);
+        if (differenceInTime < 0) {
+            Payment payment = paymentRepository.findByUserEmail(userEmail);
 
             payment.setAmount(payment.getAmount() + (differenceInTime * -1));
             paymentRepository.save(payment);
         }
 
         checkoutRepository.deleteById(validateCheckout.getId());
+
         History history = new History(
                 userEmail,
                 validateCheckout.getCheckoutDate(),
@@ -179,6 +184,7 @@ public class BookService {
                 book.get().getDescription(),
                 book.get().getImg()
         );
+
         historyRepository.save(history);
     }
 

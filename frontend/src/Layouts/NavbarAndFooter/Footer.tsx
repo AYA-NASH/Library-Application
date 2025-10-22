@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const mainColor = {
     backgroundColor: "#0f0f0f",
 };
@@ -13,14 +15,14 @@ export const Footer = () => {
                 </p>
                 <ul className="nav navbar-dark col-md-4 jsutify-content-end">
                     <li className="nav-item">
-                        <a href="#" className="nav-link px-2 text-white">
+                        <Link to={'/'} className="nav-link px-2 text-white">
                             Home
-                        </a>
+                        </Link>
                     </li>
                     <li className="nav-item">
-                        <a href="#" className="nav-link px-2 text-white">
+                        <Link to="search" className="nav-link px-2 text-white">
                             Search Books
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </footer>

@@ -45,9 +45,7 @@ export const BookCheckoutPage = () => {
 
     const fetchIsCheckedout = async () => {
         if (isAuthenticated) {
-            const url =
-                baseUrl +
-                `/books/secure/is-checked-out/byuser?bookId=${bookId}`;
+            const url =`${baseUrl}/books/secure/is-checked-out/byuser?bookId=${bookId}`;
             const response = await fetch(url, {
                 method: "GET",
                 headers: {

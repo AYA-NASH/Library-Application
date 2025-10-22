@@ -22,7 +22,7 @@ export const Messages = () => {
         const fetchUserMessages = async () => {
             const url = `${
                 import.meta.env.VITE_API_BASE_URL
-            }/api/messages/search/findByUserEmail?userEmail=${
+            }/messages/search/findByUserEmail?userEmail=${
                 user.email
             }&page=${currentPage - 1}&size=${messagesPerPage}`;
             const requestOptions = {

@@ -23,20 +23,21 @@ export const PaymentPage = () => {
                 const url = `${baseUrl}/payments/search/findByUserEmail?userEmail=${user.email}`;
 
                 const requestOptions = {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
                 };
 
                 const paymentResponse = await fetch(url, requestOptions);
 
-                if (!paymentResponse.ok) {
-                    throw new Error("something went wrong");
+                if (paymentResponse.status === 404) {
+                    setFees(0); // no payment record yet
+                } else if (!paymentResponse.ok) {
+                    throw new Error("Something went wrong!");
+                } else {
+                    const paymentResponseJson = await paymentResponse.json();
+                    setFees(paymentResponseJson.amount);
                 }
 
-                const paymentResponseJson = await paymentResponse.json();
-                setFees(paymentResponseJson.amount);
                 setLoadingFees(false);
             }
         };
@@ -57,20 +58,16 @@ export const PaymentPage = () => {
 
         setSubmitDisabled(true);
 
-        const paymentInfo = new PaymentInfoRequest(
-            Math.round(fees * 100),
-            "USD",
-            user.email
-        );
+        let paymentInfo = new PaymentInfoRequest(Math.round(fees * 100), 'USD', user.email);
 
         const url = `${baseUrl}/payment/secure/payment-intent`;
         const requestOptions = {
-            method: "POST",
+            method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`,
-                "Content-Type": "application.json",
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(paymentInfo),
+            body: JSON.stringify(paymentInfo)
         };
 
         const stripeResponse = await fetch(url, requestOptions);
@@ -78,50 +75,43 @@ export const PaymentPage = () => {
         if (!stripeResponse.ok) {
             setHttpError(true);
             setSubmitDisabled(false);
-            throw new Error("Something wrong");
+            throw new Error('Something went wrong!');
         }
 
         const stripeResponseJson = await stripeResponse.json();
 
-        stripe
-            .confirmCardPayment(
-                stripeResponseJson.client_secret,
-                {
-                    payment_method: {
-                        card: elements.getElement(CardElement)!,
-                        billing_details: {
-                            email: user.email,
-                        },
-                    },
-                },
-                { handleActions: false }
-            )
-            .then(async function (result: any) {
-                if (result.error) {
-                    setSubmitDisabled(false);
-                    alert("There was an error");
-                } else {
-                    const url = `${baseUrl}/payment/secure/payment-complete`;
-                    const requestOptions = {
-                        method: "PUT",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application.json",
-                        },
-                    };
-
-                    const stripeResponse = await fetch(url, requestOptions);
-
-                    if (!stripeResponse.ok) {
-                        setHttpError(true);
-                        setSubmitDisabled(false);
-                        throw new Error("Something wrong");
+        stripe.confirmCardPayment(
+            stripeResponseJson.client_secret, {
+                payment_method: {
+                    card: elements.getElement(CardElement)!,
+                    billing_details: {
+                        email: user.email
                     }
-
-                    setFees(0);
-                    setSubmitDisabled(false);
                 }
-            });
+            }, {handleActions: false}
+        ).then(async function (result: any) {
+            if (result.error) {
+                setSubmitDisabled(false)
+                alert('There was an error')
+            } else {
+                const url = `${baseUrl}/payment/secure/payment-complete`;
+                const requestOptions = {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                };
+                const stripeResponse = await fetch(url, requestOptions);
+                if (!stripeResponse.ok) {
+                    setHttpError(true)
+                    setSubmitDisabled(false)
+                    throw new Error('Something went wrong!')
+                }
+                setFees(0);
+                setSubmitDisabled(false);
+            }
+        });
         setHttpError(false);
     }
 
@@ -137,40 +127,34 @@ export const PaymentPage = () => {
         );
     }
 
-    return (
-        <div className="container">
-            {fees > 0 && (
-                <div className="card mt-3">
-                    <h5 className="card-header">
-                        Fees Pending:{" "}
-                        <span className="text-danger">${fees}</span>
-                    </h5>
-
-                    <div className="card-body">
-                        <h5 className="card-title mb-3">Credit Card</h5>
-                        <CardElement id="card-element" />
-                        <button
-                            disabled={submitDisabled}
-                            type="button"
-                            className="btn btn-md btn-dark text-white mt-3"
-                            onClick={checkout}
-                        >
-                            Pay Fees
-                        </button>
-                    </div>
+    return(
+        <div className='container'>
+            {fees !== null && fees > 0 && <div className='card mt-3'>
+                <h5 className='card-header'>Fees pending: <span className='text-danger'>${fees}</span></h5>
+                <div className='card-body'>
+                    <h5 className='card-title mb-3'>Credit Card</h5>
+                    <CardElement id='card-element' />
+                    <button disabled={submitDisabled} type='button' className='btn btn-md btn-dark text-white mt-3' 
+                        onClick={checkout}>
+                        Pay fees
+                    </button>
                 </div>
-            )}
+            </div>}
 
-            {fees === 0 && (
+            {fees !== null && fees === 0 && (
                 <div className="mt-3">
-                    <h5>You have no fees!</h5>
-                    <Link type="button" className="btn btn-dark" to={"/search"}>
+                    <h5>No fees yet 🎉</h5>
+                    <p>
+                        This page tracks any late return fees for borrowed books.
+                        Make sure to return books on time to keep it empty!
+                    </p>
+                    <Link type="button" className="btn btn-dark text-white" to="/search">
                         Explore top books
                     </Link>
                 </div>
             )}
-
-            {submitDisabled && <SpinnerLoading />}
+            
+            {submitDisabled && <SpinnerLoading/>}
         </div>
     );
 };

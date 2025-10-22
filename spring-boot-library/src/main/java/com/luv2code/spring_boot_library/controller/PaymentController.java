@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/payment/secure")
@@ -33,17 +30,10 @@ public class PaymentController {
         return new ResponseEntity<>(paymentString, HttpStatus.OK);
     }
 
-    @PostMapping("/payment-complete")
+    @PutMapping("/payment-complete")
     public ResponseEntity<String> stripePaymentComplete() throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
-
-//        boolean isAdmin = authentication.getAuthorities().stream()
-//                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-//
-//        if (!isAdmin) {
-//            throw new RuntimeException("Access denied: Administration page only.");
-//        }
 
         return paymentService.stripePayment(userEmail);
     }

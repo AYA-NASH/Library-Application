@@ -23,7 +23,7 @@ export const ReviewListPage = ()=>{
 
     useEffect(() => {
             const fetchBookReviews = async () => {
-                const url: string = baseUrl + `/api/reviews/search/findByBookId?bookId=${bookId}&page=${currentPage - 1}&size=${reviewsPerPage}`;
+                const url: string = baseUrl + `/reviews/search/findByBookId?bookId=${bookId}&page=${currentPage - 1}&size=${reviewsPerPage}`;
                 const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error("Something went wrong!");

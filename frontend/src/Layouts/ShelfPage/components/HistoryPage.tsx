@@ -23,7 +23,7 @@ export const HistoryPage = () => {
                 console.log("User Data: -------------------------------", user);
                 const url = `${
                     import.meta.env.VITE_API_BASE_URL
-                }/api/histories/search/findBooksByUserEmail?userEmail=${
+                }/histories/search/findBooksByUserEmail?userEmail=${
                     user.email
                 }&page=${currentPage - 1}&size=5`;
                 console.log(url);

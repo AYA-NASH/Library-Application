@@ -50,6 +50,14 @@ function Navbar() {
                                 </li>
                             }
 
+                            {user &&
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/fees">
+                                        Fees
+                                    </Link>
+                                </li>
+                            }
+
                             {(user && user.role === 'ADMIN') &&
                                 <li className="nav-item">
                                     <Link className="nav-link" to="/admin">

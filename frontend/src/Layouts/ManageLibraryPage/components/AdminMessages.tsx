@@ -27,8 +27,8 @@ export const AdminMessages = () => {
         const fetchUserMessages = async () => {
             if (user) {
                 const url = `${
-                    process.env.REACT_APP_API
-                }/api/messages/search/findByClosed?closed=false&page=${
+                    import.meta.env.VITE_API_BASE_URL
+                }/messages/search/findByClosed?closed=false&page=${
                     currentPage - 1
                 }&size=${messagesPerPage}`;
                 const requestOptions = {
