@@ -12,8 +12,6 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 @Configuration
 public class DataRestConfig implements RepositoryRestConfigurer {
 
-    private String allowedOrigins = "http://localhost:3000";
-
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config,
                                                      CorsRegistry cors) {
@@ -27,8 +25,6 @@ public class DataRestConfig implements RepositoryRestConfigurer {
         disableHttpMethods(config, Review.class, unSupported);
         disableHttpMethods(config, Message.class, unSupported);
 
-        cors.addMapping(config.getBasePath() + "/**")
-                .allowedOrigins(allowedOrigins);
     }
 
     private void disableHttpMethods(RepositoryRestConfiguration config,

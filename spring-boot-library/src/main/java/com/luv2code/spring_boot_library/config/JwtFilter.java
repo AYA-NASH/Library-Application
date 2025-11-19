@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,43 +16,49 @@ import com.luv2code.spring_boot_library.service.JwtService;
 import com.luv2code.spring_boot_library.service.MyUserDetailsService;
 
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+	private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
 
-    @Autowired
-    ApplicationContext context;
+	@Autowired
+	private JwtService jwtService;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
-        String token = null;
-        String email = null;
+	@Autowired
+	private MyUserDetailsService userDetailsService;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            email = jwtService.extractEmail(token);
-        }
-        // check if user is Authenticated
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // Validating token and Checking for email existence.
-            UserDetails userDetails = context.getBean(MyUserDetailsService.class).loadUserByUsername(email);
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+		String authHeader = request.getHeader("Authorization");
+		String token = null;
+		String email = null;
 
-            if (jwtService.validateToken(token, userDetails)) {
-                // create Authentication Object
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                // link the Auth Obj with the request
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                // give the token to the Authentication Context
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-        }
+		try {
+			if (authHeader != null && authHeader.startsWith("Bearer ")) {
+				token = authHeader.substring(7);
+				email = jwtService.extractEmail(token);
+			}
+			if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+				UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+				if (jwtService.validateToken(token, userDetails)) {
+					UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+							userDetails, null, userDetails.getAuthorities());
+					authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					SecurityContextHolder.getContext().setAuthentication(authToken);
+				}
+			}
+		} catch (io.jsonwebtoken.ExpiredJwtException ex) {
+			logger.warn("JWT expired: {}", ex.getMessage());
+		} catch (io.jsonwebtoken.JwtException ex) {
+			logger.warn("Invalid JWT: {}", ex.getMessage());
+		} catch (Exception ex) {
+			logger.error("Error in JwtFilter: {}", ex.getMessage(), ex);
+		}
 
-        filterChain.doFilter(request, response);
-    }
+		filterChain.doFilter(request, response);
+	}
 }

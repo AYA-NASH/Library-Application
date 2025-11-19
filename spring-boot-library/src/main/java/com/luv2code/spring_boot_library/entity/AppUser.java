@@ -22,6 +22,6 @@ public class AppUser {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "role")
+    @Column(name = "role", nullable = false, columnDefinition = "varchar(255) default 'USER'")
     private String role;
 }

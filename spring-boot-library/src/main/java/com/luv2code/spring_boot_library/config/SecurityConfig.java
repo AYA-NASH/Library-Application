@@ -35,18 +35,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        http.cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.GET, "/**")
-                        .permitAll()
-                        .requestMatchers("/api/register", "/api/login", "/api/**").permitAll()
-                        .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http
+            .cors(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(request -> request
+                    .requestMatchers("/api/admin/secure/**").hasRole("ADMIN")
+                    .requestMatchers("/api/books/secure/**", "/api/reviews/secure/**",
+                            "/api/messages/secure/**", "/api/payment/secure/**")
+                    .authenticated()
+                    .requestMatchers(HttpMethod.GET, "/api/books/**", "/api/reviews/**", "/api/messages/**", "/api/histories/**", "/api/payments/**").permitAll()
+                    .requestMatchers("/api/register", "/api/login", "/api/google-login").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

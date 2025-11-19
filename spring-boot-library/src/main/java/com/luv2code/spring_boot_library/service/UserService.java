@@ -7,6 +7,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.luv2code.spring_boot_library.dao.UserRepository;
 import com.luv2code.spring_boot_library.dto.LoginResponse;
 import com.luv2code.spring_boot_library.entity.AppUser;
+import com.luv2code.spring_boot_library.requestmodel.SignupRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +37,24 @@ public class UserService {
     @Value("${google.client.id}")
     private String clientId;
 
+    private boolean isNewUser = true;
+
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
-    public AppUser register(AppUser user) {
-        user.setPassword(encoder.encode(user.getPassword()));
-        System.out.println("Calling register method at the UserService");
-        return userRepo.save(user);
+    public void register(SignupRequest newUser) {
+
+        if(userRepo.existsByEmail(newUser.getEmail())){
+            throw new RuntimeException("User already registered");
+        }
+
+        AppUser user = new AppUser();
+        user.setUsername(newUser.getUsername());
+        user.setEmail(newUser.getEmail());
+        user.setPassword(encoder.encode(newUser.getPassword()));
+
+        user.setRole("USER");
+
+        userRepo.save(user);
     }
 
     public LoginResponse verify(AppUser user) {
@@ -88,6 +101,8 @@ public class UserService {
                     user.setPassword("");
                     user.setRole("USER");
                     userRepo.save(user);
+
+                    isNewUser = false;
                 }
 
                 String jwt = jwtService.generateToken(user.getEmail(), user.getRole());
@@ -99,6 +114,7 @@ public class UserService {
                         "username", user.getUsername(),
                         "role", user.getRole()
                 ));
+                response.put("isNewUser", isNewUser);
 
                 return ResponseEntity.ok(response);
             } else {
