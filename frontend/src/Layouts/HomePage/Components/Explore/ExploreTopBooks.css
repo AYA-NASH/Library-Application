@@ -1,7 +1,7 @@
 .ExploreTopBooks{
     background-image: linear-gradient( rgba(0, 0, 0, 0.7),
                     rgba(0, 0, 0, 0.7) ), 
-                    url("../../../src/Images/PublicImages/image-2.jpg");
+                    url("../../../../Images/PublicImages/image-2.jpg");
     opacity: var(--mainOpacity);
     height: 25em !important;
 }

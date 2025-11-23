@@ -4,6 +4,7 @@ import ShelfCurrentLoans from "../../../models/ShelfCurrentLoans";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { LoansModal } from "./LoansModal";
 import { useAuth } from "../../../Auth/AuthContext";
+import placeholder from "../../../Images/BooksImages/book-luv2code-1000.png";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -142,7 +143,7 @@ export const Loans = () => {
                                             />
                                         ) : (
                                             <img
-                                                src={require("./../../../Images/BooksImages/book-luv2code-1000.png")}
+                                                src={placeholder}
                                                 width="226"
                                                 height="349"
                                                 alt="Book"
@@ -248,7 +249,7 @@ export const Loans = () => {
                                         />
                                     ) : (
                                         <img
-                                            src={require("./../../../Images/BooksImages/book-luv2code-1000.png")}
+                                            src={placeholder}
                                             width="226"
                                             height="349"
                                             alt="Book"

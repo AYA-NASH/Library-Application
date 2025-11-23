@@ -70,7 +70,7 @@ public class BookService {
 
         Payment userPayment = paymentRepository.findByUserEmail(userEmail);
 
-        if ((userPayment != null && userPayment.getAmount() > 0) || (userPayment != null && bookNeedsReturned)) {
+        if ((userPayment != null && userPayment.getAmount() > 0) || bookNeedsReturned) {
             throw new Exception("Outstanding fees");
         }
 

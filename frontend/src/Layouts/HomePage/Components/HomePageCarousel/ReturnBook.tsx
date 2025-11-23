@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { BookModel } from "../../../../models/BookModel";
 import { Link } from "react-router-dom";
+import placeholder from "../../../../Images/BooksImages/book-luv2code-1000.png";
 
 export const ReturnBook: FC<{ book: BookModel }> = (props) => {
     const { img, title, author } = { ...props.book };
@@ -10,12 +11,7 @@ export const ReturnBook: FC<{ book: BookModel }> = (props) => {
                 {img ? (
                     <img src={img} width={151} height={233} alt="book" />
                 ) : (
-                    <img
-                        src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
-                        width={151}
-                        height={233}
-                        alt="book"
-                    />
+                    <img src={placeholder} width={151} height={233} alt="book" />
                 )}
                 <h6 className="mt-2">{title}</h6>
                 <p>{author}</p>

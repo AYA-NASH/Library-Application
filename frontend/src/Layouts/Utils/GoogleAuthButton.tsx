@@ -3,7 +3,7 @@ import { GoogleLogin } from "@react-oauth/google";
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 const GoogleAuthButton = () => {
-    const handleSuccess = async (credentialResponse) => {
+    const handleSuccess = async (credentialResponse: any) => {
         const token = credentialResponse.credential;
         console.log("Google Token:", token);
 
