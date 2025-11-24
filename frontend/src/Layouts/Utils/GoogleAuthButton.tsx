@@ -10,7 +10,6 @@ const GoogleAuthButton = () => {
 
     const handleSuccess = async (credentialResponse: any) => {
         const token = credentialResponse.credential;
-        console.log("Google Token:", token);
 
         const response = await fetch(`${baseUrl}/google-login`, {
             method: "POST",

@@ -20,13 +20,11 @@ export const HistoryPage = () => {
     useEffect(() => {
         const fetchUserHistory = async () => {
             if (token) {
-                console.log("User Data: -------------------------------", user);
                 const url = `${
                     import.meta.env.VITE_API_BASE_URL
                 }/histories/search/findBooksByUserEmail?userEmail=${
                     user.email
                 }&page=${currentPage - 1}&size=5`;
-                console.log(url);
                 const requestOptions = {
                     method: "GET",
                     headers: {

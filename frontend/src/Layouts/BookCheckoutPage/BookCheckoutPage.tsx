@@ -81,7 +81,6 @@ export const BookCheckoutPage = () => {
             }
 
             const responseJson = await response.json();
-            console.log("Fetch Current Loans Count Response: ", responseJson);
             setCurrentLoansCount(responseJson);
         }
         setIsLoadingCurrentLoansCount(false);

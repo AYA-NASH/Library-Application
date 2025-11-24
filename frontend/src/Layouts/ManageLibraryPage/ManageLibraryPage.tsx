@@ -33,7 +33,6 @@ export const ManageLibraryPage = ()=>{
         navigate("/"); 
     }
 
-    console.log("Admin Page")
     return (
         <div className="container">
             <div className="mt-5">
