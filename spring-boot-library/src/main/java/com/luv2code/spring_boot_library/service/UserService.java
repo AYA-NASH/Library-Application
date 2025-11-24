@@ -34,7 +34,7 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
-    @Value("${google.client.id}")
+    @Value("${google.client.id:}")
     private String clientId;
 
     private boolean isNewUser = true;
@@ -82,6 +82,9 @@ public class UserService {
     }
 
     public ResponseEntity<?> loginWithGoogle(String googleToken) {
+        if (clientId == null || clientId.isBlank()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Google login is not configured");
+        }
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(clientId))
                 .build();
