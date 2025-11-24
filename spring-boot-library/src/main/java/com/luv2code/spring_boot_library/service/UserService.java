@@ -5,7 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.luv2code.spring_boot_library.dao.UserRepository;
-import com.luv2code.spring_boot_library.dto.LoginResponse;
+import com.luv2code.spring_boot_library.responsemodel.LoginResponse;
 import com.luv2code.spring_boot_library.entity.AppUser;
 import com.luv2code.spring_boot_library.requestmodel.SignupRequest;
 import org.springframework.beans.factory.annotation.Autowired;

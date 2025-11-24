@@ -24,10 +24,13 @@ public class PaymentController {
     @PostMapping("/payment-intent")
     public ResponseEntity<String> createPaymentIntent(@RequestBody PaymentInfoRequest paymentInfoRequest)
         throws StripeException{
-        PaymentIntent paymentIntent = paymentService.createPaymentIntent(paymentInfoRequest);
-        String paymentString = paymentIntent.toJson();
-
-        return new ResponseEntity<>(paymentString, HttpStatus.OK);
+        try {
+            PaymentIntent paymentIntent = paymentService.createPaymentIntent(paymentInfoRequest);
+            String paymentString = paymentIntent.toJson();
+            return new ResponseEntity<>(paymentString, HttpStatus.OK);
+        } catch (IllegalStateException ex) {
+            return new ResponseEntity<>("Stripe is not configured", HttpStatus.SERVICE_UNAVAILABLE);
+        }
     }
 
     @PutMapping("/payment-complete")

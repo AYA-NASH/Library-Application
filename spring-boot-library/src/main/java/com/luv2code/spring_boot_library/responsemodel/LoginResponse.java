@@ -1,4 +1,4 @@
-package com.luv2code.spring_boot_library.dto;
+package com.luv2code.spring_boot_library.responsemodel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,3 +20,5 @@ public class LoginResponse {
         private String role;
     }
 }
+
+

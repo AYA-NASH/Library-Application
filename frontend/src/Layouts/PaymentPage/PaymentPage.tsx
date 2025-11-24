@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import PaymentInfoRequest from "../../models/PaymentInfoRequest";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
+const hasStripe = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 export const PaymentPage = () => {
     const { user, token } = useAuth();
@@ -113,6 +114,15 @@ export const PaymentPage = () => {
             }
         });
         setHttpError(false);
+    }
+
+    if (!hasStripe) {
+        return (
+            <div className="container m-5">
+                <h5>Payments are not configured</h5>
+                <p>You can still use the app without payments. To enable payments, set VITE_STRIPE_PUBLISHABLE_KEY on the frontend build and STRIPE_KEY_SECRET on the backend.</p>
+            </div>
+        );
     }
 
     if (loadingFees) {

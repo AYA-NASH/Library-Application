@@ -224,7 +224,7 @@ export const Loans = () => {
                 ) : (
                     <>
                         <h3 className="mt-3">Currently no loans</h3>
-                        <Link className="btn btn-primary" to={`search`}>
+                        <Link className="btn btn-primary" to={`/search`}>
                             Search for a new book
                         </Link>
                     </>
@@ -324,7 +324,7 @@ export const Loans = () => {
                 ) : (
                     <>
                         <h3 className="mt-3">Currently no loans</h3>
-                        <Link className="btn btn-primary" to={`search`}>
+                        <Link className="btn btn-primary" to={`/search`}>
                             Search for a new book
                         </Link>
                     </>

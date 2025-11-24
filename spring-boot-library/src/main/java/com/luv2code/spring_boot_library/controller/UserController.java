@@ -1,6 +1,6 @@
 package com.luv2code.spring_boot_library.controller;
 
-import com.luv2code.spring_boot_library.dto.LoginResponse;
+import com.luv2code.spring_boot_library.responsemodel.LoginResponse;
 import com.luv2code.spring_boot_library.entity.AppUser;
 import com.luv2code.spring_boot_library.requestmodel.SignupRequest;
 import com.luv2code.spring_boot_library.service.UserService;

@@ -25,13 +25,23 @@ import java.util.concurrent.TimeUnit;
 public class PaymentService {
     private PaymentRepository paymentRepository;
 
+    private final boolean stripeEnabled;
+
     @Autowired
-    public PaymentService(PaymentRepository paymentRepository, @Value("${stripe.key.secret}") String secretKey) {
+    public PaymentService(PaymentRepository paymentRepository, @Value("${stripe.key.secret:}") String secretKey) {
         this.paymentRepository = paymentRepository;
-        Stripe.apiKey = secretKey;
+        if (secretKey != null && !secretKey.isBlank()) {
+            Stripe.apiKey = secretKey;
+            this.stripeEnabled = true;
+        } else {
+            this.stripeEnabled = false;
+        }
     }
 
     public PaymentIntent createPaymentIntent(PaymentInfoRequest paymentInfoRequest) throws StripeException {
+        if (!stripeEnabled) {
+            throw new IllegalStateException("Stripe is not configured");
+        }
         List<String> paymentMethodTypes = new ArrayList<>();
         paymentMethodTypes.add("card");
 
@@ -44,6 +54,9 @@ public class PaymentService {
     }
 
     public ResponseEntity<String> stripePayment(String userEmail) throws Exception {
+        if (!stripeEnabled) {
+            return new ResponseEntity<>("Stripe is not configured", HttpStatus.SERVICE_UNAVAILABLE);
+        }
         Payment payment = paymentRepository.findByUserEmail(userEmail);
 
         if (payment == null) {

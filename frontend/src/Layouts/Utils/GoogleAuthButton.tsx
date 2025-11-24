@@ -1,8 +1,13 @@
 import { GoogleLogin } from "@react-oauth/google";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
+const hasGoogleClient = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 const GoogleAuthButton = () => {
+    if (!hasGoogleClient) {
+        return null; // Google is not configured; hide button gracefully
+    }
+
     const handleSuccess = async (credentialResponse: any) => {
         const token = credentialResponse.credential;
         console.log("Google Token:", token);

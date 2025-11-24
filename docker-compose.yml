@@ -28,6 +28,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/books_library
       SPRING_DATASOURCE_USERNAME: library
       SPRING_DATASOURCE_PASSWORD: library
+      APP_JWT_SECRET: dGVtby1qd3Qtc2VjcmV0LXRoaXMtZm9yLWRldmVsb3BtZW50LW9ubHk=
     ports:
       - "8080:8080"
     depends_on:
@@ -35,7 +36,11 @@ services:
         condition: service_healthy
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api
+        VITE_STRIPE_PUBLISHABLE_KEY: pk_test_51PIRrMRv0GnFPe3t15P9YWgSoytSvVnElQtb84cDQkzx6RdprmbCPtAU66RcRwgZZI25JlDUG7nPVLbxGKBeNSGZ00atMt0rTg
     container_name: library-frontend
     restart: on-failure
     ports:
