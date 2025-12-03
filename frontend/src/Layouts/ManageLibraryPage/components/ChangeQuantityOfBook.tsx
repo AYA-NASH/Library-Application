@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BookModel } from "../../../models/BookModel";
 import { useAuth } from "../../../Auth/AuthContext";
+import defaultBookImg from '../../../Images/BooksImages/book-luv2code-1000.png';
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -96,7 +97,7 @@ export const ChangeQuantityOfBook: React.FC<{
                             />
                         ) : (
                             <img
-                                src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
+                                src={defaultBookImg}
                                 width={123}
                                 height={196}
                                 alt="book"
@@ -114,7 +115,7 @@ export const ChangeQuantityOfBook: React.FC<{
                             />
                         ) : (
                             <img
-                                src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
+                                src={defaultBookImg}
                                 width={123}
                                 height={196}
                                 alt="book"

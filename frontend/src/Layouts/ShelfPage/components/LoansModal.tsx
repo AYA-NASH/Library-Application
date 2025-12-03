@@ -1,4 +1,5 @@
 import ShelfCurrentLoans from "../../../models/ShelfCurrentLoans";
+import defaultBookImg from '../../../Images/BooksImages/book-luv2code-1000.png';
 
 export const LoansModal: React.FC<{shelfCurrentLoan: ShelfCurrentLoans, mobile: boolean, returnBook:any, renewLoan:any}> = (props)=>{
     return(
@@ -37,7 +38,7 @@ export const LoansModal: React.FC<{shelfCurrentLoan: ShelfCurrentLoans, mobile: 
                                                 alt="Book"
                                             />
                                             :<img
-                                                src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
+                                                src={defaultBookImg}
                                                 width={56}
                                                 height={87}
                                                 alt="book"

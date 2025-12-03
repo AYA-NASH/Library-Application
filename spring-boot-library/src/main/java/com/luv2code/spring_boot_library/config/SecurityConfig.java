@@ -23,7 +23,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.luv2code.spring_boot_library.service.MyUserDetailsService;
 
 import java.util.List;
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -33,9 +32,6 @@ public class SecurityConfig {
 
     @Autowired
     private MyUserDetailsService userDetailsService;
-
-    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:http://localhost:3000}")
-    private String allowedOriginsCsv;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -61,15 +57,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        List<String> origins = Arrays.stream(allowedOriginsCsv.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .toList();
-        corsConfiguration.setAllowedOrigins(origins.isEmpty() ? List.of("http://localhost:3000") : origins);
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
+        
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
 

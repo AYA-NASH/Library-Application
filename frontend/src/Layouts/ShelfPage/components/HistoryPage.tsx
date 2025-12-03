@@ -3,6 +3,7 @@ import { useAuth } from "../../../Auth/AuthContext";
 import HistoryModel from "../../../models/HistoryModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Link } from "react-router-dom";
+import defaultBookImg from '../../../Images/BooksImages/book-luv2code-1000.png';
 import { Pagination } from "../../Utils/Pagination";
 
 export const HistoryPage = () => {
@@ -87,7 +88,7 @@ export const HistoryPage = () => {
                                                 />
                                             ) : (
                                                 <img
-                                                    src={require("./../../../Images/BooksImages/book-luv2code-1000.png")}
+                                                    src={defaultBookImg}
                                                     width="123"
                                                     height="196"
                                                     alt="Default"
@@ -104,7 +105,7 @@ export const HistoryPage = () => {
                                                 />
                                             ) : (
                                                 <img
-                                                    src={require("./../../../Images/BooksImages/book-luv2code-1000.png")}
+                                                    src={defaultBookImg}
                                                     width="123"
                                                     height="196"
                                                     alt="Default"

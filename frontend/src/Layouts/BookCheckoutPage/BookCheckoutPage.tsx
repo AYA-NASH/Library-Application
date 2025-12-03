@@ -8,6 +8,7 @@ import { ReviewModel } from "../../models/ReviewModel";
 import { LatestReviews } from "./LatestReviews";
 import { useAuth } from "../../Auth/AuthContext";
 import ReviewRequestModel from "../../models/ReviewRequestModel";
+import defaultBookImg from '../../Images/BooksImages/book-luv2code-1000.png';
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -281,7 +282,7 @@ export const BookCheckoutPage = () => {
                             />
                         ) : (
                             <img
-                                src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
+                                src={defaultBookImg}
                                 width={226}
                                 height={349}
                                 alt="book"
@@ -333,7 +334,7 @@ export const BookCheckoutPage = () => {
                         />
                     ) : (
                         <img
-                            src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
+                            src={defaultBookImg}
                             width={226}
                             height={349}
                             alt="book"

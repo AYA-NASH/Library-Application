@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { BookModel } from "../../models/BookModel";
 import { Link } from "react-router-dom";
+import defaultBookImg from '../../Images/BooksImages/book-luv2code-1000.png';
 
 export const SearchBooks: FC<{ book: BookModel }> = (props) => {
     const { id, img, title, author, description } = { ...props.book };
@@ -18,7 +19,7 @@ export const SearchBooks: FC<{ book: BookModel }> = (props) => {
                             />
                         ) : (
                             <img
-                                src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
+                                src={defaultBookImg}
                                 width={123}
                                 height={196}
                                 alt="book"
@@ -35,7 +36,7 @@ export const SearchBooks: FC<{ book: BookModel }> = (props) => {
                             />
                         ) : (
                             <img
-                                src={require("../../../../Images/BooksImages/book-luv2code-1000.png")}
+                                src={defaultBookImg}
                                 width={123}
                                 height={196}
                                 alt="book"
