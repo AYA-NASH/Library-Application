@@ -108,9 +108,16 @@ export const SearchBooksPage = () => {
             value.toLowerCase() === "data" ||
             value.toLowerCase() === "devops"
         ) {
+            const categoryMap: { [key: string]: string } = {
+                "be": "backend",
+                "fe": "frontend",
+                "data": "data",
+                "devops": "devops"
+            };
+
             setCategorySelection(value);
             setSearchUrl(
-                `/search/findByCategory?category=${value}&page=<pageNumber>&size=${booksPerPage}`
+                `/search/findByCategory?category=${categoryMap[value.toLocaleLowerCase()]}&page=<pageNumber>&size=${booksPerPage}`
             );
         } else {
             setCategorySelection("All");

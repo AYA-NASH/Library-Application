@@ -1,0 +1,16 @@
+{
+    "name": "library-db-seeder",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Database seeder for Library Application using Faker and Google Books API",
+    "main": "data_scripts.js",
+    "scripts": {
+        "seed": "node data_scripts.js"
+    },
+    "dependencies": {
+        "@faker-js/faker": "^8.4.0",
+        "bcrypt": "^5.1.1",
+        "mysql2": "^3.9.1",
+        "node-fetch": "^3.3.2"
+    }
+}

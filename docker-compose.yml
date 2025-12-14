@@ -12,13 +12,27 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+      - ./mysql-init/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword" ]
       interval: 5s
       timeout: 3s
       retries: 20
       start_period: 60s
+
+  db-seeder:
+    build:
+      context: ./mysql-init
+    container_name: library-db-seeder
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: library
+      DB_PASSWORD: library
+      DB_NAME: books_library
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   backend:
     build: ./spring-boot-library

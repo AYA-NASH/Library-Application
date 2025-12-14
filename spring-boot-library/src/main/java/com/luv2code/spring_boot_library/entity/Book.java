@@ -30,6 +30,6 @@ public class Book {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "img")
+    @Column(name = "img_url")
     private String img;
 }
