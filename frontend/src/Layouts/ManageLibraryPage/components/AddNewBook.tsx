@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../../Auth/AuthContext";
-import AddBookRequest from "../../../models/AddBookRequest";
+import { useImageUpload } from "../../Hooks/useUploadImage";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -13,7 +13,19 @@ export const AddNewBook = () => {
     const [decscription, setDescription] = useState("");
     const [copies, setCopies] = useState(0);
     const [category, setCategory] = useState("Category");
-    const [selectedImage, setSelectedImage] = useState<any>(null);
+
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+    const {
+        file: selectedImage,
+        preview: imagePreview,
+        error: imageError,
+        selectFile,
+        clearFile,
+    } = useImageUpload({
+        maxSizeMB: 5,
+    });
+
 
     // Displays
     const [displayWarning, setDisplayWarning] = useState(false);
@@ -21,24 +33,6 @@ export const AddNewBook = () => {
 
     function categoryField(value: string) {
         setCategory(value);
-    }
-
-    async function base64ConversionForImages(e: any) {
-        if (e.target.files[0]) {
-            getBase64(e.target.files[0]);
-        }
-    }
-
-    function getBase64(file: any) {
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = function () {
-            setSelectedImage(reader.result);
-        };
-
-        reader.onerror = function (error) {
-            console.log("Error ", error);
-        };
     }
 
     async function submitNewBook() {
@@ -51,22 +45,23 @@ export const AddNewBook = () => {
             decscription !== "" &&
             copies >= 0
         ) {
-            const book: AddBookRequest = new AddBookRequest(
-                title,
-                author,
-                decscription,
-                copies,
-                category
-            );
-            book.img = selectedImage;
+            const formData = new FormData();
+
+            formData.append("title", title);
+            formData.append("author", author);
+            formData.append("description", decscription);
+            formData.append("copies", copies.toString());
+            formData.append("category", category);
+            if (selectedImage) {
+                formData.append("image", selectedImage);
+            }
 
             const requestOptions = {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(book),
+                body: formData,
             };
 
             const submitNewBookResponse = await fetch(url, requestOptions);
@@ -80,7 +75,8 @@ export const AddNewBook = () => {
             setDescription("");
             setCopies(0);
             setCategory("Category");
-            setSelectedImage(null);
+
+            clearFile();
 
             setDisplayWarning(false);
             setDisplaySuccess(true);
@@ -89,6 +85,14 @@ export const AddNewBook = () => {
             setDisplaySuccess(false);
         }
     }
+
+    useEffect(() => {
+        return () => {
+            if (imagePreview) {
+                URL.revokeObjectURL(imagePreview);
+            }
+        };
+    }, [imagePreview]);
 
     return (
         <div className="container mt-5 mb-3">
@@ -137,7 +141,7 @@ export const AddNewBook = () => {
                             <div className="col-md-3 mb-3">
                                 <label className="form-label">Category</label>
                                 <button
-                                    className="form-control btn btn-secondary dropdown-toggle"
+                                    className="form-control btn btn-dark dropdown-toggle"
                                     type="button"
                                     id="dropdownMenuButton1"
                                     data-bs-toggle="dropdown"
@@ -218,11 +222,77 @@ export const AddNewBook = () => {
                                     value={copies}
                                 />
                             </div>
+                            
+                        <div className="mb-3">
+                            <label className="form-label">Book Image</label>
 
-                            <input
-                                type="file"
-                                onChange={(e) => base64ConversionForImages(e)}
-                            />
+                            <div className="d-flex align-items-center">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    ref={fileInputRef}
+                                    id="book-image-upload"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files.length > 0) {
+                                            selectFile(e.target.files[0]);
+                                        }
+                                    }}
+                                    style={{ display: "none" }}
+                                />
+
+                                <label htmlFor="book-image-upload" className="btn btn-outline-dark me-2 mb-0">
+                                    Choose Image
+                                </label>
+
+                                {selectedImage && (
+                                    <span className="text-truncate" style={{ maxWidth: "200px" }}>
+                                        {selectedImage.name}
+                                    </span>
+                                )}
+                            </div>
+
+                            {imageError && (
+                                <div className="alert alert-danger mt-2 py-1" role="alert">
+                                    {imageError}
+                                </div>
+                            )}
+
+                            {imagePreview && (
+                                <div
+                                    className="position-relative mt-3 d-inline-block"
+                                    style={{ borderRadius: "0.5rem", overflow: "hidden", border: "1px solid #ddd" }}
+                                >
+                                    <img
+                                        src={imagePreview}
+                                        alt="Book preview"
+                                        className="img-fluid"
+                                        style={{ maxWidth: "200px", maxHeight: "300px", objectFit: "cover" }}
+                                    />
+
+                                    <button
+                                        type="button"
+                                        className="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-0 d-flex justify-content-center align-items-center"
+                                        style={{
+                                            width: "25px",
+                                            height: "25px",
+                                            borderRadius: "50%",
+                                            fontWeight: "bold",
+                                            lineHeight: "1",
+                                        }}
+                                        onClick={()=>{
+                                            clearFile();
+                                            if (fileInputRef.current) {
+                                                fileInputRef.current.value = "";
+                                            }
+                                        }}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+
                             <div>
                                 <button
                                     type="button"

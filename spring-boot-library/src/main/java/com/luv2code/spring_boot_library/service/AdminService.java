@@ -8,6 +8,7 @@ import com.luv2code.spring_boot_library.requestmodel.AddBookRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -17,12 +18,14 @@ public class AdminService {
     private BookRepository bookRepository;
     private CheckoutRepository checkoutRepository;
     private ReviewRepository reviewRepository;
+    private ImageUploadService imageUploadService;
 
     @Autowired
-    public AdminService(BookRepository bookRepository, CheckoutRepository checkoutRepository, ReviewRepository reviewRepository){
+    public AdminService(BookRepository bookRepository, CheckoutRepository checkoutRepository, ReviewRepository reviewRepository, ImageUploadService imageUploadService){
         this.bookRepository = bookRepository;
         this.checkoutRepository = checkoutRepository;
         this.reviewRepository = reviewRepository;
+        this.imageUploadService = imageUploadService;
     }
 
     public void deleteBook(Long bookId) throws Exception{
@@ -65,16 +68,28 @@ public class AdminService {
         bookRepository.save(book.get());
     }
 
-    public void postBook(AddBookRequest addBookRequest){
+    public void postBook(
+            String title,
+            String author,
+            String description,
+            int copies,
+            String category,
+            MultipartFile image
+    ) {
+
+        String imageUrl = imageUploadService.uploadImage(image);
+
         Book newBook = new Book();
 
-        newBook.setTitle(addBookRequest.getTitle());
-        newBook.setAuthor(addBookRequest.getAuthor());
-        newBook.setDescription(addBookRequest.getDescription());
-        newBook.setCopies(addBookRequest.getCopies());
-        newBook.setCopiesAvailable(addBookRequest.getCopies());
-        newBook.setCategory(addBookRequest.getCategory());
-        newBook.setImg(addBookRequest.getImg());
+        newBook.setTitle(title);
+        newBook.setAuthor(author);
+        newBook.setDescription(description);
+        newBook.setCopies(copies);
+        newBook.setCopiesAvailable(copies);
+        newBook.setCategory(category);
+        newBook.setImg(imageUrl);
+
+        System.out.println(newBook.toString());
 
         bookRepository.save(newBook);
     }

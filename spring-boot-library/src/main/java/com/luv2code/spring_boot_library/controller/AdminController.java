@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -44,8 +45,16 @@ public class AdminController {
         adminService.increaseBookQuantity(bookId);
     }
 
-    @PostMapping("/secure/add/book")
-    public void postBook(@RequestBody AddBookRequest addBookRequest) throws Exception {
+    @PostMapping(value="/secure/add/book",
+                consumes = "multipart/form-data")
+    public void postBook( @RequestParam String title,
+                          @RequestParam String author,
+                          @RequestParam String description,
+                          @RequestParam int copies,
+                          @RequestParam String category,
+                          @RequestParam("image") MultipartFile image
+                         ) throws Exception {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
@@ -54,7 +63,14 @@ public class AdminController {
             throw new RuntimeException("Access denied: Administration page only.");
         }
 
-        adminService.postBook(addBookRequest);
+        adminService.postBook(
+                title,
+                author,
+                description,
+                copies,
+                category,
+                image
+        );
     }
 
     @DeleteMapping("/secure/delete/book")
