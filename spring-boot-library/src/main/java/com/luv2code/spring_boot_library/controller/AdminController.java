@@ -19,9 +19,15 @@ public class AdminController {
         this.adminService = adminService;
     }
 
-    @PutMapping("/secure/decrease/book/quantity")
-    public void decreaseBookQuantity(@RequestParam Long bookId) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    @PutMapping("/secure/update/book/quantity")
+    public void updateBookQuantity(
+            @RequestParam Long bookId,
+            @RequestParam int quantity
+    ) throws Exception {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
@@ -29,20 +35,7 @@ public class AdminController {
             throw new RuntimeException("Access denied: Administration page only.");
         }
 
-        adminService.decreaseBookQuantity(bookId);
-    }
-
-    @PutMapping("/secure/increase/book/quantity")
-    public void increaseBookQuantity(@RequestParam Long bookId) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
-            throw new RuntimeException("Access denied: Administration page only.");
-        }
-
-        adminService.increaseBookQuantity(bookId);
+        adminService.updateBookQuantity(bookId, quantity);
     }
 
     @PostMapping(value="/secure/add/book",

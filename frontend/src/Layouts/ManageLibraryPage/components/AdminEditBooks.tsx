@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { BookModel } from "../../../models/BookModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
-import { ChangeQuantityOfBook } from "./ChangeQuantityOfBook";
+import { EditBook } from "./EditBook";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-export const ChangeQuantityOfBooks = () => {
+export const AdminEditBooks = () => {
     const [books, setBooks] = useState<BookModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [httpError, setHttpError] = useState(null);
@@ -15,6 +15,7 @@ export const ChangeQuantityOfBooks = () => {
     const [totalAmountOfBooks, setTotalAmountOfBooks] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [bookDelete, setBookDelete] = useState(false);
+    const [bookUpdate, setBookUpdate] = useState(false);
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -55,7 +56,7 @@ export const ChangeQuantityOfBooks = () => {
             setIsLoading(false);
             setHttpError(error.message);
         });
-    }, [currentPage, bookDelete]);
+    }, [currentPage, bookDelete, bookUpdate]);
 
     const indexOfLastBook: number = currentPage * booksPerPage;
     const indexOfFirstBook: number = indexOfLastBook - booksPerPage;
@@ -67,6 +68,8 @@ export const ChangeQuantityOfBooks = () => {
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     const deleteBook = () => setBookDelete(!bookDelete);
+
+    const updateBook = () => setBookUpdate(!bookUpdate);
 
     if (isLoading) {
         return <SpinnerLoading />;
@@ -93,10 +96,11 @@ export const ChangeQuantityOfBooks = () => {
                         {totalAmountOfBooks} items:
                     </p>
                     {books.map((book) => (
-                        <ChangeQuantityOfBook
+                        <EditBook
                             book={book}
                             key={book.id}
                             deleteBook={deleteBook}
+                            updateBook={updateBook}
                         />
                     ))}
                 </>

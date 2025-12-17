@@ -3,27 +3,27 @@ import { useAuth } from "../../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { AdminMessages } from "./components/AdminMessages";
 import { AddNewBook } from "./components/AddNewBook";
-import { ChangeQuantityOfBooks } from "./components/ChangeQuantityOfBooks";
+import { AdminEditBooks } from "./components/AdminEditBooks";
 
 export const ManageLibraryPage = ()=>{
     
     const {user} = useAuth();
 
-    const [changeQuantityOfBooksClick, setChangeQuantityOfBooksClick] = useState(false);
+    const [editBooksClick, setEditBooksClick] = useState(false);
     const [messageClick, setMessageClick] = useState(false);
     
     function addBookClickFunction(){
-        setChangeQuantityOfBooksClick(false);
+        setEditBooksClick(false);
         setMessageClick(false);
     }
 
-    function changeQuantityOfBooksClickFunction(){
-        setChangeQuantityOfBooksClick(true);
+    function editBooksClickFunction(){
+        setEditBooksClick(true);
         setMessageClick(false);
     }
 
     function messagesClickFunction(){
-        setChangeQuantityOfBooksClick(false);
+        setEditBooksClick(false);
         setMessageClick(true);
     }
 
@@ -52,17 +52,17 @@ export const ManageLibraryPage = ()=>{
                             Add new Book
                         </button>
 
-                        <button onClick={changeQuantityOfBooksClickFunction}
+                        <button onClick={editBooksClickFunction}
                             className="nav-link"
-                            id="nav-quantity-tab"
+                            id="nav-edit-tab"
                             data-bs-toggle="tab"
-                            data-bs-target = "#nav-quantity"
+                            data-bs-target = "#nav-edit"
                             type="button"
                             role="tab"
-                            aria-controls="nav-quantity"
+                            aria-controls="nav-edit"
                             aria-selected="true"
                         >
-                            Change quantity
+                            Edit Books
                         </button>
 
                         <button onClick={messagesClickFunction}
@@ -89,11 +89,11 @@ export const ManageLibraryPage = ()=>{
                     </div>
 
                     <div className="tab-pane fade"
-                        id="nav-quantity"
+                        id="nav-edit"
                         role="tabpanel"
-                        aria-labelledby="nav-quantity-tab"
+                        aria-labelledby="nav-edit-tab"
                     >
-                        {changeQuantityOfBooksClick ? <ChangeQuantityOfBooks /> : <></>}
+                        {editBooksClick ? <AdminEditBooks /> : <></>}
                     </div>
 
                     <div className="tab-pane fade"

@@ -4,7 +4,6 @@ import com.luv2code.spring_boot_library.dao.BookRepository;
 import com.luv2code.spring_boot_library.dao.CheckoutRepository;
 import com.luv2code.spring_boot_library.dao.ReviewRepository;
 import com.luv2code.spring_boot_library.entity.Book;
-import com.luv2code.spring_boot_library.requestmodel.AddBookRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,31 +40,32 @@ public class AdminService {
         bookRepository.deleteById(bookId);
     }
 
-    public void decreaseBookQuantity(Long bookId) throws Exception{
-        Optional<Book> book = bookRepository.findById(bookId);
+    public void updateBookQuantity(Long bookId, int newTotalCopies) throws Exception {
 
-        if(!book.isPresent() || book.get().getCopiesAvailable() <= 0 || book.get().getCopies() <= 0){
-            throw new Exception("Book not found or quantity locked");
-        }
+        Optional<Book> bookOpt = bookRepository.findById(bookId);
 
-        book.get().setCopiesAvailable(book.get().getCopiesAvailable() - 1);
-        book.get().setCopies(book.get().getCopies() - 1);
-
-        bookRepository.save(book.get());
-
-    }
-
-    public void increaseBookQuantity(Long bookId) throws Exception{
-        Optional<Book> book = bookRepository.findById(bookId);
-
-        if(!book.isPresent()){
+        if (bookOpt.isEmpty()) {
             throw new Exception("Book not found");
         }
 
-        book.get().setCopiesAvailable(book.get().getCopiesAvailable() + 1);
-        book.get().setCopies(book.get().getCopies() + 1);
+        if (newTotalCopies < 0) {
+            throw new Exception("Copies cannot be negative");
+        }
 
-        bookRepository.save(book.get());
+        Book book = bookOpt.get();
+
+        int borrowedCopies = book.getCopies() - book.getCopiesAvailable();
+
+        if (newTotalCopies < borrowedCopies) {
+            throw new Exception(
+                    "Cannot set copies less than currently borrowed books"
+            );
+        }
+
+        book.setCopies(newTotalCopies);
+        book.setCopiesAvailable(newTotalCopies - borrowedCopies);
+
+        bookRepository.save(book);
     }
 
     public void postBook(
