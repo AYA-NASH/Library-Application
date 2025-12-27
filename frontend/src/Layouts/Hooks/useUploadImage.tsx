@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 interface UseImageUploadOptions {
     maxSizeMB?: number;
     allowedTypes?: string[];
+    initialImageUrl?: string;
 }
 
 export function useImageUpload(options?: UseImageUploadOptions) {
     const [file, setFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [preview, setPreview] = useState<string | null>(options?.initialImageUrl ?? null);
     const [error, setError] = useState<string | null>(null);
 
     const maxSizeMB = options?.maxSizeMB ?? 5;
@@ -42,7 +43,7 @@ export function useImageUpload(options?: UseImageUploadOptions) {
                 URL.revokeObjectURL(preview);
             }
         };
-    }, [preview]);
+    }, [file, preview]);
 
     return {
         file,
@@ -50,5 +51,6 @@ export function useImageUpload(options?: UseImageUploadOptions) {
         error,
         selectFile,
         clearFile,
+        setPreview,
     };
 }

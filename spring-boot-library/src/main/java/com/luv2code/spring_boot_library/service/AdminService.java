@@ -19,6 +19,9 @@ public class AdminService {
     private ReviewRepository reviewRepository;
     private ImageUploadService imageUploadService;
 
+    private static  final String DEFAULT_BOOK_IMAGE_URL =
+            "https://res.cloudinary.com/dg3qdvk22/image/upload/v1766340148/book_cover_default_dark_qjb5bz.png";
+
     @Autowired
     public AdminService(BookRepository bookRepository, CheckoutRepository checkoutRepository, ReviewRepository reviewRepository, ImageUploadService imageUploadService){
         this.bookRepository = bookRepository;
@@ -77,7 +80,7 @@ public class AdminService {
             MultipartFile image
     ) {
 
-        String imageUrl = imageUploadService.uploadImage(image);
+        String imageUrl = resolveBookImage(image, null);
 
         Book newBook = new Book();
 
@@ -93,4 +96,50 @@ public class AdminService {
 
         bookRepository.save(newBook);
     }
+
+    public void updateBookData(
+            Long bookId,
+            String title,
+            String author,
+            String description,
+            String category,
+            MultipartFile image
+    ) throws Exception{
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new Exception("Book not found"));
+
+        if (title != null && !title.isBlank()) {
+            book.setTitle(title);
+        }
+
+        if (author != null && !author.isBlank()) {
+            book.setAuthor(author);
+        }
+
+        if (description != null && !description.isBlank()) {
+            book.setDescription(description);
+        }
+
+        if (category != null && !category.isBlank()) {
+            book.setCategory(category);
+        }
+
+        String imageUrl = resolveBookImage(image, book.getImg());
+        book.setImg(imageUrl);
+
+        bookRepository.save(book);
+    }
+
+    private String resolveBookImage(MultipartFile image, String existingImageUrl){
+        if(image != null && !image.isEmpty()){
+            return imageUploadService.uploadImage(image);
+        }
+
+        if(existingImageUrl != null && !existingImageUrl.isBlank()){
+            return existingImageUrl;
+        }
+
+        return DEFAULT_BOOK_IMAGE_URL;
+    }
+
 }
