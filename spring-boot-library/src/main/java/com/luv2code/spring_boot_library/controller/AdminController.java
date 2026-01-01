@@ -2,6 +2,7 @@ package com.luv2code.spring_boot_library.controller;
 
 import com.luv2code.spring_boot_library.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,7 +41,8 @@ public class AdminController {
 
     @PostMapping(value="/secure/add/book",
                 consumes = "multipart/form-data")
-    public void postBook( @RequestParam String title,
+
+    public ResponseEntity<?> postBook( @RequestParam String title,
                           @RequestParam String author,
                           @RequestParam String description,
                           @RequestParam int copies,
@@ -56,14 +58,21 @@ public class AdminController {
             throw new RuntimeException("Access denied: Administration page only.");
         }
 
-        adminService.postBook(
-                title,
-                author,
-                description,
-                copies,
-                category,
-                image
-        );
+        try{
+            adminService.postBook(
+                    title,
+                    author,
+                    description,
+                    copies,
+                    category,
+                    image
+            );
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/secure/update/book/data/{bookId}")

@@ -7,6 +7,7 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL;
 export const AddNewBook = () => {
     const { user, token } = useAuth();
     const [displaySuccess, setDisplaySuccess] = useState(false);
+    const [httpError, setHttpError] = useState("");
     const [resetKey, setResetKey] = useState(0); 
 
     const handleAddBook = async (formData: FormData) => {
@@ -19,7 +20,11 @@ export const AddNewBook = () => {
                 body: formData,
             });
 
-            if (!response.ok) throw new Error("Something went wrong");
+            if (!response.ok){ 
+                const errorMessage = await response.text();
+                setHttpError(errorMessage);
+                throw new Error(errorMessage || "Failed to add book");
+            }
 
             setDisplaySuccess(true);
             setResetKey((prev) => prev + 1); 
@@ -33,6 +38,7 @@ export const AddNewBook = () => {
     return (
         <div className="container mt-5 mb-3">
             {displaySuccess && <div className="alert alert-success">Book added successfully!</div>}
+            {httpError && <div className="alert alert-danger">{httpError}</div>}
             <div className="card shadow-sm">
                 <div className="card-body">
                     <BookForm key={resetKey} isEdit={false} onSubmit={handleAddBook} />

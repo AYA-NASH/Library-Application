@@ -132,6 +132,10 @@ public class AdminService {
 
     private String resolveBookImage(MultipartFile image, String existingImageUrl){
         if(image != null && !image.isEmpty()){
+            if (!imageUploadService.isEnabled()) {
+                throw new IllegalStateException("Image upload is disabled. Cloudinary is not configured.");
+            }
+
             return imageUploadService.uploadImage(image);
         }
 

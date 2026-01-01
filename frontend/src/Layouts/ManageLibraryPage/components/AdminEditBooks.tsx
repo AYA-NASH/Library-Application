@@ -1,100 +1,65 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BookModel } from "../../../models/BookModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { EditBook } from "./EditBook";
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import { useBooks } from "../../../Hooks/useBooks";
+import { BookFilterBar } from "../../Utils/BookFilterBar"; // adjust path if needed
 
 export const AdminEditBooks = () => {
-    const [books, setBooks] = useState<BookModel[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [httpError, setHttpError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [booksPerPage] = useState(5);
-    const [totalAmountOfBooks, setTotalAmountOfBooks] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+    const [searchParams, setSearchParams] = useState<{ text?: string; category?: string }>();
     const [bookDelete, setBookDelete] = useState(false);
     const [bookUpdate, setBookUpdate] = useState(false);
 
-    useEffect(() => {
-        const fetchBooks = async () => {
-            const url = `${baseUrl}/books?page=${
-                currentPage - 1
-            }&size=${booksPerPage}`;
+    const booksPerPage = 5;
+    const categories = ["All", "BE", "FE", "Data", "DevOps"];
 
-            const response = await fetch(url);
+    // Fetch books using the custom hook
+    const { books, isLoading, httpError, totalPages, totalElements } =
+        useBooks(currentPage, booksPerPage, searchParams);
 
-            if (!response.ok) {
-                throw new Error("Something went wrong!");
-            }
-
-            const responseJson = await response.json();
-            const responseData = responseJson._embedded.books;
-
-            setTotalAmountOfBooks(responseJson.page.totalElements);
-            setTotalPages(responseJson.page.totalPages);
-
-            const loadedBooks: BookModel[] = [];
-
-            for (const key in responseData) {
-                loadedBooks.push({
-                    id: responseData[key].id,
-                    title: responseData[key].title,
-                    author: responseData[key].author,
-                    description: responseData[key].description,
-                    copies: responseData[key].copies,
-                    copiesAvailable: responseData[key].copiesAvailable,
-                    category: responseData[key].category,
-                    img: responseData[key].img,
-                });
-            }
-            setBooks(loadedBooks);
-            setIsLoading(false);
-        };
-        fetchBooks().catch((error: any) => {
-            setIsLoading(false);
-            setHttpError(error.message);
-        });
-    }, [currentPage, bookDelete, bookUpdate]);
-
-    const indexOfLastBook: number = currentPage * booksPerPage;
-    const indexOfFirstBook: number = indexOfLastBook - booksPerPage;
-    let lastItem =
-        currentPage * booksPerPage <= totalAmountOfBooks
-            ? currentPage * booksPerPage
-            : totalAmountOfBooks;
+    const handleSearch = (params: { text?: string; category?: string }) => {
+        setCurrentPage(1); // reset to first page on search
+        setSearchParams(params);
+    };
 
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     const deleteBook = () => setBookDelete(!bookDelete);
-
     const updateBook = () => setBookUpdate(!bookUpdate);
 
-    if (isLoading) {
-        return <SpinnerLoading />;
-    }
-
-    if (httpError) {
+    if (isLoading) return <SpinnerLoading />;
+    if (httpError)
         return (
             <div className="container">
                 <p>{httpError}</p>
             </div>
         );
-    }
 
     return (
         <div className="container mt-3">
-            {totalAmountOfBooks > 0 ? (
+            {/* Filter/Search bar */}
+            <BookFilterBar
+                categories={categories}
+                initialCategory="All"
+                onSearch={handleSearch}
+            />
+
+            {totalElements > 0 ? (
                 <>
                     <div className="mt-3">
-                        <h3>Number of results: ({totalAmountOfBooks})</h3>
+                        <h3>Number of results: ({totalElements})</h3>
                     </div>
 
                     <p>
-                        {indexOfFirstBook + 1} to {lastItem} of{" "}
-                        {totalAmountOfBooks} items:
+                        {currentPage * booksPerPage - booksPerPage + 1} to{" "}
+                        {currentPage * booksPerPage <= totalElements
+                            ? currentPage * booksPerPage
+                            : totalElements}{" "}
+                        of {totalElements} items:
                     </p>
+
                     {books.map((book) => (
                         <EditBook
                             book={book}
@@ -105,10 +70,10 @@ export const AdminEditBooks = () => {
                     ))}
                 </>
             ) : (
-                <p> Add a book before changing the quantity </p>
+                <p>Add a book before changing the quantity</p>
             )}
 
-            {totalPages > 0 && (
+            {totalPages > 1 && (
                 <Pagination
                     currentPage={currentPage}
                     totalPages={totalPages}

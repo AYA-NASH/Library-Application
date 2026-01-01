@@ -36,13 +36,20 @@ services:
 
   backend:
     build: ./spring-boot-library
+    env_file:
+      - ./spring-boot-library/.env
     container_name: spring-boot-library
     restart: on-failure
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/books_library
       SPRING_DATASOURCE_USERNAME: library
       SPRING_DATASOURCE_PASSWORD: library
-      APP_JWT_SECRET: dGVtby1qd3Qtc2VjcmV0LXRoaXMtZm9yLWRldmVsb3BtZW50LW9ubHk=
+
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
     ports:
       - "8080:8080"
     depends_on:

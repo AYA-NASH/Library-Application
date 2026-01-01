@@ -13,11 +13,15 @@ public class ImageUploadService {
     private final Cloudinary cloudinary;
 
     @Autowired
-    public ImageUploadService(Cloudinary cloudinary){
+    public ImageUploadService(@Autowired(required = false) Cloudinary cloudinary){
         this.cloudinary = cloudinary;
     }
 
     public String uploadImage(MultipartFile image){
+        if (cloudinary == null) {
+            throw new IllegalStateException("Image upload service is not configured");
+        }
+
         try {
             Map uploadResult = cloudinary.uploader().upload(
                     image.getBytes(),
@@ -28,5 +32,9 @@ public class ImageUploadService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload image", e);
         }
+    }
+
+    public boolean isEnabled() {
+        return cloudinary != null;
     }
 }
