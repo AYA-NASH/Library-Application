@@ -8,7 +8,7 @@ import { faker } from "@faker-js/faker";
 // -----------------------------
 export async function connectDB() {
     return await mysql.createConnection({
-        host: process.env.DB_HOST || "mysql",
+        host: process.env.DB_HOST || "localhost",
         port: process.env.DB_PORT || 3306,
         user: process.env.DB_USER || "library",
         password: process.env.DB_PASSWORD || "library",
@@ -39,8 +39,8 @@ async function fetchBooksByCategory(category) {
         const access = item.accessInfo;
 
         return info.imageLinks?.thumbnail &&
-            access.pdf?.isAvailable &&
-            access.viewability && access.viewability !== "NONE";
+            access.webReaderLink;
+
     });
 }
 
@@ -58,10 +58,26 @@ async function insertBook(db, book, category) {
     const copies_available = 5;
     const thumbnail = info.imageLinks.thumbnail;
 
+    const bookSource = "GOOGLE";
+    const bookUrl = book.accessInfo.webReaderLink;
+
     await db.execute(
-        "INSERT INTO book (title, author, description, copies, copies_available, category, img_url) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [title, author, description, copies, copies_available, category, thumbnail]
+        `INSERT INTO book 
+     (title, author, description, copies, copies_available, category, img_url, book_source, book_url) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+            title,
+            author,
+            description,
+            copies,
+            copies_available,
+            category,
+            thumbnail,
+            bookSource,
+            bookUrl
+        ]
     );
+
 }
 
 async function seedBooks(db) {

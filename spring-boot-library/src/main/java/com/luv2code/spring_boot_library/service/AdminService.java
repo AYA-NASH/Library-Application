@@ -4,6 +4,7 @@ import com.luv2code.spring_boot_library.dao.BookRepository;
 import com.luv2code.spring_boot_library.dao.CheckoutRepository;
 import com.luv2code.spring_boot_library.dao.ReviewRepository;
 import com.luv2code.spring_boot_library.entity.Book;
+import com.luv2code.spring_boot_library.entity.BookSource;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,24 +18,29 @@ public class AdminService {
     private BookRepository bookRepository;
     private CheckoutRepository checkoutRepository;
     private ReviewRepository reviewRepository;
-    private ImageUploadService imageUploadService;
+    private CloudinaryService cloudinaryService;
 
     private static  final String DEFAULT_BOOK_IMAGE_URL =
-            "https://res.cloudinary.com/dg3qdvk22/image/upload/v1766340148/book_cover_default_dark_qjb5bz.png";
+            "https://res.cloudinary.com/dg3qdvk22/image/upload/v1768942485/book_cover_default_dark_nraxu0.png";
 
     @Autowired
-    public AdminService(BookRepository bookRepository, CheckoutRepository checkoutRepository, ReviewRepository reviewRepository, ImageUploadService imageUploadService){
+    public AdminService(BookRepository bookRepository, CheckoutRepository checkoutRepository, ReviewRepository reviewRepository, CloudinaryService cloudinaryService){
         this.bookRepository = bookRepository;
         this.checkoutRepository = checkoutRepository;
         this.reviewRepository = reviewRepository;
-        this.imageUploadService = imageUploadService;
+        this.cloudinaryService = cloudinaryService;
     }
 
     public void deleteBook(Long bookId) throws Exception{
-        Optional<Book> book = bookRepository.findById(bookId);
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new Exception("Book not found"));
 
-        if(!book.isPresent()){
-            throw new Exception("Book not found");
+        if (book.getImagePublicId() != null) {
+            cloudinaryService.deleteFile(book.getImagePublicId(), "image");
+        }
+
+        if (book.getPdfPublicId() != null) {
+            cloudinaryService.deleteFile(book.getPdfPublicId(), "raw");
         }
 
         checkoutRepository.deleteAllByBookId(bookId);
@@ -77,11 +83,9 @@ public class AdminService {
             String description,
             int copies,
             String category,
-            MultipartFile image
+            MultipartFile image,
+            MultipartFile pdf
     ) {
-
-        String imageUrl = resolveBookImage(image, null);
-
         Book newBook = new Book();
 
         newBook.setTitle(title);
@@ -90,9 +94,22 @@ public class AdminService {
         newBook.setCopies(copies);
         newBook.setCopiesAvailable(copies);
         newBook.setCategory(category);
-        newBook.setImg(imageUrl);
+        newBook.setDataSource(BookSource.INTERNAL);
 
-        System.out.println(newBook.toString());
+
+        if (image != null && !image.isEmpty()) {
+            var upload = cloudinaryService.uploadImage(image);
+            newBook.setImg(upload.url());
+            newBook.setImagePublicId(upload.publicId());
+        } else {
+            newBook.setImg(DEFAULT_BOOK_IMAGE_URL);
+        }
+
+        if (pdf != null && !pdf.isEmpty()) {
+            var upload = cloudinaryService.uploadPdf(pdf);
+            newBook.setBookUrl(upload.url());
+            newBook.setPdfPublicId(upload.publicId());
+        }
 
         bookRepository.save(newBook);
     }
@@ -103,47 +120,38 @@ public class AdminService {
             String author,
             String description,
             String category,
-            MultipartFile image
-    ) throws Exception{
+            MultipartFile image,
+            MultipartFile pdf
+    ) throws Exception {
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new Exception("Book not found"));
 
-        if (title != null && !title.isBlank()) {
-            book.setTitle(title);
+        if (title != null && !title.isBlank()) book.setTitle(title);
+        if (author != null && !author.isBlank()) book.setAuthor(author);
+        if (description != null && !description.isBlank()) book.setDescription(description);
+        if (category != null && !category.isBlank()) book.setCategory(category);
+
+        if (image != null && !image.isEmpty()) {
+            if (book.getImagePublicId() != null) {
+                cloudinaryService.deleteFile(book.getImagePublicId(), "image");
+            }
+
+            var upload = cloudinaryService.uploadImage(image);
+            book.setImg(upload.url());
+            book.setImagePublicId(upload.publicId());
         }
 
-        if (author != null && !author.isBlank()) {
-            book.setAuthor(author);
-        }
+        if (book.getDataSource() == BookSource.INTERNAL && pdf != null && !pdf.isEmpty()) {
+            if (book.getPdfPublicId() != null) {
+                cloudinaryService.deleteFile(book.getPdfPublicId(), "raw");
+            }
 
-        if (description != null && !description.isBlank()) {
-            book.setDescription(description);
+            var upload = cloudinaryService.uploadPdf(pdf);
+            book.setBookUrl(upload.url());
+            book.setPdfPublicId(upload.publicId());
         }
-
-        if (category != null && !category.isBlank()) {
-            book.setCategory(category);
-        }
-
-        String imageUrl = resolveBookImage(image, book.getImg());
-        book.setImg(imageUrl);
 
         bookRepository.save(book);
     }
-
-    private String resolveBookImage(MultipartFile image, String existingImageUrl){
-        if(image != null && !image.isEmpty()){
-            if (!imageUploadService.isEnabled()) {
-                throw new IllegalStateException("Image upload is disabled. Cloudinary is not configured.");
-            }
-
-            return imageUploadService.uploadImage(image);
-        }
-
-        if(existingImageUrl != null && !existingImageUrl.isBlank()){
-            return existingImageUrl;
-        }
-
-        return DEFAULT_BOOK_IMAGE_URL;
-    }
-
 }

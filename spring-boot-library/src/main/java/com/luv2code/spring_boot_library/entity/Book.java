@@ -32,4 +32,17 @@ public class Book {
 
     @Column(name = "img_url")
     private String img;
+
+    @Column(name="image_public_id")
+    public String imagePublicId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="book_source", nullable = false)
+    private BookSource dataSource;
+
+    @Column(name="book_url")
+    private String bookUrl;
+
+    @Column(name="pdf_public_id")
+    public String pdfPublicId;
 }

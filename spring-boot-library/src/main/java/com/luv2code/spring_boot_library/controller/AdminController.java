@@ -47,7 +47,8 @@ public class AdminController {
                           @RequestParam String description,
                           @RequestParam int copies,
                           @RequestParam String category,
-                          @RequestParam("image") MultipartFile image
+                          @RequestParam("image") MultipartFile image,
+                          @RequestParam(value = "pdf", required = false) MultipartFile pdf
                          ) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -65,7 +66,8 @@ public class AdminController {
                     description,
                     copies,
                     category,
-                    image
+                    image,
+                    pdf
             );
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -82,7 +84,8 @@ public class AdminController {
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) MultipartFile image
+            @RequestParam(required = false) MultipartFile image,
+            @RequestParam(required = false) MultipartFile pdf
     ) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -93,7 +96,7 @@ public class AdminController {
             throw new RuntimeException("Access denied: Administration page only.");
         }
 
-        adminService.updateBookData(bookId, title, author, description, category, image);
+        adminService.updateBookData(bookId, title, author, description, category, image, pdf);
 
         return ResponseEntity.ok().build();
     }
