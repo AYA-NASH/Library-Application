@@ -49,7 +49,7 @@ public class AdminController {
                           @RequestParam String category,
                           @RequestParam("image") MultipartFile image,
                           @RequestParam(value = "pdf", required = false) MultipartFile pdf
-                         ) throws Exception {
+                         ){
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
@@ -59,20 +59,15 @@ public class AdminController {
             throw new RuntimeException("Access denied: Administration page only.");
         }
 
-        try{
-            adminService.postBook(
-                    title,
-                    author,
-                    description,
-                    copies,
-                    category,
-                    image,
-                    pdf
-            );
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
-
+        adminService.postBook(
+                title,
+                author,
+                description,
+                copies,
+                category,
+                image,
+                pdf
+        );
 
         return ResponseEntity.ok().build();
     }
