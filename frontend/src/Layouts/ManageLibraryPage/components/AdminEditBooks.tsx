@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { BookModel } from "../../../models/BookModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { EditBook } from "./EditBook";
 import { useBooks } from "../../../Hooks/useBooks";
-import { BookFilterBar } from "../../Utils/BookFilterBar"; // adjust path if needed
+import { BookFilterBar } from "../../Utils/BookFilterBar";
 
 export const AdminEditBooks = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -15,12 +14,11 @@ export const AdminEditBooks = () => {
     const booksPerPage = 5;
     const categories = ["All", "BE", "FE", "Data", "DevOps"];
 
-    // Fetch books using the custom hook
     const { books, isLoading, httpError, totalPages, totalElements } =
         useBooks(currentPage, booksPerPage, searchParams);
 
     const handleSearch = (params: { text?: string; category?: string }) => {
-        setCurrentPage(1); // reset to first page on search
+        setCurrentPage(1);
         setSearchParams(params);
     };
 
@@ -39,7 +37,6 @@ export const AdminEditBooks = () => {
 
     return (
         <div className="container mt-3">
-            {/* Filter/Search bar */}
             <BookFilterBar
                 categories={categories}
                 initialCategory="All"

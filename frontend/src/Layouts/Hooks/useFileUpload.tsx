@@ -1,34 +1,38 @@
 import { useEffect, useState } from "react";
 
-interface UseImageUploadOptions {
+interface useFileUploadOptions {
     maxSizeMB?: number;
-    allowedTypes?: string[];
-    initialImageUrl?: string;
+    allowedTypes: string[];
+    initialFileUrl?: string;
 }
 
-export function useImageUpload(options?: UseImageUploadOptions) {
+export function useFileUpload(options: useFileUploadOptions) {
     const [file, setFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(options?.initialImageUrl ?? null);
+    const [preview, setPreview] = useState<string | null>(options?.initialFileUrl ?? null);
     const [error, setError] = useState<string | null>(null);
 
     const maxSizeMB = options?.maxSizeMB ?? 5;
-    const allowedTypes = options?.allowedTypes ?? ["image/jpeg", "image/png", "image/webp"];
 
     function selectFile(selectedFile: File) {
-        if (!allowedTypes.includes(selectedFile.type)) {
-            setError("Only JPG, PNG, or WEBP images are allowed.");
+        if (!options.allowedTypes.includes(selectedFile.type)) {
+            setError(`Invalid file type. Allowed: ${options.allowedTypes.join(", ")}`);
             return;
         }
 
         const maxBytes = maxSizeMB * 1024 * 1024;
         if (selectedFile.size > maxBytes) {
-            setError(`Image size must be less than ${maxSizeMB}MB.`);
+            setError(`File size must be less than ${maxSizeMB}MB.`);
             return;
         }
 
         setError(null);
         setFile(selectedFile);
-        setPreview(URL.createObjectURL(selectedFile));
+        
+        if (selectedFile.type.startsWith("image/")) {
+            setPreview(URL.createObjectURL(selectedFile));
+        } else {
+            setPreview(null);
+        }
     }
 
     function clearFile() {

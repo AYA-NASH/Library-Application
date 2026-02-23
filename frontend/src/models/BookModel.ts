@@ -6,10 +6,12 @@ export class BookModel{
     copies?: number;
     copiesAvailable?: number;
     category?: string;
+    dataSource: string;
     img?:string;
+    bookPdf?: string;
     
     constructor(id: number, title: string, description: string, author: string, copies: number,
-         copiesAvailable: number ,category: string, img:string){
+         copiesAvailable: number ,category: string, dataSource: string, img:string, bookPdf?: string){
 
             this.id = id;
             this.title = title;
@@ -18,6 +20,8 @@ export class BookModel{
             this.copies = copies;
             this.copiesAvailable = copiesAvailable;
             this.category = category;
+            this.dataSource = dataSource;
             this.img = img; 
+            this.bookPdf = bookPdf;
     }
 };

@@ -50,6 +50,7 @@ export const useBooks = (page: number, size: number, search?: SearchParams) => {
             description: b.description,
             copies: b.copies,
             copiesAvailable: b.copiesAvailable,
+            dataSource: b.dataSource,
             category: b.category,
             img: b.img,
         }));

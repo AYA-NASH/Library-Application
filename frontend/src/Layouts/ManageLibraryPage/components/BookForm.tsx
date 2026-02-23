@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { BookModel } from "../../../models/BookModel";
-import { useImageUpload } from "../../Hooks/useUploadImage";
+import { useFileUpload } from "../../Hooks/useFileUpload";
 
 interface BookFormProps {
   isEdit: boolean;
@@ -16,21 +16,26 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
     description: initialData?.description ?? "",
     category: initialData?.category ?? "Category",
     copies: initialData?.copies ?? 0,
-    image: initialData?.img ?? null
   });
 
   const [displayWarning, setDisplayWarning] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const pdfInputRef = useRef<HTMLInputElement | null>(null);
 
+  const imageUpload = useFileUpload({
+    maxSizeMB: 5,
+    allowedTypes: ["image/jpeg", "image/png", "image/webp"],
+    initialFileUrl: initialData?.img
+  });
 
-  const {
-    file: selectedImage,
-    preview: imagePreview,
-    error: imageError,
-    selectFile,
-    clearFile,
-  } = useImageUpload({ maxSizeMB: 5, initialImageUrl: initialData?.img });
+  const pdfUpload = useFileUpload({
+    maxSizeMB: 50,
+    allowedTypes: ["application/pdf"],
+    initialFileUrl: initialData?.bookPdf
+  });
+
+  let showPdfLoad = true;
 
   const categoryOptions = ["Front End", "Back End", "Data", "DevOps"];
 
@@ -38,17 +43,19 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
     setForm({ ...form, [field]: value });
   };
 
+  if (isEdit && initialData) {
+    if(initialData.dataSource !== "INTERNAL") {
+      showPdfLoad = false;
+    }
+  }
   const handleSubmit = () => {
     const formData = new FormData();
 
     if (!isEdit) {
-      if (
-        !form.title ||
-        !form.author ||
-        !form.description ||
-        form.category === "Category" ||
-        form.copies < 0
-      ) {
+      const isBaseInfoMissing = !form.title || !form.author || !form.description || form.category === "Category";
+      // const isPdfMissing = !isEdit && !pdfUpload.file;
+      // if (isBaseInfoMissing || isPdfMissing) {
+      if (isBaseInfoMissing) {
         setDisplayWarning(true);
         return;
       }
@@ -68,12 +75,10 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
 
       if (form.category !== initialData.category)
         formData.append("category", form.category);
-
     }
 
-    if (selectedImage) {
-      formData.append("image", selectedImage);
-    }
+    if (imageUpload.file) formData.append("image", imageUpload.file);
+    if (pdfUpload.file) formData.append("pdf", pdfUpload.file);
 
     setDisplayWarning(false);
     onSubmit(formData);
@@ -157,80 +162,104 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
               ></textarea>
             </div>
 
-            <div className="col-12">
-              <label className="form-label">Book Image</label>
-              <div className="d-flex align-items-center">
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files.length > 0) {
-                      selectFile(e.target.files[0]);
-                    }
-                  }}
-                />
-
-                <label
-                  htmlFor="book-image-upload"
-                  className="btn btn-outline-dark me-2 mb-0"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Choose Image
-                </label>
-
-                {selectedImage && (
-                  <span className="text-truncate" style={{ maxWidth: "200px" }}>
-                    {selectedImage.name}
-                  </span>
-                )}
-              </div>
-
-              {imageError && (
-                <div className="alert alert-danger mt-2 py-1">{imageError}</div>
-              )}
-
-              {imagePreview && (
-                <div
-                  className="position-relative mt-3 d-inline-block"
-                  style={{
-                    borderRadius: "0.5rem",
-                    overflow: "hidden",
-                    border: "1px solid #ddd",
-                  }}
-                >
-                  <img
-                    src={imagePreview}
-                    alt="Book preview"
-                    className="img-fluid"
-                    style={{ maxWidth: "200px", maxHeight: "300px", objectFit: "cover" }}
+            <div className="row g-4 mt-2">
+              <div className="col-md-6">
+                <label className="form-label fw-bold">Book Cover Image</label>
+                <div className="d-flex align-items-center mb-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={imageInputRef}
+                    className="d-none"
+                    onChange={(e) => e.target.files?.[0] && imageUpload.selectFile(e.target.files[0])}
                   />
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-0 d-flex justify-content-center align-items-center"
+                  <button type="button" className="btn btn-outline-dark me-2" onClick={() => imageInputRef.current?.click()}>
+                    Choose Image
+                  </button>
+                  <span className="text-muted small text-truncate" style={{ maxWidth: '150px' }}>
+                    {imageUpload.file?.name || (isEdit ? "Current Image" : "No file chosen")}
+                  </span>
+                </div>
+                {imageUpload.error && <div className="text-danger small">{imageUpload.error}</div>}
+
+                {imageUpload.preview && (
+                  <div
+                    className="position-relative mt-3 d-inline-block"
                     style={{
-                      width: "25px",
-                      height: "25px",
-                      borderRadius: "50%",
-                      fontWeight: "bold",
-                      lineHeight: "1",
-                    }}
-                    onClick={() => {
-                      clearFile();
-                      handleChange("image", "");
-                      if (fileInputRef.current) fileInputRef.current.value = "";
+                      borderRadius: "0.5rem",
+                      overflow: "hidden",
+                      border: "1px solid #ddd",
                     }}
                   >
-                    ×
-                  </button>
+                    <img
+                      src={imageUpload.preview}
+                      alt="Book preview"
+                      className="img-fluid"
+                      style={{ maxWidth: "200px", maxHeight: "300px", objectFit: "cover" }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-0 d-flex justify-content-center align-items-center"
+                      style={{
+                        width: "25px",
+                        height: "25px",
+                        borderRadius: "50%",
+                        fontWeight: "bold",
+                        lineHeight: "1",
+                      }}
+                      onClick={() => {
+                        imageUpload.clearFile();
+                        handleChange("image", "");
+                        if (imageInputRef.current) imageInputRef.current.value = "";
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+
+              </div>
+
+              {showPdfLoad && (
+                <div className="col-md-6 border-start">
+                  <label className="form-label fw-bold">Book File (PDF) <span className="text-danger">*</span></label>
+                  <div className="d-flex align-items-center mb-2">
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      ref={pdfInputRef}
+                      className="d-none"
+                      onChange={(e) => e.target.files?.[0] && pdfUpload.selectFile(e.target.files[0])}
+                    />
+                    <button type="button" className="btn btn-outline-dark me-2" onClick={() => pdfInputRef.current?.click()}>
+                      Upload PDF
+                    </button>
+                    <span className="text-muted small text-truncate" style={{ maxWidth: '150px' }}>
+                      {pdfUpload.file?.name || (isEdit ? "Current PDF" : "No file chosen")}
+                    </span>
+
+                    {pdfUpload.file && (
+                      <button type="button"
+                        className="btn btn-sm text-danger ms-1"
+                        onClick={() => {
+                          pdfUpload.clearFile();
+                          handleChange("pdf", "");
+                          if (pdfInputRef.current) pdfInputRef.current.value = "";
+                        }}>
+                        Remove
+                      </button>
+                    )}
+
+                  </div>
+                  <small className="text-muted d-block">Max size: 50MB</small>
+                  {pdfUpload.error && <div className="text-danger small">{pdfUpload.error}</div>}
                 </div>
               )}
             </div>
 
-            <div className="col-12 mt-3">
-              <button className="btn btn-primary" type="button" onClick={handleSubmit}>
-                {isEdit ? "Update Book" : "Add Book"}
+            <div className="col-12 mt-4 pt-3 border-top">
+              <button className="btn btn-dark btn-lg w-100" type="button" onClick={handleSubmit}>
+                {isEdit ? "Update Book Details" : "Add New Book to Library"}
               </button>
             </div>
           </div>
