@@ -58,4 +58,27 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UnauthenticatedException.class)
+    public ResponseEntity<Object> handleUnauthenticated(UnauthenticatedException ex){
+        Map<String, Object> body = Map.of(
+                "timestamp", LocalDateTime.now(),
+                "error", "Unauthorized",
+                "message", ex.getMessage()
+        );
+
+        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Object> handleForbidden(ForbiddenException ex) {
+
+        Map<String, Object> body = Map.of(
+                "timestamp", LocalDateTime.now(),
+                "error", "Forbidden",
+                "message", ex.getMessage()
+        );
+
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 }

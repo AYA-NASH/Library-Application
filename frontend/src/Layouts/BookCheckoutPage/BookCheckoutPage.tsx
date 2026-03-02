@@ -34,6 +34,9 @@ export const BookCheckoutPage = () => {
     const [isBookCheckedout, setIsBookCheckedout] = useState(false);
     const [isLoadingCheckedout, setIsLoadingCheckedout] = useState(true);
 
+    // Digital Unlock State
+    const [isDigitalUnlocked, setIsDigitalUnlocked] = useState(true);
+
     // Current Loans Count States
     const [currentLoansCount, setCurrentLoansCount] = useState(0);
     const [isLoadingCurrentLoansCount, setIsLoadingCurrentLoansCount] =
@@ -106,6 +109,7 @@ export const BookCheckoutPage = () => {
                 copiesAvailable: responseJson.copiesAvailable,
                 category: responseJson.category,
                 img: responseJson.img,
+                dataSource: responseJson.dataSource,
             };
             setBook(loadedBook);
             setIsLoading(false);
@@ -304,6 +308,7 @@ export const BookCheckoutPage = () => {
                         mobile={false}
                         isAuthenticated={isAuthenticated}
                         isCheckedout={isBookCheckedout}
+                        isDigitalUnlocked={isDigitalUnlocked}
                         currentLoansCount={currentLoansCount}
                         checkoutBook={checkoutBook}
                         isReviewLeft={isReviewLeft}
@@ -354,6 +359,7 @@ export const BookCheckoutPage = () => {
                     mobile={true}
                     isAuthenticated={isAuthenticated}
                     isCheckedout={isBookCheckedout}
+                    isDigitalUnlocked={isDigitalUnlocked}
                     currentLoansCount={currentLoansCount}
                     checkoutBook={checkoutBook}
                     isReviewLeft={isReviewLeft}

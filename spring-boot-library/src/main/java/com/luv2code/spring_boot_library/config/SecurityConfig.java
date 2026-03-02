@@ -1,5 +1,7 @@
 package com.luv2code.spring_boot_library.config;
 
+import com.luv2code.spring_boot_library.exception.RestAccessDeniedHandler;
+import com.luv2code.spring_boot_library.exception.RestAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +36,12 @@ public class SecurityConfig {
     @Autowired
     private MyUserDetailsService userDetailsService;
 
+    @Autowired
+    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
+    @Autowired
+    private RestAccessDeniedHandler restAccessDeniedHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -47,6 +55,10 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/books/**", "/api/reviews/**", "/api/messages/**", "/api/histories/**", "/api/payments/**").permitAll()
                     .requestMatchers("/api/register", "/api/login", "/api/google-login").permitAll()
                     .anyRequest().authenticated()
+            )
+            .exceptionHandling(exception -> exception
+                    .authenticationEntryPoint(restAuthenticationEntryPoint)
+                    .accessDeniedHandler(restAccessDeniedHandler)
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

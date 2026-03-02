@@ -14,6 +14,10 @@ import { ShelfPage } from "./Layouts/ShelfPage/ShelfPage";
 import { MessagesPage } from "./Layouts/MessagesPage/MessagesPage";
 import { ManageLibraryPage } from "./Layouts/ManageLibraryPage/ManageLibraryPage";
 import { PaymentPage } from "./Layouts/PaymentPage/PaymentPage";
+import ReaderPreviewPage from "./Layouts/PDFReader/ReaderPreviewPage";
+import ReaderAccessPage from "./Layouts/PDFReader/ReaderAccessPage";
+import ReaderPage from "./Layouts/PDFReader/ReaderPage";
+
 
 function App() {
     return (
@@ -81,6 +85,33 @@ function InnerApp() {
                         element={
                             <RequireAuth>
                                 <PaymentPage />
+                            </RequireAuth>
+                        }
+                    />
+
+                    <Route
+                        path="/reader/:bookId/preview"
+                        element={
+                            <RequireAuth>
+                                <ReaderPreviewPage />
+                            </RequireAuth>
+                        }
+                    />
+
+                    <Route
+                        path="/reader/:bookId"
+                        element={
+                            <RequireAuth>
+                                <ReaderAccessPage />
+                            </RequireAuth>
+                        }
+                    />
+
+                    <Route
+                        path="/reader/:bookId/read"
+                        element={
+                            <RequireAuth>
+                                <ReaderPage />
                             </RequireAuth>
                         }
                     />

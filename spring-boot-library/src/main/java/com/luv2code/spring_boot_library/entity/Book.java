@@ -34,7 +34,7 @@ public class Book {
     private String img;
 
     @Column(name="image_public_id")
-    public String imagePublicId;
+    private String imagePublicId;
 
     @Enumerated(EnumType.STRING)
     @Column(name="book_source", nullable = false)
@@ -44,5 +44,8 @@ public class Book {
     private String bookUrl;
 
     @Column(name="pdf_public_id")
-    public String pdfPublicId;
+    private String pdfPublicId;
+
+    @Column(name="preview_url")
+    private String previewUrl;
 }
