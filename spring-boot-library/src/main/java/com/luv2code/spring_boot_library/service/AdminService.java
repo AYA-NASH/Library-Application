@@ -5,6 +5,7 @@ import com.luv2code.spring_boot_library.dao.CheckoutRepository;
 import com.luv2code.spring_boot_library.dao.ReviewRepository;
 import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.entity.BookSource;
+import com.luv2code.spring_boot_library.responsemodel.AdminBookEditInfoResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,5 +154,19 @@ public class AdminService {
         }
 
         bookRepository.save(book);
+    }
+
+    /**
+     * Returns edit-form metadata for a book. Does not expose PDF URL.
+     */
+    public AdminBookEditInfoResponse getBookEditInfo(Long bookId) throws Exception {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new Exception("Book not found"));
+
+        boolean hasPdf = book.getBookUrl() != null && !book.getBookUrl().isBlank();
+        boolean hasImage = book.getImg() != null && !book.getImg().isBlank();
+        String imageUrl = book.getImg();
+
+        return new AdminBookEditInfoResponse(hasPdf, hasImage, imageUrl);
     }
 }
