@@ -7,8 +7,14 @@ type SearchParams = {
     text?: string;
     category?: string;
 }
-export const useBooks = (page: number, size: number, search?: SearchParams) => {
-
+export const useBooks = (
+    page: number,
+    size: number,
+    search?: SearchParams,
+    /** When these change (e.g. after admin update/delete), the list is refetched. */
+    refreshTrigger1?: boolean,
+    refreshTrigger2?: boolean
+) => {
     const [books, setBooks] = useState<BookModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [httpError, setHttpError] = useState<null | string>(null);
@@ -17,7 +23,8 @@ export const useBooks = (page: number, size: number, search?: SearchParams) => {
 
 
     const fetchBooks = async () => {
-        setIsLoading(true);
+        const isInitial = books.length === 0;
+        if (isInitial) setIsLoading(true);
 
         let url = `${BASE_URL}?page=${page - 1}&size=${size}`;
 
@@ -57,14 +64,15 @@ export const useBooks = (page: number, size: number, search?: SearchParams) => {
 
         setBooks(loadedBooks);
         setIsLoading(false);
+        setHttpError(null);
     }
 
     useEffect(() => {
-        fetchBooks().catch(error => {
+        fetchBooks().catch((error) => {
             setHttpError(error.message);
             setIsLoading(false);
-        })
-    }, [page, size, search?.text, search?.category]);
+        });
+    }, [page, size, search?.text, search?.category, refreshTrigger1, refreshTrigger2]);
 
 
     return {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../../Auth/AuthContext";
 import { BookForm } from "./BookForm";
+import { parseApiError } from "../../../utils/apiError";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -12,6 +13,8 @@ export const AddNewBook = () => {
 
     const handleAddBook = async (formData: FormData) => {
         if (!user) return;
+        setHttpError("");
+        
         try {
             const url = `${baseUrl}/admin/secure/add/book`;
             const response = await fetch(url, {
@@ -20,25 +23,30 @@ export const AddNewBook = () => {
                 body: formData,
             });
 
-            if (!response.ok){ 
-                const errorMessage = await response.text();
-                setHttpError(errorMessage);
-                throw new Error(errorMessage || "Failed to add book");
+            if (!response.ok) {
+                const msg = await parseApiError(response);
+                setHttpError(msg);
+                return;
             }
 
             setDisplaySuccess(true);
-            setResetKey((prev) => prev + 1); 
+            setResetKey((prev) => prev + 1);
             window.scrollTo(0, 0);
             setTimeout(() => setDisplaySuccess(false), 5000);
         } catch (err) {
-            console.error(err);
+            setHttpError(err instanceof Error ? err.message : "Failed to add book");
         }
     };
 
     return (
         <div className="container mt-5 mb-3">
             {displaySuccess && <div className="alert alert-success">Book added successfully!</div>}
-            {httpError && <div className="alert alert-danger">{httpError}</div>}
+            {httpError && (
+                <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                    {httpError}
+                    <button type="button" className="btn-close" onClick={() => setHttpError("")} aria-label="Close" />
+                </div>
+            )}
             <div className="card shadow-sm">
                 <div className="card-body">
                     <BookForm key={resetKey} isEdit={false} onSubmit={handleAddBook} />

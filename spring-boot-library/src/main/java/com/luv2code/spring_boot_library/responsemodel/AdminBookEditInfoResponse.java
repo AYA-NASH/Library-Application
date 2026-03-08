@@ -18,4 +18,8 @@ public class AdminBookEditInfoResponse {
     private boolean hasImage;
     /** Current cover image URL for preview in the form. */
     private String imageUrl;
+    /** Display name for current PDF (e.g. derived from URL). Never the actual URL. */
+    private String pdfFilename;
+    /** Display name for current cover image (e.g. derived from URL). */
+    private String imageFilename;
 }

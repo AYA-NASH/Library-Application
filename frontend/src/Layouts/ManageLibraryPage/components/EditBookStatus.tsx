@@ -45,25 +45,25 @@ export const EditBookStatus : React.FC<{ book: BookModel, deleteBook: () => void
     async function updateQuantity() {
         setIsUpdating(true);
 
-        const url = `${baseUrl}/admin/secure/update/book/quantity?bookId=${props.book.id}&quantity=${quantity}`;
+            const url = `${baseUrl}/admin/secure/update/book/quantity?bookId=${props.book.id}&quantity=${quantity}`;
         const requestOptions = {
-            method: "PUT",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-            },
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
         };
 
         const response = await fetch(url, requestOptions);
-        
-        if (!response.ok) {
-            throw new Error("Something went wrong");
-        }
 
-        setDisplaySuccess(true);
-        setTimeout(() => setDisplaySuccess(false), 3000);
+            if (!response.ok) {
+            throw new Error("Something went wrong");
+            }
+
+            setDisplaySuccess(true);
+            setTimeout(() => setDisplaySuccess(false), 3000);
         
-        setIsUpdating(false);
+            setIsUpdating(false);
 
         props.updateBook();
     }

@@ -1,5 +1,6 @@
 package com.luv2code.spring_boot_library.controller;
 
+import com.luv2code.spring_boot_library.requestmodel.AdminBookRequest;
 import com.luv2code.spring_boot_library.responsemodel.AdminBookEditInfoResponse;
 import com.luv2code.spring_boot_library.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,17 +54,11 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value="/secure/add/book",
-                consumes = "multipart/form-data")
-
-    public ResponseEntity<?> postBook( @RequestParam String title,
-                          @RequestParam String author,
-                          @RequestParam String description,
-                          @RequestParam int copies,
-                          @RequestParam String category,
-                          @RequestParam("image") MultipartFile image,
-                          @RequestParam(value = "pdf", required = false) MultipartFile pdf
-                         ){
+    @PostMapping(value = "/secure/add/book", consumes = "multipart/form-data")
+    public ResponseEntity<?> postBook(
+            @ModelAttribute AdminBookRequest request,
+            @RequestParam("image") MultipartFile image,
+            @RequestParam(value = "pdf", required = false) MultipartFile pdf) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
@@ -73,29 +68,18 @@ public class AdminController {
             throw new RuntimeException("Access denied: Administration page only.");
         }
 
-        adminService.postBook(
-                title,
-                author,
-                description,
-                copies,
-                category,
-                image,
-                pdf
-        );
-
+        adminService.postBook(request, image, pdf);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/secure/update/book/data/{bookId}")
+    @PutMapping(value = "/secure/update/book/data/{bookId}", consumes = "multipart/form-data")
     public ResponseEntity<Void> updateBook(
             @PathVariable Long bookId,
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String author,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) String category,
+            @ModelAttribute AdminBookRequest request,
             @RequestParam(required = false) MultipartFile image,
-            @RequestParam(required = false) MultipartFile pdf
-    ) throws Exception {
+            @RequestParam(required = false) MultipartFile pdf,
+            @RequestParam(value = "removeImage", required = false) Boolean removeImage,
+            @RequestParam(value = "removePdf", required = false) Boolean removePdf) throws Exception {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = authentication.getAuthorities().stream()
@@ -105,7 +89,9 @@ public class AdminController {
             throw new RuntimeException("Access denied: Administration page only.");
         }
 
-        adminService.updateBookData(bookId, title, author, description, category, image, pdf);
+        adminService.updateBookData(bookId, request, image, pdf,
+                Boolean.TRUE.equals(removeImage),
+                Boolean.TRUE.equals(removePdf));
 
         return ResponseEntity.ok().build();
     }

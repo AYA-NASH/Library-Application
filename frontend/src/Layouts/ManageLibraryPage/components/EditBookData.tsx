@@ -14,11 +14,12 @@ export const EditBookData: React.FC<{
   book: BookModel;
   updateBook: () => void;
 }> = (props) => {
+
   const { token } = useAuth();
+
   const [showModal, setShowModal] = useState(false);
-  const [editInitialData, setEditInitialData] = useState<AdminBookRequest | null>(
-    null
-  );
+
+  const [editInitialData, setEditInitialData] = useState<AdminBookRequest | null>(null);
   const [editInfoLoading, setEditInfoLoading] = useState(false);
   const [editInfoError, setEditInfoError] = useState<string | null>(null);
 
@@ -28,12 +29,16 @@ export const EditBookData: React.FC<{
     setEditInfoError(null);
     try {
       const url = `${baseUrl}/admin/secure/book/${props.book.id}/edit-info`;
+      
       const response = await fetch(url, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
+      
       if (!response.ok) throw new Error("Failed to fetch book edit info");
+      
       const data: AdminBookEditInfoResponse = await response.json();
+      
       return data;
     } catch (e) {
       setEditInfoError(e instanceof Error ? e.message : "Failed to load");
@@ -47,6 +52,7 @@ export const EditBookData: React.FC<{
     if (!showModal || !props.book) return;
 
     const book = props.book;
+    
     const baseInitial: AdminBookRequest = {
       id: book.id,
       title: book.title,
@@ -65,6 +71,8 @@ export const EditBookData: React.FC<{
           hasPdf: editInfo.hasPdf,
           hasImage: editInfo.hasImage,
           imageUrl: editInfo.imageUrl ?? book.img,
+          pdfFilename: editInfo.pdfFilename,
+          imageFilename: editInfo.imageFilename,
         });
       } else {
         setEditInitialData({ ...baseInitial });
@@ -116,6 +124,7 @@ export const EditBookData: React.FC<{
             className="rounded shadow-sm"
           />
         </div>
+        
         <div className="col-md-9 d-flex flex-column justify-content-center">
           <p className="text-primary mb-1 fw-bold">{props.book.author}</p>
           <h3 className="card-title mb-2">{props.book.title}</h3>

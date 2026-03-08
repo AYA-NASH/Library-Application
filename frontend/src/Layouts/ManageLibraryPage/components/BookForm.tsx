@@ -19,6 +19,9 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
 
   const [displayWarning, setDisplayWarning] = useState(false);
 
+  const [removedCurrentPdf, setRemovedCurrentPdf] = useState(false);
+  const [removedCurrentImage, setRemovedCurrentImage] = useState(false);
+
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const pdfInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -50,15 +53,18 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
         !form.author ||
         !form.description ||
         form.category === "Category";
+
       if (isBaseInfoMissing) {
         setDisplayWarning(true);
         return;
       }
+
       formData.append("title", form.title);
       formData.append("author", form.author);
       formData.append("description", form.description);
       formData.append("category", form.category);
       formData.append("copies", form.copies.toString());
+
     } else if (initialData) {
       if (form.title !== initialData.title) formData.append("title", form.title);
       if (form.author !== initialData.author) formData.append("author", form.author);
@@ -71,15 +77,24 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
     if (imageUpload.file) formData.append("image", imageUpload.file);
     if (pdfUpload.file) formData.append("pdf", pdfUpload.file);
 
+    if (isEdit && removedCurrentImage && !imageUpload.file) formData.append("removeImage", "true");
+    if (isEdit && removedCurrentPdf && !pdfUpload.file) formData.append("removePdf", "true");
+
     setDisplayWarning(false);
     onSubmit(formData);
   };
 
-  const pdfLabel =
-    pdfUpload.file?.name ?? (isEdit && initialData?.hasPdf ? "Current PDF" : "No file chosen");
-  const imageLabel =
-    imageUpload.file?.name ??
-    (isEdit && (initialData?.hasImage ?? initialData?.imageUrl) ? "Current Image" : "No file chosen");
+  const pdfLabel = (pdfUpload.file?.name) ?? (
+    isEdit && initialData?.hasPdf && !removedCurrentPdf
+      ? (initialData.pdfFilename ?? "Current PDF")
+      : "No file chosen"
+  );
+
+  const imageLabel = (imageUpload.file?.name) ?? (
+    isEdit && (initialData?.hasImage ?? initialData?.imageUrl) && !removedCurrentImage
+      ? (initialData.imageFilename ?? "Current Image")
+      : "No file chosen"
+  );
 
   return (
     <div className="container mt-3">
@@ -91,6 +106,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
 
       <div className="card">
         <div className="card-header">{isEdit ? "Edit Book" : "Add a New Book"}</div>
+
         <div className="card-body">
           <div className="row g-3">
             <div className="col-md-6">
@@ -127,6 +143,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
 
             <div className="col-md-6">
               <label className="form-label">Category</label>
+
               <button
                 className="form-control btn btn-dark dropdown-toggle"
                 type="button"
@@ -134,6 +151,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
               >
                 {form.category}
               </button>
+
               <ul className="dropdown-menu">
                 {categoryOptions.map((cat) => (
                   <li key={cat}>
@@ -161,6 +179,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
             <div className="row g-4 mt-2">
               <div className="col-md-6">
                 <label className="form-label fw-bold">Book Cover Image</label>
+
                 <div className="d-flex align-items-center mb-2">
                   <input
                     type="file"
@@ -171,6 +190,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                       e.target.files?.[0] && imageUpload.selectFile(e.target.files[0])
                     }
                   />
+
                   <button
                     type="button"
                     className="btn btn-outline-dark me-2"
@@ -178,6 +198,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                   >
                     Choose Image
                   </button>
+
                   <span
                     className="text-muted small text-truncate"
                     style={{ maxWidth: "150px" }}
@@ -185,6 +206,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                     {imageLabel}
                   </span>
                 </div>
+                
                 {imageUpload.error && (
                   <div className="text-danger small">{imageUpload.error}</div>
                 )}
@@ -220,6 +242,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                       }}
                       onClick={() => {
                         imageUpload.clearFile();
+                        if (isEdit && (initialData?.hasImage ?? initialData?.imageUrl)) setRemovedCurrentImage(true);
                         if (imageInputRef.current) imageInputRef.current.value = "";
                       }}
                     >
@@ -258,12 +281,13 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                       {pdfLabel}
                     </span>
 
-                    {pdfUpload.file && (
+                    {(pdfUpload.file || (isEdit && initialData?.hasPdf && !removedCurrentPdf)) && (
                       <button
                         type="button"
                         className="btn btn-sm text-danger ms-1"
                         onClick={() => {
                           pdfUpload.clearFile();
+                          if (isEdit && initialData?.hasPdf) setRemovedCurrentPdf(true);
                           if (pdfInputRef.current) pdfInputRef.current.value = "";
                         }}
                       >
@@ -271,6 +295,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                       </button>
                     )}
                   </div>
+                  
                   <small className="text-muted d-block">Max size: 50MB</small>
                   {pdfUpload.error && (
                     <div className="text-danger small">{pdfUpload.error}</div>

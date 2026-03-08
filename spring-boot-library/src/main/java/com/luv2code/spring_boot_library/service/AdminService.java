@@ -5,6 +5,7 @@ import com.luv2code.spring_boot_library.dao.CheckoutRepository;
 import com.luv2code.spring_boot_library.dao.ReviewRepository;
 import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.entity.BookSource;
+import com.luv2code.spring_boot_library.requestmodel.AdminBookRequest;
 import com.luv2code.spring_boot_library.responsemodel.AdminBookEditInfoResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,25 +79,26 @@ public class AdminService {
         bookRepository.save(book);
     }
 
-    public void postBook(
-            String title,
-            String author,
-            String description,
-            int copies,
-            String category,
-            MultipartFile image,
-            MultipartFile pdf
-    ) {
+    public void postBook(AdminBookRequest request, MultipartFile image, MultipartFile pdf) {
+
+        if (request == null || request.getTitle() == null || request.getTitle().isBlank()
+                || request.getAuthor() == null || request.getAuthor().isBlank()
+                || request.getDescription() == null 
+                || request.getCategory() == null || request.getCategory().isBlank()
+                || request.getCopies() == null || request.getCopies() < 0) {
+            throw new IllegalArgumentException("Missing or invalid required fields: title, author, description, category, copies");
+        }
+
         Book newBook = new Book();
 
-        newBook.setTitle(title);
-        newBook.setAuthor(author);
-        newBook.setDescription(description);
-        newBook.setCopies(copies);
-        newBook.setCopiesAvailable(copies);
-        newBook.setCategory(category);
-        newBook.setDataSource(BookSource.INTERNAL);
+        newBook.setTitle(request.getTitle());
+        newBook.setAuthor(request.getAuthor());
+        newBook.setDescription(request.getDescription());
+        newBook.setCopies(request.getCopies());
+        newBook.setCopiesAvailable(request.getCopies());
+        newBook.setCategory(request.getCategory());
 
+        newBook.setDataSource(BookSource.INTERNAL);
 
         if (image != null && !image.isEmpty()) {
             var upload = cloudinaryService.uploadImage(image);
@@ -117,56 +119,79 @@ public class AdminService {
 
     public void updateBookData(
             Long bookId,
-            String title,
-            String author,
-            String description,
-            String category,
+            AdminBookRequest request,
             MultipartFile image,
-            MultipartFile pdf
-    ) throws Exception {
+            MultipartFile pdf,
+            boolean removeImage,
+            boolean removePdf) throws Exception {
 
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new Exception("Book not found"));
 
-        if (title != null && !title.isBlank()) book.setTitle(title);
-        if (author != null && !author.isBlank()) book.setAuthor(author);
-        if (description != null && !description.isBlank()) book.setDescription(description);
-        if (category != null && !category.isBlank()) book.setCategory(category);
+        if (request != null) {
+            if (request.getTitle() != null && !request.getTitle().isBlank()) book.setTitle(request.getTitle());
+            if (request.getAuthor() != null && !request.getAuthor().isBlank()) book.setAuthor(request.getAuthor());
+            if (request.getDescription() != null && !request.getDescription().isBlank()) book.setDescription(request.getDescription());
+            if (request.getCategory() != null && !request.getCategory().isBlank()) book.setCategory(request.getCategory());
+        }
 
-        if (image != null && !image.isEmpty()) {
+        if (removeImage || (image != null && !image.isEmpty())) {
             if (book.getImagePublicId() != null) {
                 cloudinaryService.deleteFile(book.getImagePublicId(), "image");
             }
+            book.setImagePublicId(null);
+        }
 
+        if (removeImage) {
+            book.setImg(DEFAULT_BOOK_IMAGE_URL);
+        } else if (image != null && !image.isEmpty()) {
             var upload = cloudinaryService.uploadImage(image);
             book.setImg(upload.url());
             book.setImagePublicId(upload.publicId());
         }
 
-        if (book.getDataSource() == BookSource.INTERNAL && pdf != null && !pdf.isEmpty()) {
-            if (book.getPdfPublicId() != null) {
-                cloudinaryService.deleteFile(book.getPdfPublicId(), "raw");
+        if (book.getDataSource() == BookSource.INTERNAL) {
+            if (removePdf) {
+                if (book.getPdfPublicId() != null) {
+                    cloudinaryService.deleteFile(book.getPdfPublicId(), "raw");
+                }
+                book.setBookUrl(null);
+                book.setPdfPublicId(null);
+            } else if (pdf != null && !pdf.isEmpty()) {
+                if (book.getPdfPublicId() != null) {
+                    cloudinaryService.deleteFile(book.getPdfPublicId(), "raw");
+                }
+                var upload = cloudinaryService.uploadPdf(pdf);
+                book.setBookUrl(upload.url());
+                book.setPdfPublicId(upload.publicId());
             }
-
-            var upload = cloudinaryService.uploadPdf(pdf);
-            book.setBookUrl(upload.url());
-            book.setPdfPublicId(upload.publicId());
         }
 
         bookRepository.save(book);
     }
 
-    /**
-     * Returns edit-form metadata for a book. Does not expose PDF URL.
-     */
     public AdminBookEditInfoResponse getBookEditInfo(Long bookId) throws Exception {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new Exception("Book not found"));
 
         boolean hasPdf = book.getBookUrl() != null && !book.getBookUrl().isBlank();
         boolean hasImage = book.getImg() != null && !book.getImg().isBlank();
+        
         String imageUrl = book.getImg();
+        String pdfFilename = hasPdf ? filenameFromUrl(book.getBookUrl()) : null;
+        String imageFilename = hasImage ? filenameFromUrl(book.getImg()) : null;
 
-        return new AdminBookEditInfoResponse(hasPdf, hasImage, imageUrl);
+        return new AdminBookEditInfoResponse(hasPdf, hasImage, imageUrl, pdfFilename, imageFilename);
+    }
+
+    private static String filenameFromUrl(String url) {
+        if (url == null || url.isBlank()) return null;
+        int last = url.lastIndexOf('/');
+        if (last >= 0 && last < url.length() - 1) {
+            String segment = url.substring(last + 1);
+            int q = segment.indexOf('?');
+            return q > 0 ? segment.substring(0, q) : segment;
+        }
+        return "file";
     }
 }
