@@ -1,48 +1,69 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../../Auth/AuthContext";
+
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 
 export function useReadingProgress(bookId: string) {
-    // Every book gets its own storage entry
-    const storageKey = `reading-progress-${bookId}`;
+    const { token } = useAuth();
+    const [lastPage, setLastPage] = useState<number>(1);
+    const [loading, setLoading] = useState<boolean>(true);
 
-    // Reading from storage (once)
-    const [lastPage, setLastPage] = useState<number>(() => {
-        const storedLastPage = localStorage.getItem(storageKey);
-        return storedLastPage ? Number(storedLastPage) : 1;
-    });
-
-    // Writing to storage (on change)
-    // Runs only when lastPage changes
+    // fetch saved progress - the last page read for the given book
     useEffect(() => {
-        localStorage.setItem(storageKey, String(lastPage));
-    }, [lastPage, storageKey]);
+        if (!bookId || !token) return;
 
+        async function fetchReadingProgress() {
+            try {
+                const res = await fetch(
+                    `${baseUrl}/interactions/secure/book/${bookId}/last-page`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
 
-    // The hook provides state, not behavior.
-    // lastPage = value restored from storage
-    // setLastPage = persistence-aware setter
-    return { lastPage, setLastPage };
+                if (!res.ok) throw new Error("Failed to load progress");
+
+                const page = await res.json();
+                setLastPage(page);
+
+            } catch (error) {
+                console.error("Error fetching reading progress:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchReadingProgress();
+    }, [bookId, token]);
+
+    // Persist progress when page changes
+    useEffect(() => {
+
+        if (!bookId || !token) return;
+
+        async function updateProgress() {
+            try {
+                await fetch(
+                    `${baseUrl}/interactions/secure/book/${bookId}/interact`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ page: lastPage }),
+                    }
+                );
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        updateProgress();
+
+    }, [lastPage, bookId, token]);
+
+    return { lastPage, setLastPage, loading };
 }
-
-
-/**
- * (frontend-only persistence)
-        Storage.setItem(storageKey, page);
-        localStorage.getItem(storageKey);
-
- * Later (backend-backed persistence)
-        GET  /api/reading-progress/{bookId}
-        POST /api/reading-progress/{bookId}
-
-
- * What changes:
-    Where data is stored
-    How it is fetched
-    How it is saved
- *
- */
-
-// Therefore:
-
-// Hook = persistence mechanism
-//
-// Container = domain authority

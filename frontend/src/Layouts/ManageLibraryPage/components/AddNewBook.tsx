@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../../Auth/AuthContext";
 import { BookForm } from "./BookForm";
-import { parseApiError } from "../../../utils/apiError";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -24,8 +23,7 @@ export const AddNewBook = () => {
             });
 
             if (!response.ok) {
-                const msg = await parseApiError(response);
-                setHttpError(msg);
+                setHttpError("Failed to add book");
                 return;
             }
 

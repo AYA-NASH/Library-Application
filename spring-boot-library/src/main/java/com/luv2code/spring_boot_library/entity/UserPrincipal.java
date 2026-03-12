@@ -1,5 +1,6 @@
 package com.luv2code.spring_boot_library.entity;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -7,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
+@Getter
 public class UserPrincipal implements UserDetails {
 
     private AppUser user;
@@ -15,7 +16,6 @@ public class UserPrincipal implements UserDetails {
     public UserPrincipal(AppUser user) {
         this.user = user;
     }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String role = user.getRole() == null ? "USER" : user.getRole();
