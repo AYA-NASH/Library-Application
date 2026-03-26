@@ -1,21 +1,32 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pagination } from "../Utils/Pagination";
 import { SearchBooks } from "./SearchBooks";
-import { useBooks } from "../../Hooks/useBooks";
+import { useBooks } from "../../Hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../Utils/BookFilterBar";
+import { useCategories } from "../../Hooks/BookHooks/useCategories";
+
+type SearchParams = {
+    text?: string;
+    categoryId?: number;
+};
 
 export const SearchBooksPage = () => {
+    const { categories } = useCategories();
+
     const [currentPage, setCurrentPage] = useState(1);
-    const [searchParams, setSearchParams] = useState<{ text?: string; category?: string }>();
+    const [searchParams, setSearchParams] = useState<SearchParams>();
 
     const booksPerPage = 5;
-    const categories = ["All", "BE", "FE", "Data", "DevOps"];
+
+    const options = useMemo(() =>
+        categories.map(cat => ({ value: cat.id, label: cat.name })),
+        [categories]);
 
     const { books, isLoading, httpError, totalPages, totalElements } =
         useBooks(currentPage, booksPerPage, searchParams);
 
-    const handleSearch = (params: { text?: string; category?: string }) => {
-        setCurrentPage(1); // reset to first page on new search
+    const handleSearch = (params: SearchParams) => {
+        setCurrentPage(1);
         setSearchParams(params);
     };
 
@@ -32,7 +43,7 @@ export const SearchBooksPage = () => {
     return (
         <div className="container mt-5">
             <BookFilterBar
-                categories={categories}
+                categories={options}
                 onSearch={handleSearch}
             />
 

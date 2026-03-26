@@ -16,6 +16,7 @@ public class UserPrincipal implements UserDetails {
     public UserPrincipal(AppUser user) {
         this.user = user;
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String role = user.getRole() == null ? "USER" : user.getRole();

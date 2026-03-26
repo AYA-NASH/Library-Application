@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { BookModel } from "../models/BookModel";
+import { BookModel } from "../../models/BookModel";
 
 const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/books`;
 
 type SearchParams = {
     text?: string;
-    category?: string;
-}
+    categoryId?: number;
+};
 export const useBooks = (
     page: number,
     size: number,
     search?: SearchParams,
-    /** When these change (e.g. after admin update/delete), the list is refetched. */
     refreshTrigger1?: boolean,
     refreshTrigger2?: boolean
 ) => {
@@ -26,16 +25,16 @@ export const useBooks = (
         const isInitial = books.length === 0;
         if (isInitial) setIsLoading(true);
 
-        let url = `${BASE_URL}?page=${page - 1}&size=${size}`;
+        let url = `${BASE_URL}/all?page=${page - 1}&size=${size}`;
 
         if (search?.text) {
             url =
                 `${BASE_URL}/search/findByTitleContaining?title=${search.text}&page=${page - 1}&size=${size}`;
         }
 
-        if (search?.category) {
+        if (search?.categoryId) {
             url =
-                `${BASE_URL}/search/findByCategory?category=${search.category}&page=${page - 1}&size=${size}`;
+                `${BASE_URL}/search/findByCategoryId?categoryId=${search.categoryId}&page=${page - 1}&size=${size}`;
         }
 
         const response = await fetch(url);
@@ -47,19 +46,16 @@ export const useBooks = (
 
         const data = await response.json();
 
-        setTotalElements(data.page.totalElements);
-        setTotalPages(data.page.totalPages);
+        setTotalElements(data.totalElements);
+        setTotalPages(data.totalPages);
 
-        const loadedBooks = data._embedded.books.map((b: any) => ({
+        const loadedBooks = data.content.map((b: any) => ({
             id: b.id,
             title: b.title,
             author: b.author,
             description: b.description,
-            copies: b.copies,
-            copiesAvailable: b.copiesAvailable,
-            dataSource: b.dataSource,
-            category: b.category,
-            img: b.img,
+            categories: b.categories,
+            img: b.imgUrl,
         }));
 
         setBooks(loadedBooks);
@@ -72,7 +68,7 @@ export const useBooks = (
             setHttpError(error.message);
             setIsLoading(false);
         });
-    }, [page, size, search?.text, search?.category, refreshTrigger1, refreshTrigger2]);
+    }, [page, size, search?.text, search?.categoryId, refreshTrigger1, refreshTrigger2]);
 
 
     return {
@@ -80,6 +76,7 @@ export const useBooks = (
         isLoading,
         httpError,
         totalPages,
-        totalElements
+        totalElements,
+        refresh: fetchBooks
     }
 }

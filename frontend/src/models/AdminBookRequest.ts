@@ -4,7 +4,7 @@ export interface AdminBookRequest {
   author: string;
   description: string;
   copies: number;
-  category: string;
+  categoryIds: number[];
   dataSource?: string;
   hasPdf?: boolean;
   hasImage?: boolean;

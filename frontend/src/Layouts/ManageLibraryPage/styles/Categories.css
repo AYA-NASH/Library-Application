@@ -1,0 +1,58 @@
+.btn-gold-outline {
+    border-radius: 2.5rem;
+    border: 1px solid #d4af37;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1.5rem;
+}
+
+.btn-gold-outline:hover {
+    background-color: black;
+    color: goldenrod;
+}
+
+.gold-icon {
+    color: #d4af37;
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.category-table-container {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.book-count-link {
+    color: #6c757d;
+    font-size: 0.875rem;
+    text-decoration: none;
+}
+
+.book-count-link:hover {
+    color: #d4af37;
+    text-decoration: underline;
+}
+
+.btn-icon-circle {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    border: none;
+    background: transparent;
+}
+
+.btn-icon-circle:hover {
+    background-color: rgba(0, 0, 0);
+    color: white;
+}
+
+.btn-icon-circle-danger:hover {
+    background-color: #dd313f;
+    color: white;
+}
+

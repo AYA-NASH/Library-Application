@@ -1,4 +1,4 @@
-package com.luv2code.spring_boot_library.requestmodel;
+package com.luv2code.spring_boot_library.responsemodel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,10 +9,16 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminBookRequest {
+public class BookResponse {
+    private Long id;
     private String title;
     private String author;
     private String description;
-    private Integer copies;
-    private Set<Long> categoryIds;
+    private String imgUrl;
+    private Set<BookCategory> categories;
+
+    public record BookCategory(Long id, String name) {
+    }
+
 }
+

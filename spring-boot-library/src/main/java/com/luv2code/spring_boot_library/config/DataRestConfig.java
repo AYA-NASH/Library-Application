@@ -1,6 +1,7 @@
 package com.luv2code.spring_boot_library.config;
 
 import com.luv2code.spring_boot_library.entity.Book;
+import com.luv2code.spring_boot_library.entity.Category;
 import com.luv2code.spring_boot_library.entity.Message;
 import com.luv2code.spring_boot_library.entity.Review;
 import org.springframework.context.annotation.Configuration;
@@ -20,16 +21,17 @@ public class DataRestConfig implements RepositoryRestConfigurer {
         config.exposeIdsFor(Book.class);
         config.exposeIdsFor(Review.class);
         config.exposeIdsFor(Message.class);
+        config.exposeIdsFor(Category.class);
 
         disableHttpMethods(config, Book.class, unSupported);
         disableHttpMethods(config, Review.class, unSupported);
         disableHttpMethods(config, Message.class, unSupported);
-
+        disableHttpMethods(config, Category.class, unSupported);
     }
 
     private void disableHttpMethods(RepositoryRestConfiguration config,
                                     Class entityClass,
-                                    HttpMethod[] unSupportedMethods){
+                                    HttpMethod[] unSupportedMethods) {
         config.getExposureConfiguration()
                 .forDomainType(entityClass)
                 .withItemExposure((metdata, httpMethods) -> httpMethods.disable(unSupportedMethods))

@@ -2,8 +2,8 @@ package com.luv2code.spring_boot_library.config;
 
 import com.luv2code.spring_boot_library.exception.RestAccessDeniedHandler;
 import com.luv2code.spring_boot_library.exception.RestAuthenticationEntryPoint;
+import com.luv2code.spring_boot_library.service.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -23,12 +24,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.luv2code.spring_boot_library.service.MyUserDetailsService;
-
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
@@ -45,29 +45,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults())
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(request -> request
-                    .requestMatchers("/api/admin/secure/**").hasRole("ADMIN")
-                    .requestMatchers("/api/books/secure/**", "/api/reviews/secure/**",
-                            "/api/messages/secure/**", "/api/payment/secure/**")
-                    .authenticated()
-                    .requestMatchers(HttpMethod.GET, "/api/books/**", "/api/reviews/**", "/api/messages/**", "/api/histories/**", "/api/payments/**").permitAll()
-                    .requestMatchers("/api/register", "/api/login", "/api/google-login").permitAll()
-                    .anyRequest().authenticated()
-            )
-            .exceptionHandling(exception -> exception
-                    .authenticationEntryPoint(restAuthenticationEntryPoint)
-                    .accessDeniedHandler(restAccessDeniedHandler)
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(
+                                "/api/admin/secure/**"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/books/secure/**",
+                                "/api/reviews/secure/**",
+                                "/api/messages/secure/**",
+                                "/api/payment/secure/**"
+                        ).authenticated()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/books/**",
+                                "/api/reviews/**",
+                                "/api/messages/**",
+                                "/api/histories/**",
+                                "/api/payments/**",
+                                "/api/categories/**"
+                        ).permitAll()
+                        .requestMatchers("/api/register", "/api/login", "/api/google-login").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(restAuthenticationEntryPoint)
+                        .accessDeniedHandler(restAccessDeniedHandler)
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
-    // @Value("${app.cors.allowed-origins}")
-    // private String allowedOriginsStr;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -76,7 +85,7 @@ public class SecurityConfig {
         // List<String> allowedOrigins = List.of(allowedOriginsStr.split(","));
         // corsConfiguration.setAllowedOrigins(List.of(allowedOrigins));
         corsConfiguration.setAllowedOrigins(List.of("*"));
-        
+
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         // corsConfiguration.setAllowCredentials(true);

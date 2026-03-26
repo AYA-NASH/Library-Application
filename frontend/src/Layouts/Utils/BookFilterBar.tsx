@@ -1,47 +1,64 @@
 import { useState } from "react";
+import Select from "react-select";
+
+type CategoryOption = {
+    value: number;
+    label: string;
+};
 
 type BookFilterBarProps = {
-    categories: string[];
-    initialCategory?: string;
+    categories: CategoryOption[];
+    initialCategoryId?: number;
     initialText?: string;
-    onSearch: (params: { text?: string; category?: string }) => void;
+    onSearch: (params: { text?: string; categoryId?: number }) => void;
 };
 
 export const BookFilterBar: React.FC<BookFilterBarProps> = ({
     categories,
-    initialCategory = "All",
+    initialCategoryId,
     initialText = "",
     onSearch,
 }) => {
     const [searchText, setSearchText] = useState(initialText);
-    const [selectedCategory, setSelectedCategory] = useState(initialCategory);
 
-    const handleSearchClick = () => {
+    const initialSelectedCategory =
+        categories.find((cat) => cat.value === initialCategoryId) || null;
+
+    const [selectedCategory, setSelectedCategory] = useState<CategoryOption | null>(
+        initialSelectedCategory
+    );
+
+    const triggerSearch = (text: string, category: CategoryOption | null) => {
         onSearch({
-            text: searchText || undefined,
-            category: selectedCategory !== "All" ? selectedCategory : undefined,
+            text: text.trim() || undefined,
+            categoryId: category?.value,
         });
     };
 
-    const handleCategorySelect = (category: string) => {
-        setSelectedCategory(category);
-        // Optional: immediately trigger search on category change
-        onSearch({
-            text: searchText || undefined,
-            category: category !== "All" ? category : undefined,
-        });
+    const handleSearchClick = () => {
+        triggerSearch(searchText, selectedCategory);
+    };
+
+    const handleCategoryChange = (selectedOption: CategoryOption | null) => {
+        setSelectedCategory(selectedOption);
+        triggerSearch(searchText, selectedOption);
     };
 
     return (
-        <div className="row mb-3">
-            <div className="col-6">
+        <div className="row mb-3 align-items-end g-3">
+            <div className="col-md-6">
                 <div className="d-flex">
                     <input
                         type="search"
                         className="form-control me-2"
-                        placeholder="Search"
+                        placeholder="Search for a book..."
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSearchClick();
+                            }
+                        }}
                     />
                     <button
                         className="btn btn-outline-success"
@@ -52,30 +69,16 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
                 </div>
             </div>
 
-            <div className="col-4">
-                <div className="dropdown">
-                    <button
-                        className="btn btn-secondary dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                    >
-                        {selectedCategory}
-                    </button>
-                    <ul className="dropdown-menu">
-                        {categories.map((category, idx) => (
-                            <li key={idx}>
-                                <a
-                                    href="#"
-                                    className="dropdown-item"
-                                    onClick={() => handleCategorySelect(category)}
-                                >
-                                    {category}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+            <div className="col-md-4">
+                <Select
+                    options={categories}
+                    value={selectedCategory}
+                    onChange={(selectedOption) =>
+                        handleCategoryChange(selectedOption as CategoryOption | null)
+                    }
+                    isClearable
+                    placeholder="Search by category..."
+                />
             </div>
         </div>
     );

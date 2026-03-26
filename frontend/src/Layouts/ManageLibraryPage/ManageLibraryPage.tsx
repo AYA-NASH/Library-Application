@@ -4,16 +4,17 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { AdminMessages } from "./components/AdminMessages";
 import { AddNewBook } from "./components/AddNewBook";
 import { AdminEditBooks } from "./components/AdminEditBooks";
+import { Categories } from "./components/Categories";
 
-type AdminTab = "add" | "edit" | "messages";
+type AdminTab = "categories" | "add" | "edit" | "messages";
 
 const TAB_PARAM = "tab";
-const VALID_TABS: AdminTab[] = ["add", "edit", "messages"];
+const VALID_TABS: AdminTab[] = ["categories", "add", "edit", "messages"];
 
 function tabFromSearchParams(searchParams: URLSearchParams): AdminTab {
   const t = searchParams.get(TAB_PARAM);
   if (t && VALID_TABS.includes(t as AdminTab)) return t as AdminTab;
-  return "add";
+  return "categories";
 }
 
 export const ManageLibraryPage = () => {
@@ -40,6 +41,7 @@ export const ManageLibraryPage = () => {
     navigate("/");
   }
 
+  const isCategories = activeTab === "categories";
   const isAdd = activeTab === "add";
   const isEdit = activeTab === "edit";
   const isMessages = activeTab === "messages";
@@ -50,6 +52,20 @@ export const ManageLibraryPage = () => {
         <h3>Manage Library</h3>
         <nav>
           <div className="nav nav-tabs" id="nav-tab" role="tablist">
+            <button
+              onClick={() => setTab("categories")}
+              className={`nav-link ${isCategories ? "active" : ""}`}
+              id="nav-categories-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#nav-categories"
+              type="button"
+              role="tab"
+              aria-controls="nav-categories"
+              aria-selected={isCategories}
+            >
+              Categories
+            </button>
+
             <button
               onClick={() => setTab("add")}
               className={`nav-link ${isAdd ? "active" : ""}`}
@@ -95,12 +111,21 @@ export const ManageLibraryPage = () => {
         </nav>
         <div className="tab-content" id="nav-tabContent">
           <div
+            className={`tab-pane fade ${isCategories ? "show active" : ""}`}
+            id="nav-categories"
+            role="tabpanel"
+            aria-labelledby="nav-categories-tab"
+          >
+            <Categories />
+          </div>
+
+          <div
             className={`tab-pane fade ${isAdd ? "show active" : ""}`}
             id="nav-add-book"
             role="tabpanel"
             aria-labelledby="nav-add-book-tab"
           >
-            <AddNewBook />
+            {isAdd ? <AddNewBook /> : null}
           </div>
 
           <div

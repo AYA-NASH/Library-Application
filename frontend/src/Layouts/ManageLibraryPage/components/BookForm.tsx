@@ -1,6 +1,9 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useFileUpload } from "../../Hooks/useFileUpload";
 import type { AdminBookRequest } from "../../../models/AdminBookRequest";
+import { useCategories } from "../../../Hooks/BookHooks/useCategories";
+import Select from "react-select";
+import { Controller, useForm } from "react-hook-form";
 
 interface BookFormProps {
   isEdit: boolean;
@@ -8,16 +11,26 @@ interface BookFormProps {
   onSubmit: (formData: FormData) => void;
 }
 
-export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmit }) => {
-  const [form, setForm] = useState({
-    title: initialData?.title ?? "",
-    author: initialData?.author ?? "",
-    description: initialData?.description ?? "",
-    category: initialData?.category ?? "Category",
-    copies: initialData?.copies ?? 0,
-  });
+interface IBookFormInputs {
+  title: string;
+  author: string;
+  description: string;
+  categoryIds: number[];
+  copies: number;
+}
 
-  const [displayWarning, setDisplayWarning] = useState(false);
+export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmit }) => {
+  const { categories } = useCategories();
+
+  const { control, register, handleSubmit, formState: { errors } } = useForm<IBookFormInputs>({
+    defaultValues: {
+      title: initialData?.title ?? "",
+      author: initialData?.author ?? "",
+      description: initialData?.description ?? "",
+      categoryIds: initialData?.categoryIds ?? [],
+      copies: initialData?.copies ?? 0,
+    }
+  });
 
   const [removedCurrentPdf, setRemovedCurrentPdf] = useState(false);
   const [removedCurrentImage, setRemovedCurrentImage] = useState(false);
@@ -37,50 +50,35 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
     initialFileUrl: undefined,
   });
 
+  const options = useMemo(() =>
+    categories.map(cat => ({ value: cat.id, label: cat.name })),
+    [categories]);
+
   const showPdfLoad = !(isEdit && initialData?.dataSource && initialData.dataSource !== "INTERNAL");
-  const categoryOptions = ["Front End", "Back End", "Data", "DevOps"];
 
-  const handleChange = (field: string, value: string | number) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = () => {
+  const onFormSubmit = (data: IBookFormInputs) => {
     const formData = new FormData();
 
+    formData.append("title", data.title);
+    formData.append("author", data.author);
+    formData.append("description", data.description);
+
+    data.categoryIds.forEach(id => {
+      formData.append("categoryIds", id.toString());
+    });
+
     if (!isEdit) {
-      const isBaseInfoMissing =
-        !form.title ||
-        !form.author ||
-        !form.description ||
-        form.category === "Category";
-
-      if (isBaseInfoMissing) {
-        setDisplayWarning(true);
-        return;
-      }
-
-      formData.append("title", form.title);
-      formData.append("author", form.author);
-      formData.append("description", form.description);
-      formData.append("category", form.category);
-      formData.append("copies", form.copies.toString());
-
-    } else if (initialData) {
-      if (form.title !== initialData.title) formData.append("title", form.title);
-      if (form.author !== initialData.author) formData.append("author", form.author);
-      if (form.description !== initialData.description)
-        formData.append("description", form.description);
-      if (form.category !== initialData.category)
-        formData.append("category", form.category);
+      formData.append("copies", data.copies.toString());
     }
 
     if (imageUpload.file) formData.append("image", imageUpload.file);
     if (pdfUpload.file) formData.append("pdf", pdfUpload.file);
 
-    if (isEdit && removedCurrentImage && !imageUpload.file) formData.append("removeImage", "true");
-    if (isEdit && removedCurrentPdf && !pdfUpload.file) formData.append("removePdf", "true");
+    if (isEdit) {
+      if (removedCurrentImage && !imageUpload.file) formData.append("removeImage", "true");
+      if (removedCurrentPdf && !pdfUpload.file) formData.append("removePdf", "true");
+    }
 
-    setDisplayWarning(false);
     onSubmit(formData);
   };
 
@@ -98,13 +96,8 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
 
   return (
     <div className="container mt-3">
-      {displayWarning && (
-        <div className="alert alert-danger" role="alert">
-          Please fill all required fields.
-        </div>
-      )}
 
-      <div className="card">
+      <form onSubmit={handleSubmit(onFormSubmit)} className="card shadow-sm">
         <div className="card-header">{isEdit ? "Edit Book" : "Add a New Book"}</div>
 
         <div className="card-body">
@@ -112,20 +105,16 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
             <div className="col-md-6">
               <label className="form-label">Title</label>
               <input
-                type="text"
-                className="form-control"
-                value={form.title}
-                onChange={(e) => handleChange("title", e.target.value)}
+                {...register("title", { required: "Title is required" })}
+                className={`form-control ${errors.title ? 'is-invalid' : ''}`}
               />
             </div>
 
             <div className="col-md-6">
               <label className="form-label">Author</label>
               <input
-                type="text"
-                className="form-control"
-                value={form.author}
-                onChange={(e) => handleChange("author", e.target.value)}
+                {...register("author", { required: "Author is required" })}
+                className={`form-control ${errors.author ? 'is-invalid' : ''}`}
               />
             </div>
 
@@ -134,45 +123,42 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                 <label className="form-label">Copies</label>
                 <input
                   type="number"
+                  {...register("copies", { min: 0 })}
                   className="form-control"
-                  value={form.copies}
-                  onChange={(e) => handleChange("copies", Number(e.target.value))}
                 />
               </div>
             )}
 
             <div className="col-md-6">
-              <label className="form-label">Category</label>
-
-              <button
-                className="form-control btn btn-dark dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-              >
-                {form.category}
-              </button>
-
-              <ul className="dropdown-menu">
-                {categoryOptions.map((cat) => (
-                  <li key={cat}>
-                    <a
-                      className="dropdown-item"
-                      onClick={() => handleChange("category", cat)}
-                    >
-                      {cat}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <label className="form-label">Categories</label>
+              <Controller
+                name="categoryIds"
+                control={control}
+                rules={{ required: "Select at least one category" }}
+                render={({ field: { onChange, value, ref } }) => (
+                  <Select
+                    ref={ref}
+                    isMulti
+                    options={options}
+                    value={options.filter(opt => (value || []).includes(opt.value))}
+                    onChange={(val) => {
+                      onChange(val ? val.map(c => c.value) : []);
+                    }}
+                    placeholder="Search and select categories..."
+                    classNamePrefix="react-select"
+                    className={errors.categoryIds ? 'is-invalid' : ''}
+                  />
+                )}
+              />
+              {errors.categoryIds && <small className="text-danger">{errors.categoryIds.message}</small>}
             </div>
 
             <div className="col-12">
               <label className="form-label">Description</label>
               <textarea
-                className="form-control"
+                {...register("description", { required: "Description is required" })}
+                className={`form-control ${errors.description ? 'is-invalid' : ''}`}
                 rows={3}
-                value={form.description}
-                onChange={(e) => handleChange("description", e.target.value)}
               />
             </div>
 
@@ -206,7 +192,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                     {imageLabel}
                   </span>
                 </div>
-                
+
                 {imageUpload.error && (
                   <div className="text-danger small">{imageUpload.error}</div>
                 )}
@@ -295,7 +281,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
                       </button>
                     )}
                   </div>
-                  
+
                   <small className="text-muted d-block">Max size: 50MB</small>
                   {pdfUpload.error && (
                     <div className="text-danger small">{pdfUpload.error}</div>
@@ -305,17 +291,13 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
             </div>
 
             <div className="col-12 mt-4 pt-3 border-top">
-              <button
-                className="btn btn-dark btn-lg w-100"
-                type="button"
-                onClick={handleSubmit}
-              >
+              <button className="btn btn-dark btn-lg w-100" type="submit">
                 {isEdit ? "Update Book Details" : "Add New Book to Library"}
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

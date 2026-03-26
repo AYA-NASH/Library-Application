@@ -1,21 +1,19 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BookModel } from "../../../models/BookModel";
 import defaultBookImg from "../../../Images/BooksImages/book_cover_default_dark.png";
 import { BookForm } from "./BookForm";
-import { useAuth } from "../../../Auth/AuthContext";
+
+import { useAdminBooks } from "../../../Hooks/BookHooks/useAdminBooks";
+
 import type {
   AdminBookRequest,
-  AdminBookEditInfoResponse,
-} from "../../../models/AdminBookRequest";
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+} from "../../../models/AdminBookRequest";
 
 export const EditBookData: React.FC<{
   book: BookModel;
   updateBook: () => void;
 }> = (props) => {
-
-  const { token } = useAuth();
 
   const [showModal, setShowModal] = useState(false);
 
@@ -23,54 +21,31 @@ export const EditBookData: React.FC<{
   const [editInfoLoading, setEditInfoLoading] = useState(false);
   const [editInfoError, setEditInfoError] = useState<string | null>(null);
 
-  const fetchEditInfo = useCallback(async () => {
-    if (!props.book.id) return null;
-    setEditInfoLoading(true);
-    setEditInfoError(null);
-    try {
-      const url = `${baseUrl}/admin/secure/book/${props.book.id}/edit-info`;
-      
-      const response = await fetch(url, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      if (!response.ok) throw new Error("Failed to fetch book edit info");
-      
-      const data: AdminBookEditInfoResponse = await response.json();
-      
-      return data;
-    } catch (e) {
-      setEditInfoError(e instanceof Error ? e.message : "Failed to load");
-      return null;
-    } finally {
-      setEditInfoLoading(false);
-    }
-  }, [props.book.id, token]);
+  const { updateBook, fetchEditInfo } = useAdminBooks();
 
   useEffect(() => {
     if (!showModal || !props.book) return;
 
-    const book = props.book;
-    
+    const categories = props.book.categories?.map((cat) => cat.id);
+
     const baseInitial: AdminBookRequest = {
-      id: book.id,
-      title: book.title,
-      author: book.author ?? "",
-      description: book.description ?? "",
-      copies: book.copies ?? 0,
-      category: book.category ?? "",
-      dataSource: book.dataSource,
-      imageUrl: book.img,
+      id: props.book.id,
+      title: props.book.title,
+      author: props.book.author ?? "",
+      description: props.book.description ?? "",
+      copies: props.book.copies ?? 0,
+      categoryIds: categories ?? [],
+      dataSource: props.book.dataSource,
+      imageUrl: props.book.img,
     };
 
-    fetchEditInfo().then((editInfo) => {
+    fetchEditInfo(props.book.id).then((editInfo) => {
       if (editInfo) {
         setEditInitialData({
           ...baseInitial,
           hasPdf: editInfo.hasPdf,
           hasImage: editInfo.hasImage,
-          imageUrl: editInfo.imageUrl ?? book.img,
+          imageUrl: editInfo.imageUrl ?? props.book.img,
           pdfFilename: editInfo.pdfFilename,
           imageFilename: editInfo.imageFilename,
         });
@@ -88,19 +63,13 @@ export const EditBookData: React.FC<{
 
   const handleUpdateDetails = async (formData: FormData) => {
     try {
-      const url = `${baseUrl}/admin/secure/update/book/data/${props.book.id}`;
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("Update failed");
-
-      handleCloseModal();
-      props.updateBook();
-    } catch {
-      alert("Error updating book details");
+      const success = await updateBook(props.book.id, formData);
+      if (success) {
+        handleCloseModal();
+        props.updateBook()
+      };
+    } catch (error) {
+      alert("Error updating book");
     }
   };
 
@@ -124,13 +93,13 @@ export const EditBookData: React.FC<{
             className="rounded shadow-sm"
           />
         </div>
-        
+
         <div className="col-md-9 d-flex flex-column justify-content-center">
           <p className="text-primary mb-1 fw-bold">{props.book.author}</p>
           <h3 className="card-title mb-2">{props.book.title}</h3>
           <div className="mt-2">
             <p className="rounded-pill bg-info text-dark px-3 py-1 d-inline-block">
-              Category: {props.book.category}
+              {props.book.categories?.map((cat) => cat.name).join(", ") || "No Category"}
             </p>
           </div>
         </div>

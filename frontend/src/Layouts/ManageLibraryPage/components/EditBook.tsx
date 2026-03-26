@@ -15,14 +15,13 @@ export const EditBook: React.FC<{
           <EditBookData
             book={props.book}
             updateBook={props.updateBook}
-            onEditSuccess={props.onEditSuccess}
           />
-                </div>
-
-                <div className="col-md-4 border-start">
-                    <EditBookStatus book={props.book} deleteBook={props.deleteBook} updateBook={props.updateBook}/>
-                </div>
-            </div>
         </div>
-    );
+
+        <div className="col-md-4 border-start">
+          <EditBookStatus book={props.book} deleteBook={props.deleteBook} updateBook={props.updateBook} />
+        </div>
+      </div>
+    </div>
+  );
 }

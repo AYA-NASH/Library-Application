@@ -3,6 +3,9 @@ package com.luv2code.spring_boot_library.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 @Entity
 @Table(name = "book")
@@ -12,14 +15,11 @@ public class Book {
     @Column(name = "id")
     private Long id;
 
-    @Column(name ="title")
+    @Column(name = "title")
     private String title;
 
     @Column(name = "author")
     private String author;
-
-    @Column(name = "category")
-    private String category;
 
     @Column(name = "copies")
     private Integer copies;
@@ -33,19 +33,38 @@ public class Book {
     @Column(name = "img_url")
     private String img;
 
-    @Column(name="image_public_id")
+    @Column(name = "image_public_id")
     private String imagePublicId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="book_source", nullable = false)
+    @Column(name = "book_source", nullable = false)
     private BookSource dataSource;
 
-    @Column(name="book_url")
+    @Column(name = "book_url")
     private String bookUrl;
 
-    @Column(name="pdf_public_id")
+    @Column(name = "pdf_public_id")
     private String pdfPublicId;
 
-    @Column(name="preview_url")
+    @Column(name = "preview_url")
     private String previewUrl;
+
+    @ManyToMany
+    @JoinTable(
+            name = "book_category",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories = new HashSet<>();
+
+
+    public void addCategory(Category category) {
+        this.categories.add(category);
+        category.getBooks().add(this);
+    }
+
+    public void removeCategory(Category category) {
+        this.categories.remove(category);
+        category.getBooks().remove(this);
+    }
 }

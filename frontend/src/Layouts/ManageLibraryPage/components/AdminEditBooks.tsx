@@ -1,33 +1,43 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { EditBook } from "./EditBook";
-import { useBooks } from "../../../Hooks/useBooks";
+import { useBooks } from "../../../Hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../../Utils/BookFilterBar";
+import { useCategories } from "../../../Hooks/BookHooks/useCategories";
+
+type SearchParams = {
+  text?: string;
+  categoryId?: number;
+};
 
 export const AdminEditBooks = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [searchParams, setSearchParams] = useState<{ text?: string; category?: string }>();
+  const { categories } = useCategories();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useState<SearchParams>();
   const [bookDelete, setBookDelete] = useState(false);
   const [bookUpdate, setBookUpdate] = useState(false);
 
   const booksPerPage = 5;
-  const categories = ["All", "BE", "FE", "Data", "DevOps"];
 
-    const { books, isLoading, httpError, totalPages, totalElements } =
-        useBooks(currentPage, booksPerPage, searchParams);
+  const options = useMemo(() =>
+    categories.map(cat => ({ value: cat.id, label: cat.name })),
+    [categories]);
 
-  const handleSearch = (params: { text?: string; category?: string }) => {
+  const { books, isLoading, httpError, totalPages, totalElements } =
+    useBooks(currentPage, booksPerPage, searchParams);
+
+  const handleSearch = (params: SearchParams) => {
     setCurrentPage(1);
-        setSearchParams(params);
+    setSearchParams(params);
   };
 
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const deleteBook = () => setBookDelete(!bookDelete);
   const updateBook = () => setBookUpdate(!bookUpdate);
 
-    if (isLoading) return <SpinnerLoading />;
+  if (isLoading) return <SpinnerLoading />;
   if (httpError)
     return (
       <div className="container">
@@ -38,8 +48,7 @@ export const AdminEditBooks = () => {
   return (
     <div className="container mt-3">
       <BookFilterBar
-        categories={categories}
-        initialCategory="All"
+        categories={options}
         onSearch={handleSearch}
       />
 

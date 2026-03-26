@@ -1,12 +1,15 @@
 package com.luv2code.spring_boot_library.controller;
 
 import com.luv2code.spring_boot_library.requestmodel.AdminBookRequest;
+import com.luv2code.spring_boot_library.requestmodel.AdminCategoryRequest;
 import com.luv2code.spring_boot_library.responsemodel.AdminBookEditInfoResponse;
-import com.luv2code.spring_boot_library.service.AdminService;
+import com.luv2code.spring_boot_library.responsemodel.CategoryResponse;
+import com.luv2code.spring_boot_library.service.BookCatalogService;
+import com.luv2code.spring_boot_library.service.BookInventoryService;
+import com.luv2code.spring_boot_library.service.BookManagementService;
+import com.luv2code.spring_boot_library.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,11 +17,21 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    private AdminService adminService;
+    private final CategoryService categoryService;
+    private final BookManagementService bookManagementService;
+    private final BookInventoryService bookInventoryService;
+    private final BookCatalogService bookCatalogService;
 
     @Autowired
-    public AdminController(AdminService adminService) {
-        this.adminService = adminService;
+    public AdminController(
+            CategoryService categoryService,
+            BookManagementService bookManagementService,
+            BookInventoryService bookInventoryService,
+            BookCatalogService bookCatalogService) {
+        this.categoryService = categoryService;
+        this.bookManagementService = bookManagementService;
+        this.bookInventoryService = bookInventoryService;
+        this.bookCatalogService = bookCatalogService;
     }
 
     @PutMapping("/secure/update/book/quantity")
@@ -27,30 +40,12 @@ public class AdminController {
             @RequestParam int quantity
     ) throws Exception {
 
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
-
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
-            throw new RuntimeException("Access denied: Administration page only.");
-        }
-
-        adminService.updateBookQuantity(bookId, quantity);
+        bookInventoryService.updateBookQuantity(bookId, quantity);
     }
 
     @GetMapping("/secure/book/{bookId}/edit-info")
     public ResponseEntity<AdminBookEditInfoResponse> getBookEditInfo(@PathVariable Long bookId) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
-            throw new RuntimeException("Access denied: Administration page only.");
-        }
-
-        AdminBookEditInfoResponse response = adminService.getBookEditInfo(bookId);
+        AdminBookEditInfoResponse response = bookManagementService.getBookEditInfo(bookId);
         return ResponseEntity.ok(response);
     }
 
@@ -60,16 +55,14 @@ public class AdminController {
             @RequestParam("image") MultipartFile image,
             @RequestParam(value = "pdf", required = false) MultipartFile pdf) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
-            throw new RuntimeException("Access denied: Administration page only.");
-        }
-
-        adminService.postBook(request, image, pdf);
+        bookManagementService.postBook(request, image, pdf);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/secure/add/category")
+    public ResponseEntity<CategoryResponse> createCategory(@RequestBody AdminCategoryRequest request) throws Exception {
+        CategoryResponse newCategory = categoryService.createCategory(request);
+        return ResponseEntity.ok(newCategory);
     }
 
     @PutMapping(value = "/secure/update/book/data/{bookId}", consumes = "multipart/form-data")
@@ -81,31 +74,31 @@ public class AdminController {
             @RequestParam(value = "removeImage", required = false) Boolean removeImage,
             @RequestParam(value = "removePdf", required = false) Boolean removePdf) throws Exception {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
-            throw new RuntimeException("Access denied: Administration page only.");
-        }
-
-        adminService.updateBookData(bookId, request, image, pdf,
+        bookManagementService.updateBookData(bookId, request, image, pdf,
                 Boolean.TRUE.equals(removeImage),
                 Boolean.TRUE.equals(removePdf));
 
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/secure/update/category/{id}")
+    public ResponseEntity<CategoryResponse> updateCategory(
+            @PathVariable Long id,
+            @RequestBody AdminCategoryRequest request
+    ) throws Exception {
+        CategoryResponse updatedCategory = categoryService.updateCategory(id, request);
+        return ResponseEntity.ok(updatedCategory);
+    }
+
     @DeleteMapping("/secure/delete/book")
     public void deleteBook(@RequestParam Long bookId) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
-        if (!isAdmin) {
-            throw new RuntimeException("Access denied: Administration page only.");
-        }
+        bookManagementService.deleteBook(bookId);
+    }
 
-        adminService.deleteBook(bookId);
+    @DeleteMapping("/secure/delete/category/{id}")
+    public void deleteCategory(@PathVariable Long id) throws Exception {
+
+        categoryService.deleteCategory(id);
     }
 }
