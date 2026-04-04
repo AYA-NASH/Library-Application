@@ -1,4 +1,4 @@
-package com.luv2code.spring_boot_library.dao;
+package com.luv2code.spring_boot_library.repository;
 
 import com.luv2code.spring_boot_library.entity.Book;
 import org.springframework.data.domain.Page;

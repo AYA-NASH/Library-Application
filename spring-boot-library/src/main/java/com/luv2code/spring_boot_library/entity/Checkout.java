@@ -1,37 +1,35 @@
 package com.luv2code.spring_boot_library.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "checkout")
 public class Checkout {
-
-    public Checkout() {
-    }
-
-    public Checkout(String userEmail, String checkoutDate, String returnDate, Long bookId) {
-        this.userEmail = userEmail;
-        this.checkoutDate = checkoutDate;
-        this.returnDate = returnDate;
-        this.bookId = bookId;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="user_email")
-    private String userEmail;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private AppUser user;
 
-    @Column(name="checkout_date")
-    private String checkoutDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id")
+    private Book book;
 
-    @Column(name="return_date")
-    private String returnDate;
+    @Column(name = "checkout_date")
+    private LocalDate checkoutDate;
 
-    @Column(name="book_id")
-    private Long bookId;
+    @Column(name = "return_date")
+    private LocalDate returnDate;
 }

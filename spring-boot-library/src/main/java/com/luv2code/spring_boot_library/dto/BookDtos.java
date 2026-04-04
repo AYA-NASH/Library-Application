@@ -1,0 +1,47 @@
+package com.luv2code.spring_boot_library.dto;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
+import java.util.Set;
+
+public sealed interface BookDtos {
+    record AdminBookRequest(
+            @NotBlank(message = "Title is required")
+            String title,
+            String author,
+            String description,
+            Integer copies,
+            @NotEmpty(message = "At least one category is required")
+            Set<Long> categoryIds
+    ) implements BookDtos {
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    record BookFileMetadata(
+            boolean hasPdf,
+            boolean hasImage,
+            String imageUrl,
+            String pdfFilename,
+            String imageFilename
+    ) implements BookDtos {
+    }
+
+    record BookResponse(
+            Long id,
+            String title,
+            String author,
+            String description,
+            String imgUrl,
+            Set<CategoryDto.Reference> categories
+    ) implements BookDtos {
+    }
+
+    record DigitalAccessResponse(
+            String url,
+            String source,
+            String mode
+    ) implements BookDtos {
+    }
+}

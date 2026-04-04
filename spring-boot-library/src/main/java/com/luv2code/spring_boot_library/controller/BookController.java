@@ -1,11 +1,10 @@
 package com.luv2code.spring_boot_library.controller;
 
-import com.luv2code.spring_boot_library.entity.Book;
-import com.luv2code.spring_boot_library.responsemodel.BookResponse;
-import com.luv2code.spring_boot_library.responsemodel.ShelfCurrentLoansResponse;
+import com.luv2code.spring_boot_library.dto.BookDtos;
+import com.luv2code.spring_boot_library.dto.LoanDtos;
 import com.luv2code.spring_boot_library.service.BookCatalogService;
 import com.luv2code.spring_boot_library.service.BookLoanService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -16,39 +15,34 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
+@RequiredArgsConstructor
 public class BookController {
 
     private final BookLoanService bookLoanService;
     private final BookCatalogService bookCatalogService;
 
-    @Autowired
-    public BookController(BookLoanService bookLoanService, BookCatalogService bookCatalogService) {
-        this.bookLoanService = bookLoanService;
-        this.bookCatalogService = bookCatalogService;
-    }
-
     @GetMapping("/all")
-    public Page<BookResponse> getBooksPageable(Pageable pageable) {
+    public Page<BookDtos.BookResponse> getBooksPageable(Pageable pageable) {
         return bookCatalogService.getBooks(pageable);
     }
 
     @GetMapping("/{bookId}")
-    public BookResponse getBookById(@PathVariable Long bookId) throws Exception {
+    public BookDtos.BookResponse getBookById(@PathVariable Long bookId) throws Exception {
         return bookCatalogService.getBookById(bookId);
     }
 
     @GetMapping("/search/findByTitleContaining")
-    public Page<BookResponse> searchByTitle(@RequestParam String title, Pageable pageable) {
+    public Page<BookDtos.BookResponse> searchByTitle(@RequestParam String title, Pageable pageable) {
         return bookCatalogService.searchBooksByTitle(title, pageable);
     }
 
     @GetMapping("/search/findByCategoryId")
-    public Page<BookResponse> searchBooksByCategoryIds(@RequestParam Long categoryId, Pageable pageable) {
+    public Page<BookDtos.BookResponse> searchBooksByCategoryIds(@RequestParam Long categoryId, Pageable pageable) {
         return bookCatalogService.searchBooksByCategoryId(categoryId, pageable);
     }
 
     @GetMapping("/search/findByCategories")
-    public Page<BookResponse> getBooksByCategories(
+    public Page<BookDtos.BookResponse> getBooksByCategories(
             @RequestParam List<Long> categoryIds,
             Pageable pageable
     ) {
@@ -56,46 +50,37 @@ public class BookController {
     }
 
     @GetMapping("secure/current-loans")
-    public List<ShelfCurrentLoansResponse> currentLoans() throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-
-        return bookLoanService.currentLoans(userEmail);
+    public List<LoanDtos.ShelfResponse> currentLoans() {
+        return bookLoanService.currentLoans(getAuthenticatedUserEmail());
     }
 
     @GetMapping("/secure/current-loans/count")
     public int currentLoansCount() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-        return bookLoanService.countCheckouts(userEmail);
+        return bookLoanService.countCheckouts(getAuthenticatedUserEmail());
     }
 
     @GetMapping("/secure/is-checked-out/byuser")
     public boolean isBookCheckedOutByUser(@RequestParam("bookId") Long bookId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return bookLoanService.isBookCheckedOutByUser(authentication.getName(), bookId);
+        return bookLoanService.isBookCheckedOutByUser(getAuthenticatedUserEmail(), bookId);
     }
 
     @PutMapping("/secure/checkout")
-    public Book checkoutBook(@RequestParam("bookId") Long bookId) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-        return bookLoanService.checkoutBook(userEmail, bookId);
+    public LoanDtos.ShelfResponse checkoutBook(@RequestParam("bookId") Long bookId) throws Exception {
+        return bookLoanService.checkoutBook(getAuthenticatedUserEmail(), bookId);
     }
 
     @PutMapping("/secure/return")
     public void returnBook(@RequestParam Long bookId) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-
-        bookLoanService.returnBook(userEmail, bookId);
+        bookLoanService.returnBook(getAuthenticatedUserEmail(), bookId);
     }
 
     @PutMapping("/secure/renew/loan")
     public void renewLoan(@RequestParam("bookId") Long bookId) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
+        bookLoanService.renewLoan(getAuthenticatedUserEmail(), bookId);
+    }
 
-        bookLoanService.renewLoan(userEmail, bookId);
+    private String getAuthenticatedUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 }

@@ -3,9 +3,11 @@ package com.luv2code.spring_boot_library.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
-@Data
 public class AppUser {
 
     @Id

@@ -1,42 +1,33 @@
 package com.luv2code.spring_boot_library.service;
 
-import com.luv2code.spring_boot_library.dao.MessageRepository;
+import com.luv2code.spring_boot_library.dto.MessageDtos;
 import com.luv2code.spring_boot_library.entity.Message;
-import com.luv2code.spring_boot_library.requestmodel.AdminQuestionRequest;
+import com.luv2code.spring_boot_library.mapper.MessageMapper;
+import com.luv2code.spring_boot_library.repository.MessageRepository;
+import com.luv2code.spring_boot_library.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MessageService {
 
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
+    private final MessageMapper messageMapper;
 
-    @Autowired
-    public MessageService(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
-    }
-
-    public void postMessage(Message messageRequest, String userEmail){
-        Message message = new Message(messageRequest.getTitle(), messageRequest.getQuestion());
-        message.setUserEmail(userEmail);
+    public void postMessage(MessageDtos.UserMessageRequest request) {
+        Message message = messageMapper.toEntity(request, userRepository);
         messageRepository.save(message);
     }
 
-    public void putMessage(AdminQuestionRequest adminQuestionRequest, String userEmail) throws Exception{
-        Optional<Message> foundMessage = messageRepository.findById(adminQuestionRequest.getId());
+    public void putMessage(MessageDtos.AdminMessageResponse adminResponse) {
+        Message foundMessage = messageRepository.findById(adminResponse.messageId())
+                .orElseThrow(() -> new RuntimeException("Message Not Found"));
+        messageMapper.updateEntityFromAdminResponse(adminResponse, foundMessage, userRepository);
 
-        if(!foundMessage.isPresent()){
-            throw new Exception("Message not found");
-        }
-
-        foundMessage.get().setAdminEmail(userEmail);
-        foundMessage.get().setResponse(adminQuestionRequest.getResponse());
-        foundMessage.get().setClosed(true);
-
-        messageRepository.save(foundMessage.get());
+        messageRepository.save(foundMessage);
     }
 }

@@ -8,30 +8,23 @@ import lombok.Data;
 @Table(name = "messages")
 public class Message {
 
-    public Message() {
-    }
-
-    public Message(String title, String question) {
-        this.title = title;
-        this.question = question;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_email")
-    private String userEmail;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin_id")
+    private AppUser admin;
 
     @Column(name = "title")
     private String title;
 
     @Column(name = "question")
     private String question;
-
-    @Column(name = "admin_email")
-    private String adminEmail;
-
 
     @Column(name = "response")
     private String response;

@@ -1,9 +1,9 @@
 package com.luv2code.spring_boot_library.service;
 
-import com.luv2code.spring_boot_library.dao.BookRepository;
-import com.luv2code.spring_boot_library.dao.CategoryRepository;
-import com.luv2code.spring_boot_library.dao.CheckoutRepository;
-import com.luv2code.spring_boot_library.dao.ReviewRepository;
+import com.luv2code.spring_boot_library.repository.BookRepository;
+import com.luv2code.spring_boot_library.repository.CategoryRepository;
+import com.luv2code.spring_boot_library.repository.CheckoutRepository;
+import com.luv2code.spring_boot_library.repository.ReviewRepository;
 import com.luv2code.spring_boot_library.entity.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

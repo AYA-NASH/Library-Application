@@ -1,35 +1,33 @@
 package com.luv2code.spring_boot_library.controller;
 
-import com.luv2code.spring_boot_library.entity.Review;
-import com.luv2code.spring_boot_library.requestmodel.ReviewRequest;
+import com.luv2code.spring_boot_library.dto.ReviewDto;
 import com.luv2code.spring_boot_library.service.ReviewService;
+import com.luv2code.spring_boot_library.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/reviews")
+@RequiredArgsConstructor
 public class ReviewController {
 
-    private ReviewService reviewService;
+    private final ReviewService reviewService;
+    private final UserService userService;
 
-    @Autowired
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
+
+    @GetMapping("/secure/user/{bookId}")
+    public Boolean reviewBookByUser(@PathVariable("bookId") Long bookId) throws Exception {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userService.getUserIdByEmail(userEmail);
+        return reviewService.userReviewListed(userId, bookId);
     }
 
-    @GetMapping("/secure/user/book")
-    public Boolean reviewBookByUser(@RequestParam("bookId") Long bookId) throws Exception{
+    @PostMapping("/secure/user/book/{bookId}")
+    public void postReview(@RequestBody ReviewDto.ReviewRequest reviewRequest, @PathVariable("bookId") Long bookId) throws Exception {
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return reviewService.userReviewListed(userEmail, bookId);
-    }
-
-    @PostMapping("/secure")
-    public void postReview(@RequestBody ReviewRequest reviewRequest) throws Exception{
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        reviewService.postReview(userEmail, reviewRequest);
+        Long userId = userService.getUserIdByEmail(userEmail);
+        reviewService.postReview(userId, bookId, reviewRequest);
     }
 }

@@ -1,6 +1,6 @@
 package com.luv2code.spring_boot_library.controller;
 
-import com.luv2code.spring_boot_library.responsemodel.CategoryResponse;
+import com.luv2code.spring_boot_library.dto.CategoryDto;
 import com.luv2code.spring_boot_library.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +22,8 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getCategories() {
-        List<CategoryResponse> categories = categoryService.getAllCategories();
+    public ResponseEntity<List<CategoryDto.DetailsResponse>> getCategories() {
+        List<CategoryDto.DetailsResponse> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
 

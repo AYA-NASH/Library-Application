@@ -1,8 +1,6 @@
 package com.luv2code.spring_boot_library.controller;
 
-import com.luv2code.spring_boot_library.responsemodel.LoginResponse;
-import com.luv2code.spring_boot_library.entity.AppUser;
-import com.luv2code.spring_boot_library.requestmodel.SignupRequest;
+import com.luv2code.spring_boot_library.dto.UserDtos;
 import com.luv2code.spring_boot_library.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +19,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody SignupRequest user) {
+    public ResponseEntity<?> register(@RequestBody UserDtos.SignupRequest user) {
         try {
             userService.register(user);
             return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -31,12 +29,12 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody AppUser user) {
-        return userService.verify(user);
+    public UserDtos.LoginResponse login(@RequestBody UserDtos.LoginRequest loginRequest) {
+        return userService.verify(loginRequest);
     }
 
     @PostMapping("/google-login")
-    public ResponseEntity<?> loginWithGoogle(@RequestBody Map<String, String> payload) {
+    public UserDtos.LoginResponse loginWithGoogle(@RequestBody Map<String, String> payload) throws Exception {
         String googleToken = payload.get("token");
         return userService.loginWithGoogle(googleToken);
     }

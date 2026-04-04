@@ -1,10 +1,7 @@
 package com.luv2code.spring_boot_library.controller;
 
-import com.luv2code.spring_boot_library.requestmodel.AdminBookRequest;
-import com.luv2code.spring_boot_library.requestmodel.AdminCategoryRequest;
-import com.luv2code.spring_boot_library.responsemodel.AdminBookEditInfoResponse;
-import com.luv2code.spring_boot_library.responsemodel.CategoryResponse;
-import com.luv2code.spring_boot_library.service.BookCatalogService;
+import com.luv2code.spring_boot_library.dto.BookDtos;
+import com.luv2code.spring_boot_library.dto.CategoryDto;
 import com.luv2code.spring_boot_library.service.BookInventoryService;
 import com.luv2code.spring_boot_library.service.BookManagementService;
 import com.luv2code.spring_boot_library.service.CategoryService;
@@ -20,18 +17,16 @@ public class AdminController {
     private final CategoryService categoryService;
     private final BookManagementService bookManagementService;
     private final BookInventoryService bookInventoryService;
-    private final BookCatalogService bookCatalogService;
 
     @Autowired
     public AdminController(
             CategoryService categoryService,
             BookManagementService bookManagementService,
-            BookInventoryService bookInventoryService,
-            BookCatalogService bookCatalogService) {
+            BookInventoryService bookInventoryService
+    ) {
         this.categoryService = categoryService;
         this.bookManagementService = bookManagementService;
         this.bookInventoryService = bookInventoryService;
-        this.bookCatalogService = bookCatalogService;
     }
 
     @PutMapping("/secure/update/book/quantity")
@@ -44,14 +39,14 @@ public class AdminController {
     }
 
     @GetMapping("/secure/book/{bookId}/edit-info")
-    public ResponseEntity<AdminBookEditInfoResponse> getBookEditInfo(@PathVariable Long bookId) throws Exception {
-        AdminBookEditInfoResponse response = bookManagementService.getBookEditInfo(bookId);
+    public ResponseEntity<BookDtos.BookFileMetadata> getBookEditInfo(@PathVariable Long bookId) throws Exception {
+        BookDtos.BookFileMetadata response = bookManagementService.getBookEditInfo(bookId);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/secure/add/book", consumes = "multipart/form-data")
     public ResponseEntity<?> postBook(
-            @ModelAttribute AdminBookRequest request,
+            @ModelAttribute BookDtos.AdminBookRequest request,
             @RequestParam("image") MultipartFile image,
             @RequestParam(value = "pdf", required = false) MultipartFile pdf) {
 
@@ -60,15 +55,15 @@ public class AdminController {
     }
 
     @PostMapping("/secure/add/category")
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody AdminCategoryRequest request) throws Exception {
-        CategoryResponse newCategory = categoryService.createCategory(request);
+    public ResponseEntity<CategoryDto.DetailsResponse> createCategory(@RequestBody CategoryDto.CreateRequest request) throws Exception {
+        CategoryDto.DetailsResponse newCategory = categoryService.createCategory(request);
         return ResponseEntity.ok(newCategory);
     }
 
     @PutMapping(value = "/secure/update/book/data/{bookId}", consumes = "multipart/form-data")
     public ResponseEntity<Void> updateBook(
             @PathVariable Long bookId,
-            @ModelAttribute AdminBookRequest request,
+            @ModelAttribute BookDtos.AdminBookRequest request,
             @RequestParam(required = false) MultipartFile image,
             @RequestParam(required = false) MultipartFile pdf,
             @RequestParam(value = "removeImage", required = false) Boolean removeImage,
@@ -82,11 +77,11 @@ public class AdminController {
     }
 
     @PutMapping("/secure/update/category/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(
+    public ResponseEntity<CategoryDto.DetailsResponse> updateCategory(
             @PathVariable Long id,
-            @RequestBody AdminCategoryRequest request
+            @RequestBody CategoryDto.CreateRequest request
     ) throws Exception {
-        CategoryResponse updatedCategory = categoryService.updateCategory(id, request);
+        CategoryDto.DetailsResponse updatedCategory = categoryService.updateCategory(id, request);
         return ResponseEntity.ok(updatedCategory);
     }
 

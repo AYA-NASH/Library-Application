@@ -1,9 +1,9 @@
 package com.luv2code.spring_boot_library.service;
 
-import com.luv2code.spring_boot_library.dao.CategoryRepository;
+import com.luv2code.spring_boot_library.dto.CategoryDto;
 import com.luv2code.spring_boot_library.entity.Category;
-import com.luv2code.spring_boot_library.requestmodel.AdminCategoryRequest;
-import com.luv2code.spring_boot_library.responsemodel.CategoryResponse;
+import com.luv2code.spring_boot_library.mapper.CategoryMapper;
+import com.luv2code.spring_boot_library.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,55 +15,41 @@ import java.util.List;
 @Transactional
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
 
-    public CategoryResponse createCategory(AdminCategoryRequest request) {
-        if (categoryRepository.existsByName(request.getName())) {
+    public CategoryDto.DetailsResponse createCategory(CategoryDto.CreateRequest request) {
+        if (categoryRepository.existsByName(request.name())) {
             throw new RuntimeException("Category already exists");
         }
 
-        Category newCategory = new Category();
-        newCategory.setName(request.getName());
+        Category newCategory = categoryMapper.toEntity(request);
+
         Category savedCategory = categoryRepository.save(newCategory);
 
-        return new CategoryResponse(savedCategory.getId(),
-                savedCategory.getName(),
-                0L
-        );
+        return categoryMapper.toDetailsResponse(savedCategory);
     }
 
-    public CategoryResponse updateCategory(Long id, AdminCategoryRequest request) throws Exception {
+    public CategoryDto.DetailsResponse updateCategory(Long id, CategoryDto.CreateRequest request) throws Exception {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category Not Found"));
 
-        String name = request.getName();
+        categoryMapper.updateEntityFromDto(request, category);
 
-        if (name == null || name.isBlank()) {
-            throw new RuntimeException("Invalid Category Update, Provide a proper name");
-        }
-
-        category.setName(name);
         Category updatedCategory = categoryRepository.save(category);
 
-        long booksCount = updatedCategory.getBooks() != null ? updatedCategory.getBooks().size() : 0L;
-
-        return new CategoryResponse(
-                updatedCategory.getId(),
-                updatedCategory.getName(),
-                booksCount
-        );
+        return categoryMapper.toDetailsResponse(updatedCategory);
     }
 
     public void deleteCategory(Long id) throws Exception {
         Category category = categoryRepository.findById(id).orElseThrow();
 
-        new HashSet<>(category.getBooks()).forEach(book -> {
-            book.removeCategory(category);
-        });
+        new HashSet<>(category.getBooks()).forEach(book -> book.removeCategory(category));
 
         categoryRepository.delete(category);
     }
@@ -74,7 +60,8 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAllWithCount();
+    public List<CategoryDto.DetailsResponse> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return categoryMapper.toDetailsResponseList(categories);
     }
 }

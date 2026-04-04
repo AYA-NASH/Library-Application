@@ -1,7 +1,6 @@
-package com.luv2code.spring_boot_library.dao;
+package com.luv2code.spring_boot_library.repository;
 
 import com.luv2code.spring_boot_library.entity.Category;
-import com.luv2code.spring_boot_library.responsemodel.CategoryResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,8 +18,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("SELECT COUNT(b) FROM Book b JOIN b.categories c WHERE c.id = :categoryId")
     long countBooksByCategoryId(@Param("categoryId") Long categoryId);
 
-    @Query("SELECT new com.luv2code.spring_boot_library.responsemodel.CategoryResponse(c.id, c.name, COUNT(b)) " +
-            "FROM Category c LEFT JOIN c.books b " +
-            "GROUP BY c.id, c.name")
-    List<CategoryResponse> findAllWithCount();
+    @Query("SELECT c FROM Category c LEFT JOIN FETCH c.books")
+    List<Category> findAllWithBooks();
 }

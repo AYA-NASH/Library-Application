@@ -1,6 +1,6 @@
 package com.luv2code.spring_boot_library.service;
 
-import com.luv2code.spring_boot_library.dao.UserRepository;
+import com.luv2code.spring_boot_library.repository.UserRepository;
 import com.luv2code.spring_boot_library.entity.AppUser;
 import com.luv2code.spring_boot_library.entity.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
