@@ -15,4 +15,8 @@ public interface ReviewMapper {
     @Mapping(target = "reviewDescription", expression = "java(request.reviewDescription().orElse(null))")
     Review toEntity(ReviewDto.ReviewRequest request);
 
+    @Mapping(target = "userEmail", source = "user.email")
+    @Mapping(target = "bookId", source = "book.id")
+    ReviewDto.ReviewResponse toReviewResponse(Review entity);
+
 }

@@ -2,6 +2,7 @@ package com.luv2code.spring_boot_library.controller;
 
 import com.luv2code.spring_boot_library.dto.UserDtos;
 import com.luv2code.spring_boot_library.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDtos.SignupRequest user) {
+    public ResponseEntity<?> register(@Valid @RequestBody UserDtos.SignupRequest user) {
         try {
             userService.register(user);
             return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -29,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserDtos.LoginResponse login(@RequestBody UserDtos.LoginRequest loginRequest) {
+    public UserDtos.LoginResponse login(@Valid @RequestBody UserDtos.LoginRequest loginRequest) {
         return userService.verify(loginRequest);
     }
 

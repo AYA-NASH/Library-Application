@@ -4,12 +4,13 @@ import com.luv2code.spring_boot_library.dto.BookDtos;
 import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.entity.BookSource;
 import com.luv2code.spring_boot_library.entity.Category;
+import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.BookMapper;
 import com.luv2code.spring_boot_library.repository.BookRepository;
 import com.luv2code.spring_boot_library.repository.CategoryRepository;
 import com.luv2code.spring_boot_library.repository.CheckoutRepository;
 import com.luv2code.spring_boot_library.repository.ReviewRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import java.util.Set;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class BookManagementService {
 
     private static final String DEFAULT_BOOK_IMAGE_URL =
@@ -30,26 +32,11 @@ public class BookManagementService {
     private final CloudinaryService cloudinaryService;
     private final BookMapper bookMapper;
 
-    @Autowired
-    public BookManagementService(
-            BookRepository bookRepository,
-            CheckoutRepository checkoutRepository,
-            ReviewRepository reviewRepository,
-            CategoryRepository categoryRepository,
-            CloudinaryService cloudinaryService,
-            BookMapper bookMapper) {
-        this.bookRepository = bookRepository;
-        this.checkoutRepository = checkoutRepository;
-        this.reviewRepository = reviewRepository;
-        this.categoryRepository = categoryRepository;
-        this.cloudinaryService = cloudinaryService;
-        this.bookMapper = bookMapper;
-    }
 
     @Transactional(readOnly = true)
-    public BookDtos.BookFileMetadata getBookEditInfo(Long bookId) throws Exception {
+    public BookDtos.BookFileMetadata getBookEditInfo(Long bookId) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new Exception("Book not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
         return bookMapper.toEditInfoResponse(book);
     }
@@ -71,9 +58,9 @@ public class BookManagementService {
             MultipartFile image,
             MultipartFile pdf,
             boolean removeImage,
-            boolean removePdf) throws Exception {
+            boolean removePdf) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new Exception("Book not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
         if (request != null) {
             bookMapper.updateEntityFromDto(request, book, categoryRepository);
@@ -85,9 +72,9 @@ public class BookManagementService {
         bookRepository.save(book);
     }
 
-    public void deleteBook(Long bookId) throws Exception {
+    public void deleteBook(Long bookId) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new Exception("Book not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
         if (book.getImagePublicId() != null) {
             cloudinaryService.deleteFile(book.getImagePublicId(), "image");

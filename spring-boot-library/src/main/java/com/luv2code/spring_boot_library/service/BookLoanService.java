@@ -5,6 +5,8 @@ import com.luv2code.spring_boot_library.entity.AppUser;
 import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.entity.Checkout;
 import com.luv2code.spring_boot_library.entity.Payment;
+import com.luv2code.spring_boot_library.exception.DuplicateResourceException;
+import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.LoanMapper;
 import com.luv2code.spring_boot_library.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +38,10 @@ public class BookLoanService {
                 .toList();
     }
 
-    public LoanDtos.ShelfResponse checkoutBook(String userEmail, Long bookId) throws Exception {
+    public LoanDtos.ShelfResponse checkoutBook(String userEmail, Long bookId) {
 
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new Exception("Book not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
         validateUserEligibility(userEmail, bookId, book);
 
@@ -57,12 +59,12 @@ public class BookLoanService {
         return loanMapper.toShelfResponse(checkout);
     }
 
-    public void returnBook(String userEmail, Long bookId) throws Exception {
+    public void returnBook(String userEmail, Long bookId) {
         AppUser user = userRepository.findByEmail(userEmail);
-        if (user == null) throw new Exception("User not found");
+        if (user == null) throw new ResourceNotFoundException("User not found");
 
         Checkout checkout = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId)
-                .orElseThrow(() -> new Exception("Loan record not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Loan record not found"));
 
         // 1. Calculate Late Fees (1 unit per day late)
         long overdueDays = ChronoUnit.DAYS.between(checkout.getReturnDate(), LocalDate.now());
@@ -81,12 +83,12 @@ public class BookLoanService {
         checkoutRepository.delete(checkout);
     }
 
-    public void renewLoan(String userEmail, Long bookId) throws Exception {
+    public void renewLoan(String userEmail, Long bookId) {
         Checkout checkout = checkoutRepository.findByUserEmailAndBookId(userEmail, bookId)
-                .orElseThrow(() -> new Exception("Loan not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Loan not found"));
 
         if (checkout.getReturnDate().isBefore(LocalDate.now())) {
-            throw new Exception("Overdue books cannot be renewed. Please return it first.");
+            throw new IllegalArgumentException("Overdue books cannot be renewed. Please return it first.");
         }
 
         checkout.setReturnDate(LocalDate.now().plusDays(7));
@@ -101,25 +103,25 @@ public class BookLoanService {
         return checkoutRepository.findByUserEmailAndBookId(userEmail, bookId).isPresent();
     }
 
-    private void validateUserEligibility(String userEmail, Long bookId, Book book) throws Exception {
+    private void validateUserEligibility(String userEmail, Long bookId, Book book) {
         AppUser user = userRepository.findByEmail(userEmail);
-        if (user == null) throw new Exception("User not found");
+        if (user == null) throw new ResourceNotFoundException("User not found");
 
-        if (book.getCopiesAvailable() <= 0) throw new Exception("No copies available");
+        if (book.getCopiesAvailable() <= 0) throw new IllegalArgumentException("No copies available");
 
         if (checkoutRepository.countByUserEmail(userEmail) >= 5)
-            throw new Exception("Maximum loan limit reached (5 books).");
+            throw new IllegalArgumentException("Maximum loan limit reached (5 books).");
 
         if (checkoutRepository.existsByUserEmailAndReturnDateBefore(userEmail, LocalDate.now()))
-            throw new Exception("You have overdue books. Return them before checking out new ones.");
+            throw new IllegalArgumentException("You have overdue books. Return them before checking out new ones.");
 
         if (checkoutRepository.findByUserEmailAndBookId(userEmail, bookId).isPresent())
-            throw new Exception("You already have this book checked out.");
+            throw new DuplicateResourceException("You already have this book checked out.");
 
         paymentRepository.findByUserId(user.getId()).ifPresent(payment -> {
             if (payment.getLateFees() > 0) {
                 double dollars = payment.getLateFees() / 100.0;
-                throw new RuntimeException("Outstanding fees: $" + dollars + ". Please pay at the billing section.");
+                throw new IllegalArgumentException("Outstanding fees: $" + dollars + ". Please pay at the billing section.");
             }
         });
     }

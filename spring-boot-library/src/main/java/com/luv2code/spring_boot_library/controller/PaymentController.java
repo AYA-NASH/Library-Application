@@ -1,44 +1,45 @@
 package com.luv2code.spring_boot_library.controller;
 
 import com.luv2code.spring_boot_library.dto.PaymentDtos;
+import com.luv2code.spring_boot_library.entity.UserPrincipal;
 import com.luv2code.spring_boot_library.service.PaymentService;
-import com.luv2code.spring_boot_library.service.UserService;
 import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/payment/secure")
 @RequiredArgsConstructor
 public class PaymentController {
+
     private final PaymentService paymentService;
-    private final UserService userService;
 
     @GetMapping("/balance")
-    public PaymentDtos.PaymentResponse getUserPayment() {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = userService.getUserIdByEmail(userEmail);
-
-        return paymentService.getUserPayment(userId);
+    public PaymentDtos.PaymentResponse getUserPayment(@AuthenticationPrincipal UserPrincipal currentUser) {
+        return paymentService.getUserPayment(currentUser.getUser().getId());
     }
 
     @PostMapping("/payment-intent")
-    public String createPaymentIntent() throws StripeException {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = userService.getUserIdByEmail(userEmail);
-        PaymentIntent intent = paymentService.createPaymentIntent(userId);
-        return intent.toJson();
+    public PaymentDtos.PaymentIntentDto createPaymentIntent(@AuthenticationPrincipal UserPrincipal currentUser) throws StripeException {
+        return paymentService.createPaymentIntent(currentUser.getUser().getId());
     }
 
     @PutMapping("/payment-complete")
-    public ResponseEntity<Void> stripePaymentComplete() throws Exception {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = userService.getUserIdByEmail(userEmail);
-
-        paymentService.completePayment(userId);
+    public ResponseEntity<Void> stripePaymentComplete(@AuthenticationPrincipal UserPrincipal currentUser) {
+        paymentService.completePayment(currentUser.getUser().getId());
         return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/outstanding")
+    public Page<PaymentDtos.AdminOutstandingResponse> getOutstandingPayments(Pageable pageable) {
+        return paymentService.getOutstandingPayments(pageable);
     }
 }

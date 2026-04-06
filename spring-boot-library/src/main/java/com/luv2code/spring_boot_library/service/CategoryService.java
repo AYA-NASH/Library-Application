@@ -2,9 +2,11 @@ package com.luv2code.spring_boot_library.service;
 
 import com.luv2code.spring_boot_library.dto.CategoryDto;
 import com.luv2code.spring_boot_library.entity.Category;
+import com.luv2code.spring_boot_library.exception.DuplicateResourceException;
+import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.CategoryMapper;
 import com.luv2code.spring_boot_library.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,19 +15,14 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    @Autowired
-    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
-        this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
-    }
-
     public CategoryDto.DetailsResponse createCategory(CategoryDto.CreateRequest request) {
         if (categoryRepository.existsByName(request.name())) {
-            throw new RuntimeException("Category already exists");
+            throw new DuplicateResourceException("Category already exists");
         }
 
         Category newCategory = categoryMapper.toEntity(request);
@@ -35,9 +32,9 @@ public class CategoryService {
         return categoryMapper.toDetailsResponse(savedCategory);
     }
 
-    public CategoryDto.DetailsResponse updateCategory(Long id, CategoryDto.CreateRequest request) throws Exception {
+    public CategoryDto.DetailsResponse updateCategory(Long id, CategoryDto.CreateRequest request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category Not Found"));
 
         categoryMapper.updateEntityFromDto(request, category);
 
@@ -46,8 +43,9 @@ public class CategoryService {
         return categoryMapper.toDetailsResponse(updatedCategory);
     }
 
-    public void deleteCategory(Long id) throws Exception {
-        Category category = categoryRepository.findById(id).orElseThrow();
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category Not Found"));
 
         new HashSet<>(category.getBooks()).forEach(book -> book.removeCategory(category));
 

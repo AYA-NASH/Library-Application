@@ -4,6 +4,7 @@ import com.luv2code.spring_boot_library.dto.InteractionDtos;
 import com.luv2code.spring_boot_library.entity.UserPrincipal;
 import com.luv2code.spring_boot_library.service.UserBookInteractionService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,13 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/interactions/secure/book/")
+@RequiredArgsConstructor
 public class UserBookInteractionController {
-    private UserBookInteractionService service;
-
-    @Autowired
-    public UserBookInteractionController(UserBookInteractionService service) {
-        this.service = service;
-    }
+    private final UserBookInteractionService service;
 
     @GetMapping("/{bookId}/last-page")
     public ResponseEntity<Integer> getLastReadPage(

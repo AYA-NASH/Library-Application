@@ -1,5 +1,7 @@
 package com.luv2code.spring_boot_library.config;
 
+import com.luv2code.spring_boot_library.entity.AppUser;
+import com.luv2code.spring_boot_library.entity.UserPrincipal;
 import com.luv2code.spring_boot_library.service.JwtService;
 import com.luv2code.spring_boot_library.service.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -45,14 +47,22 @@ public class JwtFilter extends OncePerRequestFilter {
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 String role = jwtService.extractRole(token);
+                Long userId = jwtService.extractUserId(token);
 
                 if (!jwtService.isTokenExpired(token)) {
 
                     String formattedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
                     List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(formattedRole));
 
+                    AppUser detachedUser = new AppUser();
+                    detachedUser.setId(userId);
+                    detachedUser.setEmail(email);
+                    detachedUser.setRole(role);
+                    
+                    UserPrincipal principal = new UserPrincipal(detachedUser);
+
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            email, null, authorities);
+                            principal, null, authorities);
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);

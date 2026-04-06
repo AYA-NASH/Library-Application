@@ -7,27 +7,17 @@ import com.luv2code.spring_boot_library.repository.BookRepository;
 import com.luv2code.spring_boot_library.repository.UserBookInteractionRepository;
 import com.luv2code.spring_boot_library.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserBookInteractionService {
     private final InteractionMapper interactionMapper;
-    private UserBookInteractionRepository userBookInteractionRepository;
-    private UserRepository userRepository;
-    private BookRepository bookRepository;
-
-    @Autowired
-    public UserBookInteractionService(UserBookInteractionRepository userBookInteractionRepository,
-                                      UserRepository userRepository,
-                                      BookRepository bookRepository,
-                                      InteractionMapper interactionMapper) {
-        this.userBookInteractionRepository = userBookInteractionRepository;
-        this.userRepository = userRepository;
-        this.bookRepository = bookRepository;
-        this.interactionMapper = interactionMapper;
-    }
+    private final UserBookInteractionRepository userBookInteractionRepository;
+    private final UserRepository userRepository;
+    private final BookRepository bookRepository;
 
     public Integer getLastReadPage(Long userId, Long bookId) {
         return userBookInteractionRepository

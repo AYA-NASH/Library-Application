@@ -1,33 +1,47 @@
 package com.luv2code.spring_boot_library.controller;
 
 import com.luv2code.spring_boot_library.dto.ReviewDto;
+import com.luv2code.spring_boot_library.entity.UserPrincipal;
 import com.luv2code.spring_boot_library.service.ReviewService;
-import com.luv2code.spring_boot_library.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final UserService userService;
-
 
     @GetMapping("/secure/user/{bookId}")
-    public Boolean reviewBookByUser(@PathVariable("bookId") Long bookId) throws Exception {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = userService.getUserIdByEmail(userEmail);
-        return reviewService.userReviewListed(userId, bookId);
+    public Boolean reviewBookByUser(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @PathVariable("bookId") @Positive Long bookId
+    ) {
+        return reviewService.userReviewListed(currentUser.getUser().getId(), bookId);
     }
 
     @PostMapping("/secure/user/book/{bookId}")
-    public void postReview(@RequestBody ReviewDto.ReviewRequest reviewRequest, @PathVariable("bookId") Long bookId) throws Exception {
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = userService.getUserIdByEmail(userEmail);
-        reviewService.postReview(userId, bookId, reviewRequest);
+    public void postReview(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @Valid @RequestBody ReviewDto.ReviewRequest reviewRequest,
+            @PathVariable("bookId") @Positive Long bookId
+    ) {
+        reviewService.postReview(currentUser.getUser().getId(), bookId, reviewRequest);
+    }
+
+    @GetMapping("/book/{bookId}")
+    public Page<ReviewDto.ReviewResponse> getBookReviews(
+            @PathVariable("bookId") @Positive Long bookId,
+            Pageable pageable
+    ) {
+        return reviewService.getBookReviews(bookId, pageable);
     }
 }
