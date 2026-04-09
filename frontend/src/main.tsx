@@ -3,6 +3,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
@@ -13,21 +14,31 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undef
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
 const stripePromise = STRIPE_PUBLISHABLE_KEY ? loadStripe(STRIPE_PUBLISHABLE_KEY) : undefined;
 
-const app =
-    stripePromise ? (
-        <Elements stripe={stripePromise}>
-            <App />
-        </Elements>
-    ) : (
-        <App />
-    );
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 1,
+            refetchOnWindowFocus: false,
+        },
+    },
+});
 
 createRoot(document.getElementById("root")!).render(
-    <BrowserRouter>
-        {GOOGLE_CLIENT_ID ? (
-            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>{app}</GoogleOAuthProvider>
-        ) : (
-            app
-        )}
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+            {GOOGLE_CLIENT_ID ? (
+                <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+                    {stripePromise ? (
+                        <Elements stripe={stripePromise}>
+                            <App />
+                        </Elements>
+                    ) : (
+                        <App />
+                    )}
+                </GoogleOAuthProvider>
+            ) : (
+                <App />
+            )}
+        </BrowserRouter>
+    </QueryClientProvider>
 );
