@@ -1,10 +1,10 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useReaderAccess } from "../../Hooks/ReaderHooks/useReaderAccess";
 import { useReaderSession } from "../../Hooks/ReaderHooks/useReaderSession";
-import { useAuth } from "../../Auth/AuthContext";
 import { ReaderBook } from "../../types/reader.types";
 import { useEffect } from "react";
 import ReaderContainer from "./components/ReaderContainer";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const ReaderPage = () => {
     console.log("Rendering ReaderPage");
@@ -13,8 +13,7 @@ const ReaderPage = () => {
     const location = useLocation();
     const state = location.state as { bookTitle?: string } | null;
 
-    const { token } = useAuth();
-
+    const token = useAuthStore((state) => state.token);
     const accessState = useReaderAccess(bookId, token, "full");
     const isInternalReader =
         accessState.status === "success" ? accessState.data.source === "INTERNAL" : false;

@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../Auth/AuthContext";
 import MessageModel from "../../../models/MessageModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { AdminMessage } from "./AdminMessage";
 import AdminMessageRequest from "../../../models/AdminMessageRequest";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export const AdminMessages = () => {
-    const { user, token } = useAuth();
-
+    const token = useAuthStore((state) => state.token);
+    const user = useAuthStore((state) => state.user);
     const [isLoadingMessages, setIsLoadingMessages] = useState(true);
     const [httpError, setHttpError] = useState(null);
 
@@ -26,11 +26,9 @@ export const AdminMessages = () => {
     useEffect(() => {
         const fetchUserMessages = async () => {
             if (user) {
-                const url = `${
-                    import.meta.env.VITE_API_BASE_URL
-                }/messages/search/findByClosed?closed=false&page=${
-                    currentPage - 1
-                }&size=${messagesPerPage}`;
+                const url = `${import.meta.env.VITE_API_BASE_URL
+                    }/messages/search/findByClosed?closed=false&page=${currentPage - 1
+                    }&size=${messagesPerPage}`;
                 const requestOptions = {
                     method: "GET",
                     headers: {

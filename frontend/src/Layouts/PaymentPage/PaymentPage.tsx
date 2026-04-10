@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { useAuth } from "../../Auth/AuthContext";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Link } from "react-router-dom";
 import PaymentInfoRequest from "../../models/PaymentInfoRequest";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 const hasStripe = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 export const PaymentPage = () => {
-    const { user, token } = useAuth();
-
+    const token = useAuthStore((state) => state.token);
+    const user = useAuthStore((state) => state.user);
     const [httpError, setHttpError] = useState(false);
     const [submitDisabled, setSubmitDisabled] = useState(false);
     const [fees, setFees] = useState(0);
@@ -83,13 +83,13 @@ export const PaymentPage = () => {
 
         stripe.confirmCardPayment(
             stripeResponseJson.client_secret, {
-                payment_method: {
-                    card: elements.getElement(CardElement)!,
-                    billing_details: {
-                        email: user.email
-                    }
+            payment_method: {
+                card: elements.getElement(CardElement)!,
+                billing_details: {
+                    email: user.email
                 }
-            }, {handleActions: false}
+            }
+        }, { handleActions: false }
         ).then(async function (result: any) {
             if (result.error) {
                 setSubmitDisabled(false)
@@ -137,14 +137,14 @@ export const PaymentPage = () => {
         );
     }
 
-    return(
+    return (
         <div className='container'>
             {fees !== null && fees > 0 && <div className='card mt-3'>
                 <h5 className='card-header'>Fees pending: <span className='text-danger'>${fees}</span></h5>
                 <div className='card-body'>
                     <h5 className='card-title mb-3'>Credit Card</h5>
                     <CardElement id='card-element' />
-                    <button disabled={submitDisabled} type='button' className='btn btn-md btn-dark text-white mt-3' 
+                    <button disabled={submitDisabled} type='button' className='btn btn-md btn-dark text-white mt-3'
                         onClick={checkout}>
                         Pay fees
                     </button>
@@ -163,8 +163,8 @@ export const PaymentPage = () => {
                     </Link>
                 </div>
             )}
-            
-            {submitDisabled && <SpinnerLoading/>}
+
+            {submitDisabled && <SpinnerLoading />}
         </div>
     );
 };

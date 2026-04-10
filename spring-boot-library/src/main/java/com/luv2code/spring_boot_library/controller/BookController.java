@@ -61,8 +61,8 @@ public class BookController {
     }
 
     @GetMapping("secure/current-loans")
-    public List<LoanDtos.ShelfResponse> currentLoans(@AuthenticationPrincipal UserPrincipal currentUser) {
-        return bookLoanService.currentLoans(currentUser.getUsername());
+    public Page<LoanDtos.ShelfResponse> currentLoans(@AuthenticationPrincipal UserPrincipal currentUser, Pageable pageable) {
+        return bookLoanService.currentLoans(currentUser.getUsername(), pageable);
     }
 
     @GetMapping("/secure/current-loans/count")

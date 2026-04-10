@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useAuth } from "../../Auth/AuthContext";
 import { AdminBookEditInfoResponse } from "../../models/AdminBookRequest";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export const useAdminBooks = () => {
-    const { token } = useAuth();
+    const token = useAuthStore((state)=> state.token);
     const [isProcessing, setIsProcessing] = useState(false);
 
     const fetchEditInfo = async (bookId: number): Promise<AdminBookEditInfoResponse | null> => {

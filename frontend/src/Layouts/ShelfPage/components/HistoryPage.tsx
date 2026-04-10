@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../Auth/AuthContext";
 import HistoryModel from "../../../models/HistoryModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Link } from "react-router-dom";
 import defaultBookImg from '../../../Images/BooksImages/book-luv2code-1000.png';
 import { Pagination } from "../../Utils/Pagination";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 export const HistoryPage = () => {
-    const { user, token } = useAuth();
+    const token = useAuthStore((state) => state.token);
+    const user = useAuthStore((state) => state.user);
     const [isLoadingHistory, setIsLoadingHistory] = useState(true);
     const [httpError, setHttpError] = useState(null);
 
@@ -21,11 +22,9 @@ export const HistoryPage = () => {
     useEffect(() => {
         const fetchUserHistory = async () => {
             if (token) {
-                const url = `${
-                    import.meta.env.VITE_API_BASE_URL
-                }/histories/search/findBooksByUserEmail?userEmail=${
-                    user.email
-                }&page=${currentPage - 1}&size=5`;
+                const url = `${import.meta.env.VITE_API_BASE_URL
+                    }/histories/search/findBooksByUserEmail?userEmail=${user.email
+                    }&page=${currentPage - 1}&size=5`;
                 const requestOptions = {
                     method: "GET",
                     headers: {

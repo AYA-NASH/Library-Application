@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../../../../Auth/AuthContext";
 import "./LibraryService";
+import { useAuthStore } from "../../../../store/useAuthStore";
 
 export const LibraryService = () => {
-    const { user } = useAuth();
-    
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     return (
         <div className="container my-5">
             <div className="row p-4 align-items-center border shadow-lg">
@@ -17,7 +16,7 @@ export const LibraryService = () => {
                         library admin's a personal message!
                     </p>
                     <div className="d-grid gap-2 justify-content-md-start mb-4 mb-lg-3">
-                        {!user ? 
+                        {!isAuthenticated() ?
                             <Link className="btn btn-dark btn-lg text-white" to="/login">
                                 Sign up
                             </Link>
@@ -26,7 +25,7 @@ export const LibraryService = () => {
                                 Library Services
                             </Link>
                         }
-                        
+
                     </div>
                 </div>
                 <div className="col-lg-4 offset-lg-1 shadow-lg lost-image"></div>

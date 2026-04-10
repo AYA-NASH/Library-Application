@@ -1,19 +1,16 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "./AuthContext";
+import { useAuthStore } from "../store/useAuthStore";
 import { JSX } from "react";
 
 const RequireAuth = ({ children, role }: { children: JSX.Element, role?: string }) => {
-    const { user } = useAuth();
+    const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+    const isAdmin = useAuthStore((s) => s.isAdmin);
     const location = useLocation();
 
-    if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
+    if (!isAuthenticated()) return <Navigate to={"/login"} state={{ from: location }} replace />
 
-    if (role && user.role !== role) {
-        return <Navigate to="/" replace />;  // redirect non-admins back to home
-    }
-    
+    if (role === "ADMIN" && !isAdmin()) return <Navigate to="/" replace />;
+
     return children;
 };
 

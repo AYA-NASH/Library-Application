@@ -1,19 +1,20 @@
 import { useState } from "react";
-import { useAuth } from "../../../Auth/AuthContext";
 import { BookForm } from "./BookForm";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export const AddNewBook = () => {
-    const { user, token } = useAuth();
+    const token = useAuthStore((state) => state.token);
+    const user = useAuthStore((state) => state.user);
     const [displaySuccess, setDisplaySuccess] = useState(false);
     const [httpError, setHttpError] = useState("");
-    const [resetKey, setResetKey] = useState(0); 
+    const [resetKey, setResetKey] = useState(0);
 
     const handleAddBook = async (formData: FormData) => {
         if (!user) return;
         setHttpError("");
-        
+
         try {
             const url = `${baseUrl}/admin/secure/add/book`;
             const response = await fetch(url, {

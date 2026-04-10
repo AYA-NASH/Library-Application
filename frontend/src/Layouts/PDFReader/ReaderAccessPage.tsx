@@ -1,9 +1,9 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../Auth/AuthContext";
 import { useReaderAccess } from "../../Hooks/ReaderHooks/useReaderAccess";
 import { useReadingProgress } from "../../Hooks/ReaderHooks/useReadingProgress";
 import { useEffect, useState } from "react";
 import { getIsBookOpen } from "../../Hooks/ReaderHooks/useReaderSession";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const ReaderAccessPage = () => {
     console.log("Rendering ReaderAccessPage");
@@ -12,7 +12,7 @@ const ReaderAccessPage = () => {
     const location = useLocation();
     const state = location.state as { bookTitle?: string } | null;
 
-    const { token } = useAuth();
+    const token = useAuthStore((state) => state.token);
 
     const accessState = useReaderAccess(bookId, token, "full");
     const { lastPage } = useReadingProgress(bookId ?? "");

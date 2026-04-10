@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { EditBook } from "./EditBook";
-import { useBooks } from "../../../Hooks/BookHooks/useBooks";
+import { useBooks } from "../../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../../Utils/BookFilterBar";
 import { useCategories } from "../../../Hooks/BookHooks/useCategories";
 

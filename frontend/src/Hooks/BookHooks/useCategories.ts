@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { CategoryModel } from "../../models/CategoryModel";
-import { useAuth } from "../../Auth/AuthContext";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
@@ -8,8 +8,7 @@ export const useCategories = () => {
     const [categories, setCategories] = useState<CategoryModel[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [httpError, setHttpError] = useState<null | string>(null);
-    const { token } = useAuth();
-
+    const token = useAuthStore((state) => state.token);
     const fetchCategories = async () => {
         setIsLoading(true);
         const url = `${BASE_URL}/categories`;
@@ -19,7 +18,7 @@ export const useCategories = () => {
 
         const data = await response.json();
 
-        setCategories(data); 
+        setCategories(data);
         setIsLoading(false);
     };
 
@@ -29,7 +28,7 @@ export const useCategories = () => {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
         });
-        
+
         if (!response.ok) throw new Error("Failed to fetch books count");
 
         const count = await response.json();
@@ -76,7 +75,7 @@ export const useCategories = () => {
         const data = await response.json();
 
         if (!response.ok) throw new Error(data.message || "Failed to update category");
-        
+
         return data;
     };
 

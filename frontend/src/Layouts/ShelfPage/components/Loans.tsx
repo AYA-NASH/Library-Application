@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import ShelfCurrentLoans from "../../../models/ShelfCurrentLoans";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { LoansModal } from "./LoansModal";
-import { useAuth } from "../../../Auth/AuthContext";
 import placeholder from "../../../Images/BooksImages/book-luv2code-1000.png";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export const Loans = () => {
-    const { user, token } = useAuth();
+    const token = useAuthStore((state) => state.token);
+    const user = useAuthStore((state) => state.user);
     const [httpError, setHttpError] = useState(null);
 
     // Current Loans
@@ -20,7 +21,7 @@ export const Loans = () => {
 
     const [checkout, setCheckout] = useState(false);
 
-    
+
     const [lateReturnMessage, setLateReturnMessage] = useState<string | null>(null);
 
     const lateReturnMsg = () => {
@@ -93,7 +94,7 @@ export const Loans = () => {
 
         setCheckout(!checkout);
 
-        if (isLate) {   
+        if (isLate) {
             lateReturnMsg();
         }
     }
@@ -156,30 +157,30 @@ export const Loans = () => {
                                                 <h4>Loan Options</h4>
                                                 {shelfCurrentLoan.daysLeft >
                                                     0 && (
-                                                    <p className="text-secondary">
-                                                        Due in{" "}
-                                                        {
-                                                            shelfCurrentLoan.daysLeft
-                                                        }{" "}
-                                                        days.
-                                                    </p>
-                                                )}
+                                                        <p className="text-secondary">
+                                                            Due in{" "}
+                                                            {
+                                                                shelfCurrentLoan.daysLeft
+                                                            }{" "}
+                                                            days.
+                                                        </p>
+                                                    )}
                                                 {shelfCurrentLoan.daysLeft ===
                                                     0 && (
-                                                    <p className="text-success">
-                                                        Due Today.
-                                                    </p>
-                                                )}
+                                                        <p className="text-success">
+                                                            Due Today.
+                                                        </p>
+                                                    )}
                                                 {shelfCurrentLoan.daysLeft <
                                                     0 && (
-                                                    <p className="text-danger">
-                                                        Past due by{" "}
-                                                        {
-                                                            shelfCurrentLoan.daysLeft
-                                                        }{" "}
-                                                        days.
-                                                    </p>
-                                                )}
+                                                        <p className="text-danger">
+                                                            Past due by{" "}
+                                                            {
+                                                                shelfCurrentLoan.daysLeft
+                                                            }{" "}
+                                                            days.
+                                                        </p>
+                                                    )}
                                                 <div className="list-group mt-3">
                                                     <button
                                                         className="list-group-item list-group-item-action"
@@ -269,10 +270,10 @@ export const Loans = () => {
                                             )}
                                             {shelfCurrentLoan.daysLeft ===
                                                 0 && (
-                                                <p className="text-success">
-                                                    Due Today.
-                                                </p>
-                                            )}
+                                                    <p className="text-success">
+                                                        Due Today.
+                                                    </p>
+                                                )}
                                             {shelfCurrentLoan.daysLeft < 0 && (
                                                 <p className="text-danger">
                                                     Past due by{" "}

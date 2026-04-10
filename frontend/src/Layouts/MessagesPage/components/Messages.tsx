@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../Auth/AuthContext";
 import MessageModel from "../../../models/MessageModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 export const Messages = () => {
-    const { user, token } = useAuth();
-
+    const token = useAuthStore((state) => state.token);
+    const user = useAuthStore((state) => state.user);
     const [isLoadingMessages, setIsLoadingMessages] = useState(true);
     const [httpError, setHttpError] = useState(null);
 
@@ -20,11 +20,9 @@ export const Messages = () => {
 
     useEffect(() => {
         const fetchUserMessages = async () => {
-            const url = `${
-                import.meta.env.VITE_API_BASE_URL
-            }/messages/search/findByUserEmail?userEmail=${
-                user.email
-            }&page=${currentPage - 1}&size=${messagesPerPage}`;
+            const url = `${import.meta.env.VITE_API_BASE_URL
+                }/messages/search/findByUserEmail?userEmail=${user.email
+                }&page=${currentPage - 1}&size=${messagesPerPage}`;
             const requestOptions = {
                 method: "GET",
                 headers: {

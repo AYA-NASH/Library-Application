@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Select from "react-select";
 
 type CategoryOption = {
@@ -20,13 +20,16 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
     onSearch,
 }) => {
     const [searchText, setSearchText] = useState(initialText);
+    const [selectedCategory, setSelectedCategory] = useState<CategoryOption | null>(null);
 
-    const initialSelectedCategory =
-        categories.find((cat) => cat.value === initialCategoryId) || null;
+    useEffect(() => {
+        setSearchText(initialText);
+    }, [initialText]);
 
-    const [selectedCategory, setSelectedCategory] = useState<CategoryOption | null>(
-        initialSelectedCategory
-    );
+    useEffect(() => {
+        const found = categories.find((cat) => cat.value === initialCategoryId);
+        setSelectedCategory(found || null);
+    }, [initialCategoryId, categories]);
 
     const triggerSearch = (text: string, category: CategoryOption | null) => {
         onSearch({
@@ -78,6 +81,7 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
                     }
                     isClearable
                     placeholder="Search by category..."
+                    classNamePrefix="react-select"
                 />
             </div>
         </div>

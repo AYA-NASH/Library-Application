@@ -10,12 +10,13 @@ import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.LoanMapper;
 import com.luv2code.spring_boot_library.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Service
 @Transactional
@@ -30,12 +31,9 @@ public class BookLoanService {
     private final LoanMapper loanMapper;
 
     @Transactional(readOnly = true)
-    public List<LoanDtos.ShelfResponse> currentLoans(String userEmail) {
-        List<Checkout> checkoutList = checkoutRepository.findAllByUserEmailWithBooks(userEmail);
-
-        return checkoutList.stream()
-                .map(loanMapper::toShelfResponse)
-                .toList();
+    public Page<LoanDtos.ShelfResponse> currentLoans(String userEmail, Pageable pageable) {
+        Page<Checkout> checkoutList = checkoutRepository.findAllByUserEmailWithBooks(userEmail, pageable);
+        return checkoutList.map(loanMapper::toShelfResponse);
     }
 
     public LoanDtos.ShelfResponse checkoutBook(String userEmail, Long bookId) {

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../Auth/AuthContext";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
 
 export function useReadingProgress(bookId: string) {
-    const { token } = useAuth();
+    const token = useAuthStore((state) => state.token);
     const [lastPage, setLastPage] = useState<number>(1);
     const [loading, setLoading] = useState<boolean>(true);
 

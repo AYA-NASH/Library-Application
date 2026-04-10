@@ -5,7 +5,6 @@ import { Route, Routes } from "react-router-dom";
 import { SearchBooksPage } from "./Layouts/SearchBooks/SearchBooksPage";
 import { BookCheckoutPage } from "./Layouts/BookCheckoutPage/BookCheckoutPage";
 
-import { AuthProvider } from "./Auth/AuthContext";
 import LoginPage from "./Layouts/AuthPage/LoginPage";
 import SignupPage from "./Layouts/AuthPage/SignupPage";
 import { ReviewListPage } from "./Layouts/BookCheckoutPage/ReviewListPage/ReviewListPage";
@@ -21,9 +20,7 @@ import ReaderPage from "./Layouts/PDFReader/ReaderPage";
 
 function App() {
     return (
-        <AuthProvider>
-            <InnerApp />
-        </AuthProvider>
+        <InnerApp />
     );
 }
 
@@ -32,11 +29,6 @@ function InnerApp() {
     return (
         <div className="d-flex flex-column min-vh-100">
             <Navbar />
-            {/* {alertMessage && (
-                <div className="alert alert-warning text-center m-0 rounded-0" role="alert">
-                    {alertMessage}
-                </div>
-            )} */}
             <main className="flex-grow-1">
                 <Routes>
                     {/* Public Routes */}

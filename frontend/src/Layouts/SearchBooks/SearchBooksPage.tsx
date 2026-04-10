@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pagination } from "../Utils/Pagination";
 import { SearchBooks } from "./SearchBooks";
-import { useBooks } from "../../Hooks/BookHooks/useBooks";
+import { useBooks } from "../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../Utils/BookFilterBar";
 import { useCategories } from "../../Hooks/BookHooks/useCategories";
 
@@ -14,7 +14,7 @@ export const SearchBooksPage = () => {
     const { categories } = useCategories();
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [searchParams, setSearchParams] = useState<SearchParams>();
+    const [searchParams, setSearchParams] = useState<SearchParams>({});
 
     const booksPerPage = 5;
 
@@ -22,8 +22,12 @@ export const SearchBooksPage = () => {
         categories.map(cat => ({ value: cat.id, label: cat.name })),
         [categories]);
 
-    const { books, isLoading, httpError, totalPages, totalElements } =
-        useBooks(currentPage, booksPerPage, searchParams);
+    const { data, isLoading, isError, error } = useBooks(
+        currentPage,
+        booksPerPage,
+        searchParams.text,
+        searchParams.categoryId
+    );
 
     const handleSearch = (params: SearchParams) => {
         setCurrentPage(1);
@@ -32,8 +36,13 @@ export const SearchBooksPage = () => {
 
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-    if (isLoading) return <div>Loading...</div>;
-    if (httpError) return <div>{httpError}</div>;
+    if (isLoading) return <div className="container mt-5">Loading...</div>;
+    if (isError) return <div className="container mt-5 text-danger">Error: {error?.message}</div>;
+
+
+    const books = data?.content ?? [];
+    const totalElements = data?.totalElements ?? 0;
+    const totalPages = data?.totalPages ?? 0;
 
     const lastItem =
         currentPage * booksPerPage <= totalElements
@@ -44,6 +53,8 @@ export const SearchBooksPage = () => {
         <div className="container mt-5">
             <BookFilterBar
                 categories={options}
+                initialCategoryId={searchParams.categoryId}
+                initialText={searchParams.text}
                 onSearch={handleSearch}
             />
 

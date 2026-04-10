@@ -1,64 +1,25 @@
-import { useEffect, useState } from "react";
-import { BookModel } from "../../../../models/BookModel";
-
 import { ReturnBook } from "./ReturnBook";
-
-import "./Carousel.css";
 import { SpinnerLoading } from "../../../Utils/SpinnerLoading";
 import { Link } from "react-router-dom";
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import "./Carousel.css";
+import { useBooks } from "../../../../api/hooks/BookHooks/useBooks";
 
 export const Carousel = () => {
-    // const booksArr: [] = [book1, book2, book3];
-    const [books, setBooks] = useState<BookModel[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [httpError, setHttpError] = useState(null);
-    useEffect(() => {
-        const fetchBooks = async () => {
-            const url: string = baseUrl + "/books?page=0&size=9";
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                throw new Error("Something went wrong!");
-            }
-
-            const responseJson = await response.json();
-            const responseData = responseJson._embedded.books;
-            // setBooks(responseJson._embedded.books);
-            const loadedBooks: BookModel[] = [];
-            for (const key in responseData) {
-                loadedBooks.push({
-                    id: responseData[key].id,
-                    title: responseData[key].title,
-                    author: responseData[key].author,
-                    description: responseData[key].description,
-                    copies: responseData[key].copies,
-                    copiesAvailable: responseData[key].copiesAvailable,
-                    category: responseData[key].category,
-                    img: responseData[key].img,
-                });
-            }
-            setBooks(loadedBooks);
-            setIsLoading(false);
-        };
-        fetchBooks().catch((error: any) => {
-            setIsLoading(false);
-            setHttpError(error.message);
-        });
-    }, []);
+    const { data, isLoading, isError, error } = useBooks(1, 9);
 
     if (isLoading) {
         return <SpinnerLoading />;
     }
 
-    if (httpError) {
+    if (isError) {
         return (
-            <div className="container">
-                <p>{httpError}</p>
+            <div className="container mt-5">
+                <p className="text-danger">Error: {error.message}</p>
             </div>
         );
     }
+
+    const books = data?.content ?? [];
 
     return (
         <div className="container mt-5">
@@ -68,17 +29,14 @@ export const Carousel = () => {
             <div
                 id="booksCarousel"
                 className="carousel carousel-dark slide mt-5 d-none d-lg-block"
-                // data-bs-ride="carousel"
                 data-bs-interval="false"
             >
-                {/*Desktop*/}
+                {/* Desktop View */}
                 <div className="carousel-inner">
                     {Array.from({ length: Math.ceil(books.length / 3) }).map(
                         (_, index) => (
                             <div
-                                className={`carousel-item ${
-                                    index === 0 ? "active" : ""
-                                }`}
+                                className={`carousel-item ${index === 0 ? "active" : ""}`}
                                 key={index}
                             >
                                 <div className="row d-flex justify-content-center align-items-center">
@@ -102,10 +60,7 @@ export const Carousel = () => {
                     data-bs-target="#booksCarousel"
                     data-bs-slide="prev"
                 >
-                    <span
-                        className="carousel-control-prev-icon"
-                        aria-hidden="true"
-                    ></span>
+                    <span className="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span className="visually-hidden">Previous</span>
                 </button>
 
@@ -115,18 +70,16 @@ export const Carousel = () => {
                     data-bs-target="#booksCarousel"
                     data-bs-slide="next"
                 >
-                    <span
-                        className="carousel-control-next-icon"
-                        aria-hidden="true"
-                    ></span>
+                    <span className="carousel-control-next-icon" aria-hidden="true"></span>
                     <span className="visually-hidden">Next</span>
                 </button>
             </div>
 
-            {/* Mobile View */}
             <div className="d-lg-none mt-3">
                 <div className="row d-flex justify-content-center align-items-center">
-                    <ReturnBook book={books[7]} key={books[7].id} />
+                    {books.length > 0 && (
+                        <ReturnBook book={books[0]} key={books[0].id} />
+                    )}
                 </div>
             </div>
 

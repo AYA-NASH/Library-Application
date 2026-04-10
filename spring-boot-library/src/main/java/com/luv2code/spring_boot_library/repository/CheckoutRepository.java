@@ -1,6 +1,8 @@
 package com.luv2code.spring_boot_library.repository;
 
 import com.luv2code.spring_boot_library.entity.Checkout;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +23,7 @@ public interface CheckoutRepository extends JpaRepository<Checkout, Long> {
     @Query("SELECT c FROM Checkout c " +
             "JOIN FETCH c.book " +
             "WHERE c.user.email = :email")
-    List<Checkout> findAllByUserEmailWithBooks(@Param("email") String email);
+    Page<Checkout> findAllByUserEmailWithBooks(@Param("email") String email, Pageable pageable);
 
 //    List<Checkout> findCheckoutsByUserEmail(String userEmail);
 

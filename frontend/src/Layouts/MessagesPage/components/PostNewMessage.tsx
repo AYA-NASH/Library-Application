@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useAuth } from "../../../Auth/AuthContext";
 import MessageModel from "../../../models/MessageModel";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export const PostNewMessage = () => {
-    const { token } = useAuth();
+    const token = useAuthStore((state) => state.token);
     const [title, setTitle] = useState("");
     const [question, setQuestion] = useState("");
     const [displayWarning, setDisplayWarning] = useState(false);

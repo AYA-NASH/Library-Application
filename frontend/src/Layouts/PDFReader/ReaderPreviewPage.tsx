@@ -3,13 +3,13 @@ import { useReaderAccess } from "../../Hooks/ReaderHooks/useReaderAccess";
 import { useEffect } from "react";
 import { ReaderBook } from "../../types/reader.types";
 import ReaderContainer from "./components/ReaderContainer";
-import { useAuth } from "../../Auth/AuthContext";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const ReaderPreviewPage = () => {
     const { bookId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const {token} = useAuth();
+    const token = useAuthStore((state) => state.token);
     const state = location.state as { bookTitle?: string } | null;
 
     const accessState = useReaderAccess(bookId, token, "preview");

@@ -10,14 +10,15 @@ export const CheckoutAndReviewBox: FC<{
     isCheckedout: boolean;
     isDigitalUnlocked: boolean;
     currentLoansCount: number;
-    checkoutBook: any;
+    checkoutBook: () => void;
     isReviewLeft: boolean;
-    submitReview: any;
+    submitReview: (star: number, desc: string) => void;
 }> = (props) => {
 
     const [showDigital, setShowDigital] = useState(false);
-
     const navigate = useNavigate();
+
+    const loanPercentage = (props.currentLoansCount / 5) * 100;
 
     const renderCheckoutButton = () => {
         if (!props.isAuthenticated) {
@@ -47,13 +48,20 @@ export const CheckoutAndReviewBox: FC<{
             );
         }
 
+        const isAvailable = props.book?.copiesAvailable && props.book.copiesAvailable > 0;
+
         return (
             <button
                 onClick={props.checkoutBook}
-                className="btn btn-dark btn-lg w-100 rounded-3 fw-semibold mt-3"
+                disabled={!isAvailable}
+                className={`btn ${isAvailable ? 'btn-dark' : 'btn-secondary'} btn-lg w-100 rounded-3 fw-semibold mt-3`}
             >
-                <i className="bi bi-book me-2"></i>
-                Borrow Hardcopy
+                {isAvailable ? (<>
+                    <i className="bi bi-book me-2"></i>
+                    Borrow Hardcopy
+                </>) : "Currently Out of Stock"
+                }
+
             </button>
         );
     };
@@ -161,8 +169,8 @@ export const CheckoutAndReviewBox: FC<{
                 </p>
             </div>
 
-            <hr />
-
+            <hr className="text-muted opacity-25" />
+            
             {/* Digital Header (Clickable & Styled) */}
             <div
                 className="d-flex justify-content-between align-items-center py-2 px-2 rounded-3 digital-toggle"

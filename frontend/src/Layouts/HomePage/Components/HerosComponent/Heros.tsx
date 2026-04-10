@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../../../../Auth/AuthContext";
 import "./Heros.css";
+import { useAuthStore } from "../../../../store/useAuthStore";
 
 export const Heros = () => {
-    const { user } = useAuth();
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     return (
         <div>
             <div className="d-none d-lg-block">
@@ -21,22 +21,22 @@ export const Heros = () => {
                                 skill or grow within one, we will be able to
                                 provide the top content for you.
                             </p>
-                            {!user ? 
+                            {!isAuthenticated() ?
                                 <Link
                                     className="btn btn-dark btn-lg text-white"
                                     to="/login"
-                                > 
+                                >
                                     Sign up
                                 </Link>
-                            :
+                                :
                                 <Link
-                                className="btn btn-dark btn-lg text-white"
-                                to="/search"
-                                > 
+                                    className="btn btn-dark btn-lg text-white"
+                                    to="/search"
+                                >
                                     Explore Top Books
                                 </Link>
                             }
-                            
+
                         </div>
                     </div>
                 </div>
@@ -75,7 +75,7 @@ export const Heros = () => {
                                 skill or grow within one, we will be able to
                                 provide the top content for you.
                             </p>
-                            {!user ?
+                            {!isAuthenticated() ?
                                 <Link
                                     className="btn btn-dark btn-lg text-white"
                                     to="/login"
