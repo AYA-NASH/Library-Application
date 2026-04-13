@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookForm } from "./BookForm";
+import { BookForm } from "../components/BookForm";
 import { useAuthStore } from "../../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;

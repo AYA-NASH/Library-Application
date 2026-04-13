@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
-import { EditBook } from "./EditBook";
+import { EditBook } from "../components/EditBook";
 import { useBooks } from "../../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../../Utils/BookFilterBar";
-import { useCategories } from "../../../Hooks/BookHooks/useCategories";
+import { useCategoriesReferences } from "../../../api/hooks/BookHooks/useCategories";
 
 type SearchParams = {
   text?: string;
@@ -12,7 +12,6 @@ type SearchParams = {
 };
 
 export const AdminEditBooks = () => {
-  const { categories } = useCategories();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchParams, setSearchParams] = useState<SearchParams>();
   const [bookDelete, setBookDelete] = useState(false);
@@ -20,12 +19,18 @@ export const AdminEditBooks = () => {
 
   const booksPerPage = 5;
 
-  const options = useMemo(() =>
-    categories.map(cat => ({ value: cat.id, label: cat.name })),
-    [categories]);
+  const { data: options } = useCategoriesReferences();
 
-  const { books, isLoading, httpError, totalPages, totalElements } =
-    useBooks(currentPage, booksPerPage, searchParams);
+  const { data, isLoading, isError, error } = useBooks(
+    currentPage,
+    booksPerPage,
+    searchParams?.text,
+    searchParams?.categoryId
+  );
+
+  const books = data?.content ?? [];
+  const totalElements = data?.totalElements ?? 0;
+  const totalPages = data?.totalPages ?? 0;
 
   const handleSearch = (params: SearchParams) => {
     setCurrentPage(1);
@@ -34,21 +39,21 @@ export const AdminEditBooks = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const deleteBook = () => setBookDelete(!bookDelete);
-  const updateBook = () => setBookUpdate(!bookUpdate);
+  const deleteBook = () => setBookDelete(prev => !prev);
+  const updateBook = () => setBookUpdate(prev => !prev);
 
   if (isLoading) return <SpinnerLoading />;
-  if (httpError)
+  if (isError)
     return (
       <div className="container">
-        <p>{httpError}</p>
+        <p>{(error as Error)?.message}</p>
       </div>
     );
 
   return (
     <div className="container mt-3">
       <BookFilterBar
-        categories={options}
+        categories={options ?? []}
         onSearch={handleSearch}
       />
 

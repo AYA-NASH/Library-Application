@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MessageModel from "../../../models/MessageModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
-import { AdminMessage } from "./AdminMessage";
+import { AdminMessage } from "../components/AdminMessage";
 import AdminMessageRequest from "../../../models/AdminMessageRequest";
 import { useAuthStore } from "../../../store/useAuthStore";
 

@@ -3,3 +3,8 @@ export interface PageResponse<T> {
     totalPages: number;
     totalElements: number;
 }
+
+export interface PageParams{
+    size: number;
+    page: number;
+}

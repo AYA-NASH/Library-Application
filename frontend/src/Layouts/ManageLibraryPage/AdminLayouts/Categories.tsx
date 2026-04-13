@@ -1,22 +1,20 @@
-import { useCategories } from "../../../Hooks/BookHooks/useCategories";
+import { useCategories, useCreateCategory, useDeleteCategory, useGetBookCountByCategory, useUpdateCategory } from "../../../api/hooks/BookHooks/useCategories";
 import { Check, X, PencilSquare, Trash, PlusCircle } from "react-bootstrap-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "../styles/Categories.css";
 import { ConfirmAction } from "../../Utils/ConfirmAction";
+import { CategoryDetails } from "../../../models/CategoryModel";
+import { toast } from "sonner";
 
 export const Categories = () => {
-    const {
-        categories,
-        setCategories,
-        httpError,
-        setHttpError,
-        isLoading,
-        setIsLoading,
-        createCategory,
-        updateCategory,
-        deleteCategory,
-        fetchBooksCountByCategory
-    } = useCategories();
+
+    const { data, isLoading, isError, error } = useCategories(1, 20);
+
+    const categories = data?.content ?? [];
+
+    const createCategoryMutation = useCreateCategory();
+    const updateCategoryMutation = useUpdateCategory();
+    const deleteCategoryMutation = useDeleteCategory();
 
     // Category Creation
     const [categoryName, setCategoryName] = useState("");
@@ -27,37 +25,56 @@ export const Categories = () => {
     const [editName, setEditName] = useState("");
 
     // Category Deletion
-    const [booksCount, setBooksCount] = useState<number | null>(null);
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+
+    const { data: booksCount } = useGetBookCountByCategory(
+        deletingId ?? 0,
+        showDeleteConfirm
+    );
 
     const handleCloseModal = () => {
         setShowModal(false);
         setCategoryName("");
-        setHttpError(null);
     };
 
-    const handleAddCategory = async () => {
+    const handleAddCategory = () => {
         if (!categoryName.trim()) return;
 
-        setIsLoading(true);
-        try {
-            const newCategory = await createCategory(categoryName);
-
-            setCategories((prev) => [...prev, {
-                ...newCategory
-            }]);
-
-            handleCloseModal();
-        } catch (error: any) {
-            setHttpError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
+        createCategoryMutation.mutate(
+            { name: categoryName },
+            {
+                onSuccess: () => {
+                    toast.success("Category created");
+                    handleCloseModal();
+                },
+                onError: (err: any) => {
+                    toast.error(err.message || "Failed to create category");
+                }
+            }
+        );
     };
 
-    const handleEditClick = (category: any) => {
+    const handleUpdate = (category: CategoryDetails) => {
+        if (editName.trim() === category.name) return;
+        updateCategoryMutation.mutate(
+            {
+                categoryId: category.id,
+                requestBody: { name: editName }
+            },
+            {
+                onSuccess: () => {
+                    toast.success("Category updated");
+                    setEditingId(null);
+                },
+                onError: (err: any) => {
+                    toast.error(err.message || "Update failed");
+                }
+            }
+        );
+    };
+
+    const handleEditClick = (category: CategoryDetails) => {
         setEditingId(category.id);
         setEditName(category.name);
     }
@@ -67,56 +84,34 @@ export const Categories = () => {
         setEditName("");
     };
 
-    const handleUpdate = async (id: number) => {
-        if (!editName.trim()) return;
-        setIsLoading(true);
-        try {
-            const updated = await updateCategory(id, editName);
-            setCategories(prev => prev.map(c => c.id === id ? { ...c, name: updated.name } : c));
-            setEditingId(null);
-        } catch (err: any) {
-            setHttpError(err.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleDeleteClick = (category: any) => {
+    const handleDeleteClick = (category: CategoryDetails) => {
         setDeletingId(category.id);
-        setBooksCount(null);
         setShowDeleteConfirm(true);
     };
 
-    useEffect(() => {
-        if (showDeleteConfirm && deletingId !== null) {
-            fetchBooksCountByCategory(deletingId)
-                .then(count => setBooksCount(count))
-                .catch(() => setBooksCount(0));
-        }
-    }, [showDeleteConfirm, deletingId]);
-
-    const confirmDeleteCategory = async () => {
+    const confirmDeleteCategory = () => {
         if (deletingId === null) return;
 
-        setIsDeleting(true);
-        try {
-            await deleteCategory(deletingId);
-            setCategories(prev => prev.filter(c => c.id !== deletingId));
-            setShowDeleteConfirm(false);
-            setDeletingId(null);
-        } catch (error: any) {
-            setHttpError(error.message);
-            setShowDeleteConfirm(false);
-        } finally {
-            setIsDeleting(false);
-        }
+        deleteCategoryMutation.mutate(deletingId, {
+            onSuccess: () => {
+                toast.success("Category deleted");
+                setShowDeleteConfirm(false);
+                setDeletingId(null);
+            },
+            onError: (err: any) => {
+                toast.error(err.message || "Delete failed");
+            }
+        });
     };
 
     const cancelDelete = () => {
         setShowDeleteConfirm(false);
         setDeletingId(null);
-        setBooksCount(null);
     };
+
+    if (isLoading) {
+        return <div className="container mt-5">Loading...</div>;
+    }
 
     return (
         <div className="container mt-5" style={{ maxWidth: '900px' }}>
@@ -128,8 +123,10 @@ export const Categories = () => {
                 </button>
             </div>
 
-            {httpError && !showModal && (
-                <div className="alert alert-danger">{httpError}</div>
+            {isError && !showModal && (
+                <div className="alert alert-danger">
+                    {(error as Error)?.message}
+                </div>
             )}
 
             <div className="mt-4 category-table-container border">
@@ -155,23 +152,35 @@ export const Categories = () => {
                                     ) : (
                                         <>
                                             <span className="fw-semibold">{category.name}</span>
-                                            <small className="text-muted ms-2">({category.booksCount} books)</small>
+                                            <small className="text-muted ms-2">
+                                                ({category.booksCount} books)
+                                            </small>
                                         </>
                                     )}
                                 </td>
                                 <td className="text-end">
                                     {editingId === category.id ? (
                                         <>
-                                            <button className="btn btn-sm btn-success me-2" onClick={() => handleUpdate(category.id)}>
+                                            <button
+                                                className="btn btn-sm btn-success me-2"
+                                                onClick={() => handleUpdate(category)}
+                                                disabled={updateCategoryMutation.isPending}
+                                            >
                                                 <Check size={18} />
                                             </button>
-                                            <button className="btn btn-sm btn-light" onClick={handleCancelEdit}>
+                                            <button
+                                                className="btn btn-sm btn-light"
+                                                onClick={handleCancelEdit}
+                                            >
                                                 <X size={18} />
                                             </button>
                                         </>
                                     ) : (
                                         <>
-                                            <button className="btn-icon-circle me-1" onClick={() => handleEditClick(category)}>
+                                            <button
+                                                className="btn-icon-circle me-1"
+                                                onClick={() => handleEditClick(category)}
+                                            >
                                                 <PencilSquare size={18} />
                                             </button>
                                             <button
@@ -199,38 +208,42 @@ export const Categories = () => {
                             </div>
 
                             <div className="modal-body">
-                                {httpError && (
-                                    <div className="alert alert-danger" role="alert">
-                                        {httpError}
+                                {createCategoryMutation.isError && (
+                                    <div className="alert alert-danger">
+                                        {(createCategoryMutation.error as Error)?.message}
                                     </div>
                                 )}
 
-                                <form onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleAddCategory();
-                                }}
+                                <form
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        handleAddCategory();
+                                    }}
                                 >
                                     <div className="mb-3">
-                                        <label htmlFor="categoryName" className="form-label">Category Name</label>
+                                        <label className="form-label">Category Name</label>
                                         <input
                                             type="text"
                                             className="form-control"
-                                            id="categoryName"
                                             value={categoryName}
                                             onChange={(e) => setCategoryName(e.target.value)}
-                                            disabled={isLoading}
+                                            disabled={createCategoryMutation.isPending}
                                             autoFocus
                                         />
                                     </div>
                                 </form>
                             </div>
+
                             <div className="modal-footer">
                                 <button
                                     className="btn btn-gold-outline"
                                     onClick={handleAddCategory}
-                                    disabled={isLoading || !categoryName.trim()}
+                                    disabled={
+                                        createCategoryMutation.isPending ||
+                                        !categoryName.trim()
+                                    }
                                 >
-                                    {isLoading ? "Saving..." : "Add Category"}
+                                    {createCategoryMutation.isPending ? "Saving..." : "Add Category"}
                                 </button>
                             </div>
                         </div>
@@ -242,12 +255,12 @@ export const Categories = () => {
                 show={showDeleteConfirm}
                 title="Delete Category"
                 message={
-                    booksCount === null
+                    booksCount === undefined
                         ? "Calculating associated books..."
                         : `There are ${booksCount} books in this category. Are you sure you want to delete it?`
                 }
                 confirmText="Delete"
-                isProcessing={isDeleting}
+                isProcessing={deleteCategoryMutation.isPending}
                 onConfirm={confirmDeleteCategory}
                 onCancel={cancelDelete}
             />

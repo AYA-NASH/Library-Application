@@ -7,6 +7,8 @@ import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.CategoryMapper;
 import com.luv2code.spring_boot_library.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,8 +60,16 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<CategoryDto.DetailsResponse> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
-        return categoryMapper.toDetailsResponseList(categories);
+    public Page<CategoryDto.DetailsResponse> getAllCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable)
+                .map(categoryMapper::toDetailsResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryDto.Reference> getCategoriesReferences() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(categoryMapper::toCategoryReference)
+                .toList();
     }
 }

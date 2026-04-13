@@ -1,11 +1,14 @@
-export class CategoryModel{
+export interface CategoryDetails {
     id: number;
     name: string;
     booksCount?: number;
+}
 
-    constructor(id: number, name: string, booksCount?: number){
-        this.id = id;
-        this.name = name;
-        this.booksCount = booksCount;
-    }
+export interface CategoryCreateRequest {
+    name: string;
+}
+
+export interface CategoryReference {
+    id: number;
+    name: string;
 }

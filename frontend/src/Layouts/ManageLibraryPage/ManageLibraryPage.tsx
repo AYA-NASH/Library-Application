@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AdminMessages } from "./components/AdminMessages";
+import { AdminMessages } from "./AdminLayouts/AdminMessages";
 import { AddNewBook } from "./components/AddNewBook";
-import { AdminEditBooks } from "./components/AdminEditBooks";
+import { AdminEditBooks } from "./AdminLayouts/AdminEditBooks";
 import { Categories } from "./components/Categories";
 import { useAuthStore } from "../../store/useAuthStore";
 
@@ -18,7 +18,7 @@ function tabFromSearchParams(searchParams: URLSearchParams): AdminTab {
 }
 
 export const ManageLibraryPage = () => {
-  const user = useAuthStore((state) => state.user);
+  const isAdmin = useAuthStore((state) => state.isAdmin);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<AdminTab>(() => tabFromSearchParams(searchParams));
@@ -37,7 +37,7 @@ export const ManageLibraryPage = () => {
     });
   };
 
-  if (user.role !== "ADMIN") {
+  if (!isAdmin()) {
     navigate("/");
   }
 

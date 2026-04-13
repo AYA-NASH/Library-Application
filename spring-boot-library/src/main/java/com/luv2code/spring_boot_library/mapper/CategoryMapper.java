@@ -23,5 +23,5 @@ public interface CategoryMapper {
     @Mapping(target = "booksCount", expression = "java(category.getBooks() != null ? category.getBooks().size() : 0)")
     CategoryDto.DetailsResponse toDetailsResponse(Category category);
 
-    List<CategoryDto.DetailsResponse> toDetailsResponseList(List<Category> categories);
+    CategoryDto.Reference toCategoryReference(Category category);
 }

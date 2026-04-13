@@ -2,32 +2,29 @@ package com.luv2code.spring_boot_library.controller;
 
 import com.luv2code.spring_boot_library.dto.CategoryDto;
 import com.luv2code.spring_boot_library.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.validation.annotation.Validated;
-import jakarta.validation.constraints.Positive;
 
 import java.util.List;
 
 @RestController
 @Validated
+@RequiredArgsConstructor
 @RequestMapping("api/categories")
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @Autowired
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
-
     @GetMapping
-    public ResponseEntity<List<CategoryDto.DetailsResponse>> getCategories() {
-        List<CategoryDto.DetailsResponse> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
+    public Page<CategoryDto.DetailsResponse> getCategories(Pageable pageable) {
+        return categoryService.getAllCategories(pageable);
     }
 
     @GetMapping("/{id}/books/count")
@@ -36,5 +33,9 @@ public class CategoryController {
         return ResponseEntity.ok(count);
     }
 
+    @GetMapping("/references")
+    public List<CategoryDto.Reference> getCategoriesReferences() {
+        return categoryService.getCategoriesReferences();
+    }
 
 }

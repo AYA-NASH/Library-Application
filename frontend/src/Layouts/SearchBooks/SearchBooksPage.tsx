@@ -3,7 +3,7 @@ import { Pagination } from "../Utils/Pagination";
 import { SearchBooks } from "./SearchBooks";
 import { useBooks } from "../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../Utils/BookFilterBar";
-import { useCategories } from "../../Hooks/BookHooks/useCategories";
+import { useCategories, useCategoriesReferences } from "../../api/hooks/BookHooks/useCategories";
 
 type SearchParams = {
     text?: string;
@@ -11,16 +11,13 @@ type SearchParams = {
 };
 
 export const SearchBooksPage = () => {
-    const { categories } = useCategories();
 
     const [currentPage, setCurrentPage] = useState(1);
     const [searchParams, setSearchParams] = useState<SearchParams>({});
 
     const booksPerPage = 5;
 
-    const options = useMemo(() =>
-        categories.map(cat => ({ value: cat.id, label: cat.name })),
-        [categories]);
+  const { data: options } = useCategoriesReferences();
 
     const { data, isLoading, isError, error } = useBooks(
         currentPage,
@@ -52,7 +49,7 @@ export const SearchBooksPage = () => {
     return (
         <div className="container mt-5">
             <BookFilterBar
-                categories={options}
+                categories={options ?? []}
                 initialCategoryId={searchParams.categoryId}
                 initialText={searchParams.text}
                 onSearch={handleSearch}
