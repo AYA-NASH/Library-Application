@@ -2,59 +2,34 @@ import { useState } from "react";
 import { PostNewMessage } from "./components/PostNewMessage";
 import { Messages } from "./components/Messages";
 
-export const MessagesPage = ()=>{
-    const [messagesClick, setMessagesClick] = useState(false);
+export const MessagesPage = () => {
+    const [activeTab, setActiveTab] = useState<'post' | 'view'>('post');
 
     return (
-        <div className="container">
-            <div className="mt-3 mb-2">
-                <nav>
-                    <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                        <button onClick={()=> setMessagesClick(false)}
-                            className="nav-link  active"
-                            id="nav-send-message-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#nav-send-message"
-                            type="button"
-                            role="tab"
-                            aria-controls="nav-send-message"
-                            aria-selected="true"
-                        >
-                            Submit Question
-                        </button>
-
-                        <button onClick={()=> setMessagesClick(true)}
-                            className="nav-link"
-                            id="nav-message-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#nav-message"
-                            type="button"
-                            role="tab"
-                            aria-controls="nav-message"
-                            aria-selected="false"
-                        >
-                            Q/A Response/Pending
-                        </button>
-                    </div>
-                </nav>
-
-                <div className='tab-content' id='nav-tabContent'>
-                    <div className='tab-pane fade show active' 
-                        id='nav-send-message'
-                        role='tabpanel' 
-                        aria-labelledby='nav-send-message-tab'
-                    >
-                        <PostNewMessage />
+        <div className="container py-5">
+            <div className="row justify-content-center">
+                <div className="col-lg-10">
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h2 className="fw-bold text-dark">Support Center</h2>
+                        <nav className="nav nav-pills bg-light p-1 rounded-pill shadow-sm">
+                            <button
+                                onClick={() => setActiveTab('post')}
+                                className={`nav-link rounded-pill px-4 ${activeTab === 'post' ? 'active shadow-sm' : 'text-secondary'}`}
+                            >
+                                <i className="bi bi-plus-circle me-2"></i>New Ticket
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('view')}
+                                className={`nav-link rounded-pill px-4 ${activeTab === 'view' ? 'active shadow-sm' : 'text-secondary'}`}
+                            >
+                                <i className="bi bi-chat-left-text me-2"></i>My History
+                            </button>
+                        </nav>
                     </div>
 
-                    <div className='tab-pane fade' 
-                        id='nav-message' 
-                        role='tabpanel' 
-                        aria-labelledby='nav-message-tab'
-                    >
-                        {messagesClick? <Messages/> :<></>}
+                    <div className="animate__animated animate__fadeIn">
+                        {activeTab === 'post' ? <PostNewMessage /> : <Messages />}
                     </div>
-
                 </div>
             </div>
         </div>

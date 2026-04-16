@@ -1,96 +1,63 @@
 import { useState } from "react";
-import MessageModel from "../../../models/MessageModel";
-import { useAuthStore } from "../../../store/useAuthStore";
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import { useAddUserMessage } from "../../../api/hooks/LibraryServiceHooks/useMessage";
 
 export const PostNewMessage = () => {
-    const token = useAuthStore((state) => state.token);
     const [title, setTitle] = useState("");
     const [question, setQuestion] = useState("");
     const [displayWarning, setDisplayWarning] = useState(false);
-    const [displaySuccess, setDisplaySuccess] = useState(false);
 
-    async function submitNewQuestion() {
-        const url = `${baseUrl}/messages/secure/add/message`;
-        if (token && title !== "" && question !== "") {
-            const messageRequestModel: MessageModel = new MessageModel(
-                title,
-                question
-            );
-            const requestOptions = {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(messageRequestModel),
-            };
+    const { mutate: addMessage, isPending } = useAddUserMessage();
 
-            const submitNewQuestionResponse = await fetch(url, requestOptions);
-
-            if (!submitNewQuestionResponse.ok) {
-                throw new Error("something went wrong");
-            }
-
-            setTitle("");
-            setQuestion("");
-            setDisplaySuccess(true);
-            setDisplayWarning(false);
+    function submitNewQuestion() {
+        if (title.trim() !== "" && question.trim() !== "") {
+            addMessage({ title, question }, {
+                onSuccess: () => {
+                    setTitle("");
+                    setQuestion("");
+                    setDisplayWarning(false);
+                }
+            });
         } else {
             setDisplayWarning(true);
-            setDisplaySuccess(false);
         }
     }
 
     return (
-        <div className="card mt-3">
-            {displaySuccess && (
-                <div className="alert alert-success" role="alert">
-                    Question added successfully
-                </div>
-            )}
-            <div className="card-header">Ask question to Luv2Read Admin</div>
-            <div className="card-body">
-                <form method="POST">
-                    {displayWarning && (
-                        <div className="alert alert-danger" role="alert">
-                            All fields must be filled out!
-                        </div>
-                    )}
-                    <div className="mb-3">
-                        <label className="form-label">Title</label>
+        <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div className="card-header bg-white border-bottom py-3">
+                <h5 className="mb-0 fw-semibold text-primary">Submit a New Inquiry</h5>
+                <small className="text-muted">Our admin team typically responds within 24 hours.</small>
+            </div>
+            <div className="card-body p-4">
+                <form>
+                    <div className="mb-4">
+                        <label className="form-label fw-bold text-secondary small text-uppercase">Subject</label>
                         <input
                             type="text"
-                            className="form-control"
-                            id="exampleFormControlInput1"
-                            placeholder="title"
+                            className="form-control form-control-lg border-2"
+                            placeholder="What can we help you with?"
                             onChange={(e) => setTitle(e.target.value)}
                             value={title}
                         />
                     </div>
-
-                    <div className="mb-3">
-                        <label className="form-label">Question</label>
+                    <div className="mb-4">
+                        <label className="form-label fw-bold text-secondary small text-uppercase">Detailed Description</label>
                         <textarea
-                            className="form-control"
-                            id="exampleFormControlTextarea1"
-                            rows={3}
-                            placeholder="question"
+                            className="form-control border-2"
+                            rows={5}
+                            placeholder="Please provide as much detail as possible..."
                             onChange={(e) => setQuestion(e.target.value)}
                             value={question}
                         />
                     </div>
-
-                    <div>
-                        <button
-                            type="button"
-                            className="btn btn-primary mt-3"
-                            onClick={submitNewQuestion}
-                        >
-                            Submit Question
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        className="btn btn-primary btn-lg px-5 rounded-pill shadow-sm"
+                        onClick={submitNewQuestion}
+                        disabled={isPending}
+                    >
+                        {isPending ? "Sending Ticket..." : "Post Message"}
+                    </button>
                 </form>
             </div>
         </div>

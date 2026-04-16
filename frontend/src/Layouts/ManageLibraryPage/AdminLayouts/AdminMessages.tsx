@@ -1,127 +1,77 @@
-import { useEffect, useState } from "react";
-import MessageModel from "../../../models/MessageModel";
+import { useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { AdminMessage } from "../components/AdminMessage";
-import { useAuthStore } from "../../../store/useAuthStore";
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import { useAdminOpenMessages } from "../../../api/hooks/LibraryServiceHooks/useMessage";
 
 export const AdminMessages = () => {
-    const token = useAuthStore((state) => state.token);
-    const user = useAuthStore((state) => state.user);
-    const [isLoadingMessages, setIsLoadingMessages] = useState(true);
-    const [httpError, setHttpError] = useState(null);
-
-    const [messages, setMessages] = useState<MessageModel[]>([]);
-
-    const [messagesPerPage] = useState(5);
-    const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
+    const messagesPerPage = 5;
 
-    // Recall useEffect
-    const [btnSubmit, setBtnSubmit] = useState(false);
+    const { data, isLoading, isError, error } = useAdminOpenMessages(currentPage, messagesPerPage);
 
-    useEffect(() => {
-        const fetchUserMessages = async () => {
-            if (user) {
-                const url = `${import.meta.env.VITE_API_BASE_URL
-                    }/messages/search/findByClosed?closed=false&page=${currentPage - 1
-                    }&size=${messagesPerPage}`;
-                const requestOptions = {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Conetent-Type": "application/json",
-                    },
-                };
-
-                const messageResponse = await fetch(url, requestOptions);
-
-                if (!messageResponse.ok) {
-                    throw new Error("Something went wrong");
-                }
-
-                const messageResponseJson = await messageResponse.json();
-
-                setMessages(messageResponseJson._embedded.messages);
-                setTotalPages(messageResponseJson.page.totalPages);
-            }
-            setIsLoadingMessages(false);
-        };
-
-        fetchUserMessages().catch((error: any) => {
-            setHttpError(error.message);
-            setIsLoadingMessages(false);
-        });
-
+    const paginate = (pageNumber: number) => {
+        setCurrentPage(pageNumber);
         window.scrollTo(0, 0);
-    }, [token, currentPage, btnSubmit]);
+    };
 
-    if (isLoadingMessages) {
-        return <SpinnerLoading />;
-    }
+    if (isLoading) return <SpinnerLoading />;
 
-    if (httpError) {
+    if (isError) {
         return (
-            <div className="container m-5">
-                <p>{httpError}</p>
+            <div className="container py-5 text-center">
+                <div className="alert alert-danger d-inline-block shadow-sm">
+                    <i className="bi bi-x-circle-fill me-2"></i>
+                    {error instanceof Error ? error.message : "Something went wrong"}
+                </div>
             </div>
         );
     }
 
-    // async function submitResponseToQuestion(id: number, response: string) {
-    //     const url = `${baseUrl}/messages/secure/admin/message`;
-    //     if (token && id !== null && response !== null) {
-    //         const messageAdminRequestAdmin: AdminMessageRequest =
-    //             new AdminMessageRequest(id, response);
-    //         const requestOptions = {
-    //             method: "PUT",
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //                 "Content-Type": "application/json",
-    //             },
-    //             body: JSON.stringify(messageAdminRequestAdmin),
-    //         };
-
-    //         const messageAdminRequestAdminResponse = await fetch(
-    //             url,
-    //             requestOptions
-    //         );
-
-    //         if (!messageAdminRequestAdminResponse.ok) {
-    //             throw new Error("Something went wrong");
-    //         }
-
-    //         setBtnSubmit(!btnSubmit);
-    //     }
-    // }
-
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+    const messages = data?.content || [];
+    const totalPages = data?.totalPages || 0;
+    const totalElements = data?.totalElements || 0;
 
     return (
-        <div className="mt-3">
+        <div className="mt-4">
+            <div className="d-flex justify-content-between align-items-end mb-4 border-bottom pb-3">
+                <div>
+                    <h3 className="fw-bold text-dark mb-1">Message Queue</h3>
+                    <p className="text-muted mb-0">Manage and respond to user inquiries.</p>
+                </div>
+                <div className="text-end">
+                    <span className="h4 fw-bold text-primary mb-0">{totalElements}</span>
+                    <p className="small text-uppercase fw-bold text-secondary mb-0">Total Open Tickets</p>
+                </div>
+            </div>
+
             {messages.length > 0 ? (
-                <>
-                    <h5>Pending Q/A: </h5>
-                    {/* {messages.map((message) => (
+                <div className="animate__animated animate__fadeIn">
+                    {messages.map((message) => (
                         <AdminMessage
-                            message={message}
                             key={message.id}
-                            submitResponseToQuestion={submitResponseToQuestion}
+                            message={message}
                         />
-                    ))} */}
-                </>
+                    ))}
+                </div>
             ) : (
-                <h5>No Pending Q/A</h5>
+                <div className="card border-0 shadow-sm rounded-4 p-5 text-center">
+                    <div className="py-4">
+                        <i className="bi bi-check2-circle display-1 text-success opacity-50"></i>
+                        <h4 className="mt-3 fw-bold text-dark">Inbox Zero!</h4>
+                        <p className="text-muted">All customer questions have been addressed.</p>
+                    </div>
+                </div>
             )}
 
-            {totalPages > 0 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    paginate={paginate}
-                />
+            {totalPages > 1 && (
+                <div className="d-flex justify-content-center mt-5">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        paginate={paginate}
+                    />
+                </div>
             )}
         </div>
     );

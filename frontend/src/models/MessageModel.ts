@@ -1,4 +1,4 @@
-class MessageModel {
+export interface MessageModel {
     title: string;
     question: string;
     id?: number;
@@ -6,11 +6,30 @@ class MessageModel {
     adminEmail?: string;
     response?: string;
     closed?: boolean;
-
-    constructor(title: string, question: string){
-        this.title = title;
-        this.question = question;
-    }
 }
 
-export default MessageModel;
+export interface MessageResponse {
+    id: number,
+    title: string,
+    question: string,
+    adminName?: string,
+    adminResponse?: string,
+    closed?: boolean
+}
+
+export interface userCreateMessageRequest {
+    title: string,
+    question: string
+}
+
+export interface AdminMessageView {
+    id: number,
+    userEmail: string,
+    title: string,
+    question: string
+}
+
+export interface AdminReplyRequest {
+    messageId: number,
+    response: string
+}
