@@ -57,7 +57,7 @@ public class AdminController {
     @PutMapping(value = "/secure/update/book/data/{bookId}", consumes = "multipart/form-data")
     public ResponseEntity<Void> updateBook(
             @PathVariable @Positive Long bookId,
-            @Valid @ModelAttribute BookDtos.AdminBookRequest request,
+            @ModelAttribute BookDtos.AdminBookRequest request,
             @RequestParam(required = false) MultipartFile image,
             @RequestParam(required = false) MultipartFile pdf,
             @RequestParam(value = "removeImage", required = false) Boolean removeImage,
@@ -79,15 +79,13 @@ public class AdminController {
         return ResponseEntity.ok(updatedCategory);
     }
 
-    @DeleteMapping("/secure/delete/book")
-    public void deleteBook(@RequestParam @Positive Long bookId) {
-
+    @DeleteMapping("/secure/delete/book/{bookId}")
+    public void deleteBook(@PathVariable @Positive Long bookId) {
         bookManagementService.deleteBook(bookId);
     }
 
     @DeleteMapping("/secure/delete/category/{id}")
     public void deleteCategory(@PathVariable @Positive Long id) {
-
         categoryService.deleteCategory(id);
     }
 }

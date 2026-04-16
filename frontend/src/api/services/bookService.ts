@@ -27,8 +27,11 @@ export const bookService = {
             title: b.title,
             author: b.author,
             description: b.description,
+            copies: b.copies,
+            copiesAvailable: b.copiesAvailable,
             categories: b.categories,
             img: b.imgUrl,
+            dataSource: b.dataSource
         }));
 
         return {

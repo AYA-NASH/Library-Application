@@ -1,103 +1,60 @@
 import { useEffect, useState } from "react";
 import { BookModel } from "../../../models/BookModel"
 import { ConfirmAction } from "../../Utils/ConfirmAction";
-import { useAuthStore } from "../../../store/useAuthStore";
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import { useDeleteBook, useUpdateBookQuantity } from "../../../api/hooks/BookHooks/useAdminBooks";
+import { toast } from "sonner";
 
 export const EditBookStatus: React.FC<{ book: BookModel, deleteBook: () => void, updateBook: () => void }> = (props) => {
-    const token = useAuthStore((state) => state.token);
-    const [quantity, setQuantity] = useState<number>(0);
-    const [remaining, setRemaining] = useState<number>(0);
+    const [quantity, setQuantity] = useState<number>(() => props.book.copies ?? 0);
+    const [remaining, setRemaining] = useState<number>(() => props.book.copiesAvailable ?? 0);
+
+    const { mutate: updateQty, isPending: isUpdating } = useUpdateBookQuantity();
+    const { mutate: deleteMutation, isPending: isDeleting } = useDeleteBook();
+
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+    useEffect(() => {
+        setQuantity(props.book.copies ?? 0);
+        setRemaining(props.book.copiesAvailable ?? 0);
+    }, [props.book.copies, props.book.copiesAvailable]); // Specific dependencies are safer
 
     const isInternalChange = quantity !== props.book.copies;
 
-    const [isUpdating, setIsUpdating] = useState(false);
-    const [displaySuccess, setDisplaySuccess] = useState(false);
-
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    useEffect(() => {
-        const fetchBookInState = () => {
-            props.book.copies ? setQuantity(props.book.copies) : setQuantity(0);
-            props.book.copiesAvailable
-                ? setRemaining(props.book.copiesAvailable)
-                : setRemaining(0);
-        };
-
-        fetchBookInState();
-    }, []);
-
     function internalIncrease() {
-        setQuantity(quantity + 1);
-        setRemaining(remaining + 1);
+        setQuantity(prev => prev + 1);
+        setRemaining(prev => prev + 1);
     }
 
     function internalDecrease() {
         if (quantity > 0 && remaining > 0) {
-            setQuantity(quantity - 1);
-            setRemaining(remaining - 1);
+            setQuantity(prev => prev - 1);
+            setRemaining(prev => prev - 1);
         }
     }
 
     async function updateQuantity() {
-        setIsUpdating(true);
-
-        const url = `${baseUrl}/admin/secure/update/book/quantity?bookId=${props.book.id}&quantity=${quantity}`;
-        const requestOptions = {
-            method: "PUT",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
+        updateQty({ bookId: props.book.id, quantity }, {
+            onSuccess: () => {
+                toast.success("Quantity updated!");
+                props.updateBook();
             },
-        };
-
-        const response = await fetch(url, requestOptions);
-
-        if (!response.ok) {
-            throw new Error("Something went wrong");
-        }
-
-        setDisplaySuccess(true);
-        setTimeout(() => setDisplaySuccess(false), 3000);
-
-        setIsUpdating(false);
-
-        props.updateBook();
+            onError: () => toast.error("Failed to update quantity")
+        });
     }
 
     async function confirmDeleteBook() {
-        try {
-            setIsDeleting(true);
-
-            const url = `${baseUrl}/admin/secure/delete/book?bookId=${props.book.id}`;
-            const requestOptions = {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            };
-
-            const response = await fetch(url, requestOptions);
-
-            if (!response.ok) {
-                throw new Error("Failed to delete book");
-            }
-
-            setShowDeleteConfirm(false);
-            props.deleteBook();
-        } finally {
-            setIsDeleting(false);
-        }
+        deleteMutation(props.book.id, {
+            onSuccess: () => {
+                setShowDeleteConfirm(false);
+                toast.success("Book deleted successfully");
+                props.deleteBook();
+            },
+            onError: () => toast.error("Failed to delete book")
+        });
     }
-
-
 
     return (
         <div className="d-flex flex-column align-items-center justify-content-center h-100 p-3">
-
             <div className="mb-4">
                 {remaining > 0 ? (
                     <span className="badge rounded-pill px-3 py-2 bg-success-subtle text-success border border-success-subtle">
@@ -130,7 +87,7 @@ export const EditBookStatus: React.FC<{ book: BookModel, deleteBook: () => void,
                 <input
                     type="text"
                     className="form-control form-control-sm text-center border-0 bg-transparent fw-bold"
-                    style={{ pointerEvents: 'none' }}
+                    style={{ pointerEvents: 'none', width: '60px' }}
                     value={quantity}
                     readOnly
                 />
@@ -141,20 +98,19 @@ export const EditBookStatus: React.FC<{ book: BookModel, deleteBook: () => void,
 
             <div className="d-grid gap-2 w-100 px-4">
                 <button
-                    className={`btn shadow-sm btn-sm ${displaySuccess ? 'btn-success' : (isInternalChange ? 'btn-primary' : 'btn-secondary disabled opacity-50')
-                        }`}
+                    className={`btn shadow-sm btn-sm ${isInternalChange ? 'btn-primary' : 'btn-secondary disabled opacity-50'}`}
                     onClick={updateQuantity}
+                    disabled={!isInternalChange || isUpdating}
                 >
                     {isUpdating ? (
-                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    ) : (
-                        displaySuccess ? 'Updated!' : 'Update Quantity'
-                    )}
+                        <span className="spinner-border spinner-border-sm" role="status"></span>
+                    ) : 'Update Quantity'}
                 </button>
 
                 <button
                     className="btn btn-outline-danger btn-sm border-0 mt-1"
                     onClick={() => setShowDeleteConfirm(true)}
+                    disabled={isDeleting}
                 >
                     Delete Book
                 </button>
@@ -170,7 +126,6 @@ export const EditBookStatus: React.FC<{ book: BookModel, deleteBook: () => void,
                 onCancel={() => setShowDeleteConfirm(false)}
                 onConfirm={confirmDeleteBook}
             />
-
         </div>
     );
 }

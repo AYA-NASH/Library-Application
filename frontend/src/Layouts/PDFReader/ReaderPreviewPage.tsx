@@ -74,7 +74,6 @@ const ReaderPreviewPage = () => {
         fileUrl: accessState.data.url,
     };
 
-    console.log("Book INFO", book);
     return (
         <div className="container-fluid py-4 min-vh-100 bg-light font-sans">
             <div className="row justify-content-center">

@@ -1,55 +1,51 @@
 import { useState } from "react";
 import { BookForm } from "../components/BookForm";
 import { useAuthStore } from "../../../store/useAuthStore";
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import { useAddBook } from "../../../api/hooks/BookHooks/useAdminBooks";
+import { toast } from "sonner";
 
 export const AddNewBook = () => {
-    const token = useAuthStore((state) => state.token);
-    const user = useAuthStore((state) => state.user);
-    const [displaySuccess, setDisplaySuccess] = useState(false);
-    const [httpError, setHttpError] = useState("");
+    const isAdmin = useAuthStore((s) => s.isAdmin);
     const [resetKey, setResetKey] = useState(0);
 
+    const { mutate, isPending } = useAddBook();
+
     const handleAddBook = async (formData: FormData) => {
-        if (!user) return;
-        setHttpError("");
-
-        try {
-            const url = `${baseUrl}/admin/secure/add/book`;
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { Authorization: `Bearer ${token}` },
-                body: formData,
-            });
-
-            if (!response.ok) {
-                setHttpError("Failed to add book");
-                return;
-            }
-
-            setDisplaySuccess(true);
-            setResetKey((prev) => prev + 1);
-            window.scrollTo(0, 0);
-            setTimeout(() => setDisplaySuccess(false), 5000);
-        } catch (err) {
-            setHttpError(err instanceof Error ? err.message : "Failed to add book");
+        if (!isAdmin()) {
+            toast.error("Unauthorized: Admin access required");
+            return;
         }
+
+
+        mutate(formData, {
+            onSuccess: () => {
+                toast.success("Book Added Successfully");
+                setResetKey(prev => prev + 1);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+            onError: (err: any) => {
+                const errorMessage = err.response?.data?.message || err.message || "Failed to Add Book";
+                toast.error(errorMessage);
+            }
+        }
+        );
+
     };
 
     return (
         <div className="container mt-5 mb-3">
-            {displaySuccess && <div className="alert alert-success">Book added successfully!</div>}
-            {httpError && (
-                <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                    {httpError}
-                    <button type="button" className="btn-close" onClick={() => setHttpError("")} aria-label="Close" />
-                </div>
-            )}
             <div className="card shadow-sm">
                 <div className="card-body">
                     <BookForm key={resetKey} isEdit={false} onSubmit={handleAddBook} />
                 </div>
+
+                {isPending && (
+                    <div className="position-absolute top-50 start-50 translate-middle">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Uploading...</span>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

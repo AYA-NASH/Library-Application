@@ -7,7 +7,6 @@ import ReaderContainer from "./components/ReaderContainer";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const ReaderPage = () => {
-    console.log("Rendering ReaderPage");
     const { bookId } = useParams<{ bookId: string }>();
     const navigate = useNavigate();
     const location = useLocation();

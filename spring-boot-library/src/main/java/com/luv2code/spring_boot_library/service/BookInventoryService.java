@@ -17,25 +17,17 @@ public class BookInventoryService {
     private final BookRepository bookRepository;
 
     public void updateBookQuantity(Long bookId, int newTotalCopies) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ID: " + bookId));
 
-        Optional<Book> bookOpt = bookRepository.findById(bookId);
+        int currentTotal = (book.getCopies() != null) ? book.getCopies() : 0;
+        int currentAvailable = (book.getCopiesAvailable() != null) ? book.getCopiesAvailable() : 0;
 
-        if (bookOpt.isEmpty()) {
-            throw new ResourceNotFoundException("Book not found");
-        }
-
-        if (newTotalCopies < 0) {
-            throw new IllegalArgumentException("Copies cannot be negative");
-        }
-
-        Book book = bookOpt.get();
-
-        int borrowedCopies = book.getCopies() - book.getCopiesAvailable();
+        int borrowedCopies = currentTotal - currentAvailable;
 
         if (newTotalCopies < borrowedCopies) {
-            throw new IllegalArgumentException(
-                    "Cannot set copies less than currently borrowed books"
-            );
+            throw new IllegalArgumentException("Cannot set total copies (" + newTotalCopies +
+                    ") lower than borrowed copies (" + borrowedCopies + ")");
         }
 
         book.setCopies(newTotalCopies);

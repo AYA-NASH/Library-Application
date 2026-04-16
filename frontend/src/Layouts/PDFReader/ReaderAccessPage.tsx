@@ -6,7 +6,6 @@ import { getIsBookOpen } from "../../Hooks/ReaderHooks/useReaderSession";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const ReaderAccessPage = () => {
-    console.log("Rendering ReaderAccessPage");
     const { bookId } = useParams<{ bookId: string }>();
     const navigate = useNavigate();
     const location = useLocation();

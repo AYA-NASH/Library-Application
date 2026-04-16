@@ -1,6 +1,7 @@
 package com.luv2code.spring_boot_library.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.luv2code.spring_boot_library.entity.BookSource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -34,7 +35,10 @@ public sealed interface BookDtos {
             String author,
             String description,
             String imgUrl,
-            Set<CategoryDto.Reference> categories
+            Set<CategoryDto.Reference> categories,
+            BookSource dataSource,
+            Integer copies,
+            Integer copiesAvailable
     ) implements BookDtos {
     }
 

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AdminMessages } from "./AdminLayouts/AdminMessages";
-import { AddNewBook } from "./components/AddNewBook";
+import { AddNewBook } from "./AdminLayouts/AddNewBook";
 import { AdminEditBooks } from "./AdminLayouts/AdminEditBooks";
-import { Categories } from "./components/Categories";
+import { Categories } from "./AdminLayouts/Categories";
 import { useAuthStore } from "../../store/useAuthStore";
 
 type AdminTab = "categories" | "add" | "edit" | "messages";

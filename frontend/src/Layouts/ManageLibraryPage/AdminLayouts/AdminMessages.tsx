@@ -3,7 +3,6 @@ import MessageModel from "../../../models/MessageModel";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { AdminMessage } from "../components/AdminMessage";
-import AdminMessageRequest from "../../../models/AdminMessageRequest";
 import { useAuthStore } from "../../../store/useAuthStore";
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
@@ -71,32 +70,32 @@ export const AdminMessages = () => {
         );
     }
 
-    async function submitResponseToQuestion(id: number, response: string) {
-        const url = `${baseUrl}/messages/secure/admin/message`;
-        if (token && id !== null && response !== null) {
-            const messageAdminRequestAdmin: AdminMessageRequest =
-                new AdminMessageRequest(id, response);
-            const requestOptions = {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(messageAdminRequestAdmin),
-            };
+    // async function submitResponseToQuestion(id: number, response: string) {
+    //     const url = `${baseUrl}/messages/secure/admin/message`;
+    //     if (token && id !== null && response !== null) {
+    //         const messageAdminRequestAdmin: AdminMessageRequest =
+    //             new AdminMessageRequest(id, response);
+    //         const requestOptions = {
+    //             method: "PUT",
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify(messageAdminRequestAdmin),
+    //         };
 
-            const messageAdminRequestAdminResponse = await fetch(
-                url,
-                requestOptions
-            );
+    //         const messageAdminRequestAdminResponse = await fetch(
+    //             url,
+    //             requestOptions
+    //         );
 
-            if (!messageAdminRequestAdminResponse.ok) {
-                throw new Error("Something went wrong");
-            }
+    //         if (!messageAdminRequestAdminResponse.ok) {
+    //             throw new Error("Something went wrong");
+    //         }
 
-            setBtnSubmit(!btnSubmit);
-        }
-    }
+    //         setBtnSubmit(!btnSubmit);
+    //     }
+    // }
 
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
@@ -105,13 +104,13 @@ export const AdminMessages = () => {
             {messages.length > 0 ? (
                 <>
                     <h5>Pending Q/A: </h5>
-                    {messages.map((message) => (
+                    {/* {messages.map((message) => (
                         <AdminMessage
                             message={message}
                             key={message.id}
                             submitResponseToQuestion={submitResponseToQuestion}
                         />
-                    ))}
+                    ))} */}
                 </>
             ) : (
                 <h5>No Pending Q/A</h5>

@@ -1,24 +1,23 @@
-import {  useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useCategoriesReferences } from "../../../api/hooks/BookHooks/useCategories";
-import { useFileUpload } from "../../Hooks/useFileUpload";
+import { useFileUpload } from "../FormUtilities/useFileUpload";
 import { buildBookFormData } from "../FormUtilities/BookFormUtils";
 
 import { CategorySelectField } from "../FormUtilities/CategorySelectField";
 import { ImageUploadField } from "../FormUtilities/ImageUploadField";
 import { PdfUploadField } from "../FormUtilities/PdfUploadField";
 import { IBookFormInputs } from "../../../types/book-form";
-import { AdminBookRequest } from "../../../models/AdminBookRequest";
+import { AdminBookRequest } from "../../../models/Admin";
 
 interface BookFormProps {
-  isEdit: boolean;              
-  initialData?: AdminBookRequest; 
+  isEdit: boolean;
+  initialData?: AdminBookRequest;
   onSubmit: (formData: FormData) => void;
 }
 
 export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmit }) => {
   const { data: options } = useCategoriesReferences();
-
   const { control, register, handleSubmit, formState: { errors } } = useForm<IBookFormInputs>({
     defaultValues: {
       title: initialData?.title ?? "",
@@ -56,12 +55,12 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
     onSubmit(formData);
   };
 
-  const imageLabel = imageUpload.file?.name ?? 
-    (isEdit && (initialData?.hasImage || initialData?.imageUrl) && !removedCurrentImage 
+  const imageLabel = imageUpload.file?.name ??
+    (isEdit && (initialData?.hasImage || initialData?.imageUrl) && !removedCurrentImage
       ? (initialData.imageFilename ?? "Current Image") : "No file chosen");
 
-  const pdfLabel = pdfUpload.file?.name ?? 
-    (isEdit && initialData?.hasPdf && !removedCurrentPdf 
+  const pdfLabel = pdfUpload.file?.name ??
+    (isEdit && initialData?.hasPdf && !removedCurrentPdf
       ? (initialData.pdfFilename ?? "Current PDF") : "No file chosen");
 
   const showPdfSection = !(isEdit && initialData?.dataSource && initialData.dataSource !== "INTERNAL");
@@ -75,22 +74,22 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
 
         <div className="card-body p-4">
           <div className="row g-4">
-            
+
             <div className="col-lg-7 border-end pe-lg-4">
               <div className="row g-3">
                 <div className="col-md-12">
                   <label className="form-label fw-semibold">Title</label>
-                  <input 
-                    {...register("title", { required: "Title is required" })} 
-                    className={`form-control ${errors.title ? 'is-invalid' : ''}`} 
+                  <input
+                    {...register("title", { required: "Title is required" })}
+                    className={`form-control ${errors.title ? 'is-invalid' : ''}`}
                   />
                 </div>
 
                 <div className="col-md-6">
                   <label className="form-label fw-semibold">Author</label>
-                  <input 
-                    {...register("author", { required: "Author is required" })} 
-                    className={`form-control ${errors.author ? 'is-invalid' : ''}`} 
+                  <input
+                    {...register("author", { required: "Author is required" })}
+                    className={`form-control ${errors.author ? 'is-invalid' : ''}`}
                   />
                 </div>
 
@@ -107,9 +106,9 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
 
                 <div className="col-12">
                   <label className="form-label fw-semibold">Description</label>
-                  <textarea 
-                    {...register("description", { required: "Description is required" })} 
-                    className={`form-control ${errors.description ? 'is-invalid' : ''}`} 
+                  <textarea
+                    {...register("description", { required: "Description is required" })}
+                    className={`form-control ${errors.description ? 'is-invalid' : ''}`}
                     rows={4}
                   />
                 </div>
@@ -117,7 +116,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
             </div>
 
             <div className="col-lg-5 ps-lg-4">
-              <ImageUploadField 
+              <ImageUploadField
                 uploadHook={imageUpload}
                 isEdit={isEdit}
                 hasInitialImage={initialData?.hasImage || initialData?.imageUrl}
@@ -126,7 +125,7 @@ export const BookForm: React.FC<BookFormProps> = ({ isEdit, initialData, onSubmi
               />
 
               {showPdfSection && (
-                <PdfUploadField 
+                <PdfUploadField
                   uploadHook={pdfUpload}
                   isEdit={isEdit}
                   hasInitialPdf={initialData?.hasPdf}

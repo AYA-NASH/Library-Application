@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Pagination } from "../Utils/Pagination";
 import { SearchBooks } from "./SearchBooks";
 import { useBooks } from "../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../Utils/BookFilterBar";
-import { useCategories, useCategoriesReferences } from "../../api/hooks/BookHooks/useCategories";
+import { useCategoriesReferences } from "../../api/hooks/BookHooks/useCategories";
 
 type SearchParams = {
     text?: string;
@@ -17,7 +17,7 @@ export const SearchBooksPage = () => {
 
     const booksPerPage = 5;
 
-  const { data: options } = useCategoriesReferences();
+    const { data: options } = useCategoriesReferences();
 
     const { data, isLoading, isError, error } = useBooks(
         currentPage,
