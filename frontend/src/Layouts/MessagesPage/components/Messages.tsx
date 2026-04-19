@@ -67,7 +67,11 @@ export const Messages = () => {
                     <h5 className="mt-3 text-muted">No messages found in your history.</h5>
                 </div>
             )}
-            {/* Pagination remains at the bottom */}
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                paginate={paginate}
+            />
         </div>
     );
 };

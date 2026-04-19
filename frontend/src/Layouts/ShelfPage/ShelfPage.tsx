@@ -3,6 +3,7 @@ import { HistoryPage } from "./components/HistoryPage";
 import { Loans } from "./components/Loans";
 
 export const ShelfPage = () => {
+  console.log("Shelf Page")
   const [historyClick, setHistoryClick] = useState(false);
   return (
     <div className="container">

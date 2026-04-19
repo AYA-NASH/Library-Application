@@ -55,3 +55,16 @@ export const useReturnBook = () => {
         }
     });
 };
+
+export const useRenewLoan = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (bookId: number | string) => loanService.renewLoan(bookId),
+        onSuccess: (_, bookId) => {
+            queryClient.invalidateQueries({ queryKey: ["user-current-loans"] });
+            queryClient.invalidateQueries({ queryKey: ["user-current-loans-count"] });
+            queryClient.invalidateQueries({ queryKey: ["is-checked-out", bookId] });
+            queryClient.invalidateQueries({ queryKey: ["book", bookId] });
+        }
+    });
+}

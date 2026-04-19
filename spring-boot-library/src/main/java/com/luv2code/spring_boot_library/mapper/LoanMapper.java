@@ -24,7 +24,6 @@ public interface LoanMapper {
     }
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "userEmail", source = "user.email")
     @Mapping(target = "checkoutDate", source = "checkoutDate")
     @Mapping(target = "returnedDate", expression = "java(java.time.LocalDate.now())")
     @Mapping(target = "title", source = "book.title")

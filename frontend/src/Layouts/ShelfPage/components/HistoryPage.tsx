@@ -1,65 +1,39 @@
-import { useEffect, useState } from "react";
-import HistoryModel from "../../../models/HistoryModel";
+import { useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Link } from "react-router-dom";
-import defaultBookImg from '../../../Images/BooksImages/book-luv2code-1000.png';
 import { Pagination } from "../../Utils/Pagination";
-import { useAuthStore } from "../../../store/useAuthStore";
+import { useGetUserBooksHistory } from "../../../api/hooks/BookHooks/useHistory";
+import { HistoryItem } from "./HistoryItem";
+import { HistoryModel } from "../../../models/HistoryModel";
+import { useIsMobile } from "../../Utils/useIsMobile";
 
-export const HistoryPage = () => {
-    const token = useAuthStore((state) => state.token);
-    const user = useAuthStore((state) => state.user);
-    const [isLoadingHistory, setIsLoadingHistory] = useState(true);
-    const [httpError, setHttpError] = useState(null);
-
-    // Histories:
-    const [histories, setHistories] = useState<HistoryModel[]>([]);
-
-    // Pagination:
+export const HistoryPage: React.FC = () => {
+    const isMobile = useIsMobile();
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
+    const {
+        data: histories,
+        isLoading: isLoadingHistory,
+        isError,
+        error: httpError
+    } = useGetUserBooksHistory(currentPage, 2);
 
-    useEffect(() => {
-        const fetchUserHistory = async () => {
-            if (token) {
-                const url = `${import.meta.env.VITE_API_BASE_URL
-                    }/histories/search/findBooksByUserEmail?userEmail=${user.email
-                    }&page=${currentPage - 1}&size=5`;
-                const requestOptions = {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                };
+    if (isLoadingHistory) return <SpinnerLoading />;
 
-                const historyResponse = await fetch(url, requestOptions);
-
-                if (!historyResponse.ok) {
-                    throw new Error("Something went wrong");
-                }
-
-                const historyResponseJson = await historyResponse.json();
-
-                setHistories(historyResponseJson._embedded.histories);
-                setTotalPages(historyResponseJson.page.totalPages);
-            }
-            setIsLoadingHistory(false);
-        };
-
-        fetchUserHistory().catch((error: any) => {
-            setIsLoadingHistory(false);
-            setHttpError(error.message);
-        });
-    }, [token, currentPage]);
-
-    if (isLoadingHistory) {
-        return <SpinnerLoading />;
+    if (isError) {
+        return (
+            <div className="container m-5 alert alert-danger">
+                {httpError?.message || "Error loading history."}
+            </div>
+        );
     }
 
-    if (httpError) {
+    if (!histories || histories.content.length === 0) {
         return (
-            <div className="container m-5">
-                <p>{httpError}</p>
+            <div className="container mt-5 text-center">
+                <h3>Currently no history</h3>
+                <Link className="btn btn-dark mt-2" to="/search">
+                    Search for new book
+                </Link>
             </div>
         );
     }
@@ -67,95 +41,23 @@ export const HistoryPage = () => {
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     return (
-        <div className="mt-2">
-            {histories.length > 0 ? (
-                <>
-                    <h5>Recent History:</h5>
+        <div className="container mt-4">
+            <h5 className="fw-bold mb-4">Recent History:</h5>
 
-                    {histories.map((history) => (
-                        <div key={history.id}>
-                            <div className="card mt-3 shadow p-3 mb-3 bg-body rounded">
-                                <div className="row g-0">
-                                    <div className="col-md-2">
-                                        <div className="d-none d-lg-block">
-                                            {history.img ? (
-                                                <img
-                                                    src={history.img}
-                                                    width="123"
-                                                    height="196"
-                                                    alt="Book"
-                                                />
-                                            ) : (
-                                                <img
-                                                    src={defaultBookImg}
-                                                    width="123"
-                                                    height="196"
-                                                    alt="Default"
-                                                />
-                                            )}
-                                        </div>
-                                        <div className="d-lg-none d-flex justify-content-center align-items-center">
-                                            {history.img ? (
-                                                <img
-                                                    src={history.img}
-                                                    width="123"
-                                                    height="196"
-                                                    alt="Book"
-                                                />
-                                            ) : (
-                                                <img
-                                                    src={defaultBookImg}
-                                                    width="123"
-                                                    height="196"
-                                                    alt="Default"
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col">
-                                        <div className="card-body">
-                                            <h5 className="card-title">
-                                                {" "}
-                                                {history.author}{" "}
-                                            </h5>
-                                            <h4>{history.title}</h4>
-                                            <p className="card-text">
-                                                {history.description}
-                                            </p>
-                                            <hr />
-                                            <p className="card-text">
-                                                {" "}
-                                                Checked out on:{" "}
-                                                {history.checkoutDate}
-                                            </p>
-                                            <p className="card-text">
-                                                {" "}
-                                                Returned on:{" "}
-                                                {history.returnedDate}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <hr />
-                        </div>
-                    ))}
-                </>
-            ) : (
-                <>
-                    <h3 className="mt-3">Currently no history: </h3>
-                    <Link className="btn btn-primary" to={"search"}>
-                        Search for new book
-                    </Link>
-                </>
-            )}
-            {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    paginate={paginate}
-                />
+            {histories.content.map((history: HistoryModel) => (
+                <HistoryItem key={history.id} history={history} isMobile={isMobile} />
+            ))}
+
+            {histories.totalPages > 1 && (
+                <div className="mt-4">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={histories.totalPages}
+                        paginate={paginate}
+                    />
+                </div>
             )}
         </div>
     );
 };
+

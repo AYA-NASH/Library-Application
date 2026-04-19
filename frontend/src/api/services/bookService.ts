@@ -50,6 +50,8 @@ export const bookService = {
             title: b.title,
             author: b.author,
             description: b.description,
+            copies: b.copies,
+            copiesAvailable: b.copiesAvailable,
             categories: b.categories,
             dataSource: b.dataSource,
             img: b.imgUrl,
