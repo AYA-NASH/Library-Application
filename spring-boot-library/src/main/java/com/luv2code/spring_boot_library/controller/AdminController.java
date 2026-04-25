@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/secure")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Library Admin", description = "Endpoints for managing the library catalog and inventory")
@@ -32,7 +32,7 @@ public class AdminController {
     private final BookManagementService bookManagementService;
     private final BookInventoryService bookInventoryService;
 
-    @PutMapping("/secure/update/book/quantity")
+    @PutMapping("/update/book/quantity")
     @Operation(summary = "Update book quantity", description = "Adjusts the available stock of a specific book.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Quantity successfully updated"),
@@ -47,13 +47,13 @@ public class AdminController {
         bookInventoryService.updateBookQuantity(bookId, quantity);
     }
 
-    @GetMapping("/secure/book/{bookId}/edit-info")
+    @GetMapping("/book/{bookId}/edit-info")
     public ResponseEntity<BookDtos.BookFileMetadata> getBookEditInfo(@PathVariable @Positive Long bookId) {
         BookDtos.BookFileMetadata response = bookManagementService.getBookEditInfo(bookId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/secure/add/book", consumes = "multipart/form-data")
+    @PostMapping(value = "/add/book", consumes = "multipart/form-data")
     @Operation(summary = "Add a new book", description = "Uploads a new book to the library, including an image and optional PDF.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Book successfully added"),
@@ -69,13 +69,13 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/secure/add/category")
+    @PostMapping("/add/category")
     public ResponseEntity<CategoryDto.DetailsResponse> createCategory(@Valid @RequestBody CategoryDto.CreateRequest request) {
         CategoryDto.DetailsResponse newCategory = categoryService.createCategory(request);
         return ResponseEntity.ok(newCategory);
     }
 
-    @PutMapping(value = "/secure/update/book/data/{bookId}", consumes = "multipart/form-data")
+    @PutMapping(value = "/update/book/data/{bookId}", consumes = "multipart/form-data")
     public ResponseEntity<Void> updateBook(
             @PathVariable @Positive Long bookId,
             @ModelAttribute BookDtos.AdminBookRequest request,
@@ -91,7 +91,7 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/secure/update/category/{id}")
+    @PutMapping("/update/category/{id}")
     public ResponseEntity<CategoryDto.DetailsResponse> updateCategory(
             @PathVariable @Positive Long id,
             @Valid @RequestBody CategoryDto.CreateRequest request
@@ -100,13 +100,13 @@ public class AdminController {
         return ResponseEntity.ok(updatedCategory);
     }
 
-    @DeleteMapping("/secure/delete/book/{bookId}")
+    @DeleteMapping("/delete/book/{bookId}")
     @Operation(summary = "Delete a book", description = "Permanently removes a book from the library catalog.")
     public void deleteBook(@PathVariable @Positive Long bookId) {
         bookManagementService.deleteBook(bookId);
     }
 
-    @DeleteMapping("/secure/delete/category/{id}")
+    @DeleteMapping("/delete/category/{id}")
     public void deleteCategory(@PathVariable @Positive Long id) {
         categoryService.deleteCategory(id);
     }

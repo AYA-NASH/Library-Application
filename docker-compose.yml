@@ -10,29 +10,31 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
       - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ./mysql-init/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    # volumes:
+    #   - mysql-data:/var/lib/mysql
+    #   - ./mysql-init/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword" ]
       interval: 5s
       timeout: 3s
       retries: 20
       start_period: 60s
+    networks:
+      - library-net
 
-  db-seeder:
-    build:
-      context: ./mysql-init
-    container_name: library-db-seeder
-    environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: library
-      DB_PASSWORD: library
-      DB_NAME: books_library
-    depends_on:
-      mysql:
-        condition: service_healthy
+  # db-seeder:
+  #   build:
+  #     context: ./mysql-init
+  #   container_name: library-db-seeder
+  #   environment:
+  #     DB_HOST: mysql
+  #     DB_PORT: 3306
+  #     DB_USER: library
+  #     DB_PASSWORD: library
+  #     DB_NAME: books_library
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
 
   backend:
     build: ./spring-boot-library
@@ -41,33 +43,30 @@ services:
     container_name: spring-boot-library
     restart: on-failure
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/books_library
-      SPRING_DATASOURCE_USERNAME: library
-      SPRING_DATASOURCE_PASSWORD: library
-
-      APP_JWT_SECRET: ${APP_JWT_SECRET}
-
-      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
-      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
-      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      SPRING_PROFILES_ACTIVE: docker-dev
     ports:
       - "8080:8080"
     depends_on:
       mysql:
         condition: service_healthy
+    networks:
+      - library-net
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        VITE_API_BASE_URL: /api
-        VITE_STRIPE_PUBLISHABLE_KEY: pk_test_51PIRrMRv0GnFPe3t15P9YWgSoytSvVnElQtb84cDQkzx6RdprmbCPtAU66RcRwgZZI25JlDUG7nPVLbxGKBeNSGZ00atMt0rTg
-    container_name: library-frontend
-    restart: on-failure
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
+      build:
+        context: ./frontend
+      container_name: library-frontend
+      restart: on-failure
+      ports:
+        - "3000:80"
+      depends_on:
+        - backend
+      networks:
+        - library-net
 
 volumes:
   mysql-data:
+
+networks:
+  library-net:      
+    driver: bridge

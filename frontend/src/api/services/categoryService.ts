@@ -5,7 +5,7 @@ import apiClient from "../client"
 export const categoryService = {
     getCategoriesDetails: async (page: number, size: number): Promise<PageResponse<CategoryDetails>> => {
         const params: PageParams = { page: page - 1, size };
-        const response = await apiClient.get("/categories", { params });
+        const response = await apiClient.get("/categories/public", { params });
         return {
             content: response.data.content,
             totalPages: response.data.totalPages,
@@ -14,12 +14,12 @@ export const categoryService = {
     },
 
     getCategoriesReferences: async (): Promise<CategoryReference[]> => {
-        const response = await apiClient.get(`categories/references`);
+        const response = await apiClient.get(`categories/public/references`);
         return response.data;
     },
 
     getBookCountByCategory: async (categoryId: number | string): Promise<number> => {
-        const response = await apiClient.get(`/categories/${categoryId}/books/count`);
+        const response = await apiClient.get(`/categories/public/${categoryId}/books/count`);
         return response.data;
     },
 

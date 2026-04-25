@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/api/messages/secure")
 @RequiredArgsConstructor
 @Tag(name = "User Interaction", description = "Endpoints for user support messages and admin replies")
 public class MessagesController {
@@ -36,7 +36,7 @@ public class MessagesController {
         return messageService.getOpenedQuestions(pageable);
     }
 
-    @PostMapping("/secure/add/message")
+    @PostMapping("/add/message")
     public void postMessage(
             @AuthenticationPrincipal UserPrincipal currentUser,
             @Valid @RequestBody MessageDtos.NewMessageRequest messageRequest
@@ -45,7 +45,7 @@ public class MessagesController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/secure/admin/reply")
+    @PutMapping("/admin/reply")
     public void adminReply(
             @AuthenticationPrincipal UserPrincipal currentUser,
             @Valid @RequestBody MessageDtos.AdminReplyRequest adminReply

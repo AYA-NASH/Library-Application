@@ -8,7 +8,7 @@ export const readerService = {
     },
 
     getPreviewAccessUrl: async (bookId: number|string): Promise<DigitalAccessResponse> => {
-        const response = await apiClient.get(`/reading/${bookId}/preview`);
+        const response = await apiClient.get(`/reading/public/${bookId}/preview`);
         return response.data;
     },
 

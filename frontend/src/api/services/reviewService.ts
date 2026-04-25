@@ -4,7 +4,7 @@ import { PageResponse } from "../../models/PageResponse";
 
 export const reviewService = {
     getBookReviews: async (bookId: number | string, page: number, size: number): Promise<PageResponse<ReviewModel>> => {
-        const url = `/reviews/book/${bookId}`;
+        const url = `/reviews/public/book/${bookId}`;
         const params: any = { page: page - 1, size };
         const response = await apiClient.get(url, { params });
 

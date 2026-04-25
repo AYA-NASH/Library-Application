@@ -24,7 +24,12 @@ public class JwtService {
 
     public String generateToken(Long userId, String email, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+
+        String cleanRole = role != null && role.startsWith("ROLE_")
+                ? role.replace("ROLE_", "")
+                : role;
+
+        claims.put("role", cleanRole);
         claims.put("userId", userId);
 
         long now = System.currentTimeMillis();

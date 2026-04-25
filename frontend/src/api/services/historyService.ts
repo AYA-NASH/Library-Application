@@ -6,7 +6,7 @@ import { PageResponse } from "./bookService";
 export const historyService = {
     getUserBooksHistory: async (page: number, size: number): Promise<PageResponse<HistoryModel>> => {
         const params: PageParams = { page: page - 1, size: size };
-        const response = await apiClient.get("/history/user", { params });
+        const response = await apiClient.get("/history/secure/user", { params });
 
         return {
             content: response.data.content,

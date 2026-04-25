@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Pageable;
 
 @RestController
-@RequestMapping("/api/history")
+@RequestMapping("/api/history/secure")
 @RequiredArgsConstructor
 @Tag(name = "User Interaction", description = "Endpoints for user borrowing history")
 public class HistoryController {

@@ -6,7 +6,7 @@ export const messageService = {
     // -------- USER --------------
     getUserMessges: async (page: number, size: number): Promise<PageResponse<MessageResponse>> => {
         const params: PageParams = { page: page - 1, size };
-        const response = await apiClient.get("/messages/mine", { params });
+        const response = await apiClient.get("/messages/secure/mine", { params });
         return {
             content: response.data.content,
             totalPages: response.data.page.totalPages,
@@ -21,7 +21,7 @@ export const messageService = {
     // ------- ADMIN --------------
     getAdminOpenedMessages: async (page: number, size: number): Promise<PageResponse<AdminMessageView>> => {
         const params: PageParams = { page: page - 1, size };
-        const response = await apiClient.get("/messages/admin/open", { params });
+        const response = await apiClient.get("/messages/secure/admin/open", { params });
         return {
             content: response.data.content,
             totalPages: response.data.page.totalPages,

@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("api/categories")
+@RequestMapping("api/categories/public")
 @Tag(name = "User Interaction", description = "Endpoints for book categories")
 public class CategoryController {
     private final CategoryService categoryService;

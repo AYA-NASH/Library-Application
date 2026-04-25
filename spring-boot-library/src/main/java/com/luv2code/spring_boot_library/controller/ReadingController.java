@@ -28,7 +28,7 @@ public class ReadingController {
         return readingService.getBookUrl(bookId);
     }
 
-    @GetMapping("{bookId}/preview")
+    @GetMapping("/public/{bookId}/preview")
     public BookDtos.DigitalAccessResponse getBookPreviewUrl(
             @PathVariable("bookId") @Positive Long bookId) {
         return readingService.getBookPreviewUrl(bookId);

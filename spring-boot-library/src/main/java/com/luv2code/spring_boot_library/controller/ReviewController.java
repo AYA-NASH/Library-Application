@@ -39,7 +39,7 @@ public class ReviewController {
         reviewService.postReview(currentUser.getUser().getId(), bookId, reviewRequest);
     }
 
-    @GetMapping("/book/{bookId}")
+    @GetMapping("/public/book/{bookId}")
     public Page<ReviewDto.ReviewResponse> getBookReviews(
             @PathVariable("bookId") @Positive Long bookId,
             Pageable pageable
