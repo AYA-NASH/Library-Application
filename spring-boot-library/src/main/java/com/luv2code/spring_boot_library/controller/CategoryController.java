@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("api/categories")
+@Tag(name = "User Interaction", description = "Endpoints for book categories")
 public class CategoryController {
     private final CategoryService categoryService;
 

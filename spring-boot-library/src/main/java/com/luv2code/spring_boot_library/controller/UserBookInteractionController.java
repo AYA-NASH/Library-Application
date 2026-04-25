@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/interactions/secure/book/")
 @RequiredArgsConstructor
+@Tag(name = "User Interaction", description = "Endpoints for user-book interactions like reading progress")
 public class UserBookInteractionController {
     private final UserBookInteractionService service;
 

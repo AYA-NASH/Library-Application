@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 @RestController
 @RequestMapping("/api/history")
 @RequiredArgsConstructor
+@Tag(name = "User Interaction", description = "Endpoints for user borrowing history")
 public class HistoryController {
 
     private final HistoryService historyService;

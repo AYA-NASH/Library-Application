@@ -5,6 +5,7 @@ import com.luv2code.spring_boot_library.entity.UserPrincipal;
 import com.luv2code.spring_boot_library.service.ReviewService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
+@Tag(name = "User Interaction", description = "Endpoints for user reviews and ratings")
 public class ReviewController {
 
     private final ReviewService reviewService;

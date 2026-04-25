@@ -5,6 +5,14 @@ import com.luv2code.spring_boot_library.dto.CategoryDto;
 import com.luv2code.spring_boot_library.service.BookInventoryService;
 import com.luv2code.spring_boot_library.service.BookManagementService;
 import com.luv2code.spring_boot_library.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import com.luv2code.spring_boot_library.dto.ErrorsDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Library Admin", description = "Endpoints for managing the library catalog and inventory")
 public class AdminController {
 
     private final CategoryService categoryService;
@@ -24,9 +33,15 @@ public class AdminController {
     private final BookInventoryService bookInventoryService;
 
     @PutMapping("/secure/update/book/quantity")
+    @Operation(summary = "Update book quantity", description = "Adjusts the available stock of a specific book.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Quantity successfully updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid input or book not found", 
+                         content = @Content(schema = @Schema(implementation = ErrorsDto.ApiErrorResponse.class)))
+    })
     public void updateBookQuantity(
-            @RequestParam @Positive Long bookId,
-            @RequestParam @Positive int quantity
+            @RequestParam @Parameter(description = "ID of the book to update", example = "1") @Positive Long bookId,
+            @RequestParam @Parameter(description = "New total quantity", example = "10") @Positive int quantity
     ) {
 
         bookInventoryService.updateBookQuantity(bookId, quantity);
@@ -39,10 +54,16 @@ public class AdminController {
     }
 
     @PostMapping(value = "/secure/add/book", consumes = "multipart/form-data")
+    @Operation(summary = "Add a new book", description = "Uploads a new book to the library, including an image and optional PDF.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Book successfully added"),
+            @ApiResponse(responseCode = "400", description = "Invalid book data or missing image", 
+                         content = @Content(schema = @Schema(implementation = ErrorsDto.ApiErrorResponse.class)))
+    })
     public ResponseEntity<?> postBook(
-            @Valid @ModelAttribute BookDtos.AdminBookRequest request,
-            @RequestParam("image") MultipartFile image,
-            @RequestParam(value = "pdf", required = false) MultipartFile pdf) {
+            @Valid @ModelAttribute @Parameter(description = "Book details") BookDtos.AdminBookRequest request,
+            @RequestParam("image") @Parameter(description = "Book cover image file") MultipartFile image,
+            @RequestParam(value = "pdf", required = false) @Parameter(description = "Book PDF file (optional)") MultipartFile pdf) {
 
         bookManagementService.postBook(request, image, pdf);
         return ResponseEntity.ok().build();
@@ -80,6 +101,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/secure/delete/book/{bookId}")
+    @Operation(summary = "Delete a book", description = "Permanently removes a book from the library catalog.")
     public void deleteBook(@PathVariable @Positive Long bookId) {
         bookManagementService.deleteBook(bookId);
     }
