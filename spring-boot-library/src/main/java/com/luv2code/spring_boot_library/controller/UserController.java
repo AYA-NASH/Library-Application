@@ -36,13 +36,12 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "Invalid input or user already exists", 
                          content = @Content(schema = @Schema(implementation = ErrorsDto.ApiErrorResponse.class)))
     })
-    public ResponseEntity<?> register(@Valid @RequestBody @Parameter(description = "User registration details") UserDtos.SignupRequest user) {
-        try {
-            userService.register(user);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public ResponseEntity<Void> register(
+            @Parameter(description = "User registration details")
+            @Valid @RequestBody UserDtos.SignupRequest user
+    ) {
+        userService.register(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")

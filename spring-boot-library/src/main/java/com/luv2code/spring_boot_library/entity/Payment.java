@@ -19,4 +19,7 @@ public class Payment {
 
     @Column(name = "late_fees")
     private Long lateFees;
+
+    @Column(name = "last_payment_completion_key", length = 120)
+    private String lastPaymentCompletionKey;
 }

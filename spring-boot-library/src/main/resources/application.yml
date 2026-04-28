@@ -1,0 +1,30 @@
+resilience4j:
+  retry:
+    instances:
+      stripeService:
+        max-attempts: 3
+        wait-duration: 500ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - com.stripe.exception.ApiConnectionException
+          - com.stripe.exception.RateLimitException
+      cloudinaryService:
+        max-attempts: 3
+        wait-duration: 300ms
+        retry-exceptions:
+          - java.io.IOException
+          - com.cloudinary.api.exceptions.ApiException
+  circuitbreaker:
+    instances:
+      stripeService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        register-health-indicator: true
+      cloudinaryService:
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s

@@ -12,7 +12,12 @@ export const paymentService = {
         return response.data;
     },
     stripePaymentComplete: async (): Promise<void> => {
-        return await apiClient.put("/payment/secure/payment-complete");
+        const idempotencyKey = crypto.randomUUID();
+        await apiClient.put("/payment/secure/payment-complete", undefined, {
+            headers: {
+                "Idempotency-Key": idempotencyKey,
+            },
+        });
     },
     getOutstandingPayments: async (page: number, size: number): Promise<PageResponse<AdminOutstandingResponse>> => {
         const params = { page: page - 1, size: size }

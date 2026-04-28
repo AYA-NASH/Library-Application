@@ -24,5 +24,11 @@ public sealed interface ErrorsDto {
         public ApiErrorResponse(int status, String error, String message, String path) {
             this(LocalDateTime.now(), status, error, message, path, null);
         }
+
+        public ApiErrorResponse(
+                int status, String error, String message, String path, Map<String, String> validationErrors
+        ) {
+            this(LocalDateTime.now(), status, error, message, path, validationErrors);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.luv2code.spring_boot_library.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.luv2code.spring_boot_library.dto.ErrorsDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
 
-// When a user is authenticated but doesn’t have the required role (e.g. hits /api/admin/secure/** without ROLE_ADMIN),
-// Spring calls this, and you return a 403 JSON response.
+// When a user is authenticated but doesn’t have the required role (e.g. hits /api/admin/secure/** without ROLE_ADMIN).
 
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
@@ -35,10 +34,11 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        Map<String, Object> body = Map.of(
-                "timestamp", java.time.Instant.now().toString(),
-                "error", "Forbidden",
-                "message", accessDeniedException.getMessage()
+        ErrorsDto.ApiErrorResponse body = new ErrorsDto.ApiErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden",
+                "You do not have permission to access this resource.",
+                request.getRequestURI()
         );
 
         objectMapper.writeValue(response.getOutputStream(), body);

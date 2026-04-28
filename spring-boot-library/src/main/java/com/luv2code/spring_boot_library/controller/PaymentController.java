@@ -34,8 +34,10 @@ public class PaymentController {
     }
 
     @PutMapping("/payment-complete")
-    public ResponseEntity<Void> stripePaymentComplete(@AuthenticationPrincipal UserPrincipal currentUser) {
-        paymentService.completePayment(currentUser.getUser().getId());
+    public ResponseEntity<Void> stripePaymentComplete(
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @AuthenticationPrincipal UserPrincipal currentUser) {
+        paymentService.completePayment(currentUser.getUser().getId(), idempotencyKey);
         return ResponseEntity.ok().build();
     }
 
