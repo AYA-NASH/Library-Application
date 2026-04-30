@@ -16,11 +16,19 @@ import { PaymentPage } from "./Layouts/PaymentPage/PaymentPage";
 import { ReaderPreviewPage } from "./Layouts/PDFReader/ReaderPreviewPage";
 import { ReaderAccessPage } from "./Layouts/PDFReader/ReaderAccessPage";
 import { ReaderPage } from "./Layouts/PDFReader/ReaderPage";
+import { NotFoundPage } from "./Layouts/Utils/NotFoundPage";
 
+import { ErrorBoundary } from "react-error-boundary";
+import { GlobalErrorFallback } from "./Layouts/Utils/GlobalErrorFallback";
 
 function App() {
     return (
-        <InnerApp />
+        <ErrorBoundary
+            FallbackComponent={GlobalErrorFallback}
+            onReset={() => window.location.replace("/")}
+        >
+            <InnerApp />
+        </ErrorBoundary>
     );
 }
 
@@ -51,6 +59,9 @@ function InnerApp() {
                     <Route path="/reader/:bookId/preview" element={<RequireAuth><ReaderPreviewPage /></RequireAuth>} />
                     <Route path="/reader/:bookId" element={<RequireAuth><ReaderAccessPage /></RequireAuth>} />
                     <Route path="/reader/:bookId/read" element={<RequireAuth><ReaderPage /></RequireAuth>} />
+                    
+                    {/* Catch-all Route */}
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </main>
             <Footer />

@@ -11,6 +11,8 @@ type SearchParams = {
   categoryId?: number;
 };
 
+import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
+
 export const AdminEditBooks = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchParams, setSearchParams] = useState<SearchParams>();
@@ -21,7 +23,7 @@ export const AdminEditBooks = () => {
 
   const { data: options } = useCategoriesReferences();
 
-  const { data, isLoading, isError, error } = useBooks(
+  const { data, isLoading, isError, error, refetch } = useBooks(
     currentPage,
     booksPerPage,
     searchParams?.text,
@@ -44,11 +46,7 @@ export const AdminEditBooks = () => {
 
   if (isLoading) return <SpinnerLoading />;
   if (isError)
-    return (
-      <div className="container">
-        <p>{(error as Error)?.message}</p>
-      </div>
-    );
+    return <ApiErrorDisplay error={error} title="Failed to load books for editing" onRetry={() => refetch()} />;
 
   return (
     <div className="container mt-3">

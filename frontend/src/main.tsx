@@ -15,10 +15,22 @@ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undef
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
 const stripePromise = STRIPE_PUBLISHABLE_KEY ? loadStripe(STRIPE_PUBLISHABLE_KEY) : undefined;
 
+import { parseApiError } from "./errors/parseApiError";
+
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            retry: 1,
+            retry: (failureCount, error) => {
+                const apiError = parseApiError(error);
+
+                if (failureCount >= 2) return false;
+
+                if (!apiError.status || apiError.status >= 500) {
+                    return true;
+                }
+
+                return false;
+            },
             refetchOnWindowFocus: false,
         },
     },

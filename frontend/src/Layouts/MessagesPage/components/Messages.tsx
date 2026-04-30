@@ -3,11 +3,13 @@ import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Pagination } from "../../Utils/Pagination";
 import { useUserMessages } from "../../../api/hooks/LibraryServiceHooks/useMessage";
 
+import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
+
 export const Messages = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const messagesPerPage = 5;
 
-    const { data, isLoading, isError, error } = useUserMessages(currentPage, messagesPerPage);
+    const { data, isLoading, isError, error, refetch } = useUserMessages(currentPage, messagesPerPage);
 
     const paginate = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -17,11 +19,7 @@ export const Messages = () => {
     if (isLoading) return <SpinnerLoading />;
 
     if (isError) {
-        return (
-            <div className="container m-5">
-                <p>{error instanceof Error ? error.message : "Something went wrong"}</p>
-            </div>
-        );
+        return <ApiErrorDisplay error={error} title="Failed to load your messages" onRetry={() => refetch()} />;
     }
 
     const messages = data?.content || [];

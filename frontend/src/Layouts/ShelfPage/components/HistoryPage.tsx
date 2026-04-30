@@ -7,6 +7,8 @@ import { HistoryItem } from "./HistoryItem";
 import { HistoryModel } from "../../../models/HistoryModel";
 import { useIsMobile } from "../../Utils/useIsMobile";
 
+import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
+
 export const HistoryPage: React.FC = () => {
     const isMobile = useIsMobile();
     const [currentPage, setCurrentPage] = useState(1);
@@ -14,17 +16,14 @@ export const HistoryPage: React.FC = () => {
         data: histories,
         isLoading: isLoadingHistory,
         isError,
-        error: httpError
+        error: httpError,
+        refetch
     } = useGetUserBooksHistory(currentPage, 2);
 
     if (isLoadingHistory) return <SpinnerLoading />;
 
     if (isError) {
-        return (
-            <div className="container m-5 alert alert-danger">
-                {httpError?.message || "Error loading history."}
-            </div>
-        );
+        return <ApiErrorDisplay error={httpError} title="Failed to load history" onRetry={() => refetch()} />;
     }
 
     if (!histories || histories.content.length === 0) {

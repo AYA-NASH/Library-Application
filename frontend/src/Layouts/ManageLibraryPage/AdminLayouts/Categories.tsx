@@ -5,6 +5,8 @@ import "../styles/Categories.css";
 import { ConfirmAction } from "../../Utils/ConfirmAction";
 import { CategoryDetails } from "../../../models/CategoryModel";
 import { toast } from "sonner";
+import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
+import { parseApiError } from "../../../errors/parseApiError";
 
 export const Categories = () => {
 
@@ -49,7 +51,8 @@ export const Categories = () => {
                     handleCloseModal();
                 },
                 onError: (err: any) => {
-                    toast.error(err.message || "Failed to create category");
+                    const apiError = parseApiError(err);
+                    toast.error(apiError.message);
                 }
             }
         );
@@ -68,7 +71,8 @@ export const Categories = () => {
                     setEditingId(null);
                 },
                 onError: (err: any) => {
-                    toast.error(err.message || "Update failed");
+                    const apiError = parseApiError(err);
+                    toast.error(apiError.message);
                 }
             }
         );
@@ -99,7 +103,8 @@ export const Categories = () => {
                 setDeletingId(null);
             },
             onError: (err: any) => {
-                toast.error(err.message || "Delete failed");
+                const apiError = parseApiError(err);
+                toast.error(apiError.message);
             }
         });
     };
@@ -113,6 +118,10 @@ export const Categories = () => {
         return <div className="container mt-5">Loading...</div>;
     }
 
+    if (isError) {
+        return <ApiErrorDisplay error={error} title="Failed to load categories" />;
+    }
+
     return (
         <div className="container mt-5" style={{ maxWidth: '900px' }}>
             <div className="d-flex justify-content-between align-items-end mb-4">
@@ -123,11 +132,6 @@ export const Categories = () => {
                 </button>
             </div>
 
-            {isError && !showModal && (
-                <div className="alert alert-danger">
-                    {(error as Error)?.message}
-                </div>
-            )}
 
             <div className="mt-4 category-table-container border">
                 <table className="table table-hover align-middle mb-0">
@@ -210,7 +214,7 @@ export const Categories = () => {
                             <div className="modal-body">
                                 {createCategoryMutation.isError && (
                                     <div className="alert alert-danger">
-                                        {(createCategoryMutation.error as Error)?.message}
+                                        {parseApiError(createCategoryMutation.error).message}
                                     </div>
                                 )}
 

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ShelfCurrentLoans } from "../../../models/ShelfCurrentLoans";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
+import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
+import { parseApiError } from "../../../errors/parseApiError";
 
 import { useCurrentLoans, useRenewLoan, useReturnBook } from "../../../api/hooks/BookHooks/useLoans";
 import { toast } from "sonner";
@@ -35,11 +37,7 @@ export const Loans = () => {
     }
 
     if (isError) {
-        return (
-            <div className="container m-5">
-                {httpError.message}
-            </div>
-        );
+        return <ApiErrorDisplay error={httpError} title="Failed to load loans" />;
     }
 
     async function returnBook(shelfCurrentLoan: ShelfCurrentLoans) {
@@ -50,8 +48,9 @@ export const Loans = () => {
                 setCheckout(!checkout);
                 if (isLate) lateReturnMsg();
                 toast.success(`${shelfCurrentLoan.book.title} is returned`);
-            }, onError: () => {
-                toast.error("Something went wrong!");
+            }, onError: (err) => {
+                const apiError = parseApiError(err);
+                toast.error(apiError.message);
             }
         }
         );
@@ -62,8 +61,9 @@ export const Loans = () => {
             onSuccess: () => {
                 setCheckout(!checkout);
                 toast.success("you renewed checkout due-date, remeber to return it back in next 7-days");
-            }, onError: () => {
-                toast.error("Something went wrong!");
+            }, onError: (err) => {
+                const apiError = parseApiError(err);
+                toast.error(apiError.message);
             }
         }
         );

@@ -4,8 +4,9 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCreatePaymentIntent, useFetchFees, useStripePaymentComplete } from "../../api/hooks/PaymentHooks/usePayment";
 import { toast } from "sonner";
 import { StripeNotConfigured } from "./components/StripeNotConfigured";
-import { ErrorDisplay } from "../Utils/ErrorDisplay";
+import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
 import { NoFeesEmptyState } from "./components/NoFeesEmptyState";
+import { parseApiError } from "../../errors/parseApiError";
 
 
 const hasStripe = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
@@ -14,7 +15,7 @@ export const PaymentPage = () => {
     const stripe = useStripe();
     const elements = useElements();
 
-    const { data: feeData, isLoading: loadingFees, error: feeError } = useFetchFees();
+    const { data: feeData, isLoading: loadingFees, error: feeError, refetch } = useFetchFees();
 
     const { mutateAsync: createIntent } = useCreatePaymentIntent();
     const { mutateAsync: completePayment } = useStripePaymentComplete();
@@ -49,7 +50,8 @@ export const PaymentPage = () => {
             }
 
         } catch (err: any) {
-            toast.error("An unexpected error occurred during checkout.");
+            const apiError = parseApiError(err);
+            toast.error(apiError.message);
             setIsProcessing(false);
         }
     }
@@ -58,7 +60,7 @@ export const PaymentPage = () => {
 
     if (loadingFees) return <SpinnerLoading message="Checking for outstanding fees..." />;
 
-    if (feeError) return <ErrorDisplay message="Could not retrieve fee information." onBack={() => { }} />;
+    if (feeError) return <ApiErrorDisplay error={feeError} title="Could not retrieve fee information" onRetry={() => refetch()} />;
 
     return (
         <div className='container py-5'>

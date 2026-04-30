@@ -4,15 +4,15 @@ import { useBookAccess } from "../../api/hooks/ReaderHooks/useBookAccess";
 import { useReaderSession } from "../../api/hooks/ReaderHooks/useReaderSession";
 import { useEffect } from "react";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
-import { ErrorDisplay } from "../Utils/ErrorDisplay";
 
+import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
 
 export const ReaderAccessPage = () => {
     const { bookId } = useParams<{ bookId: string }>();
     const navigate = useNavigate();
     const { state } = useLocation() as { state: { bookTitle?: string } };
 
-    const { data: access, isLoading: loadingAccess, error } = useBookAccess(Number(bookId), "full");
+    const { data: access, isLoading: loadingAccess, error, refetch } = useBookAccess(Number(bookId), "full");
     const { lastPage, isLoading: loadingProgress } = useReadingProgress(Number(bookId));
     const { isBookOpenElsewhere } = useReaderSession(bookId, false);
 
@@ -23,7 +23,7 @@ export const ReaderAccessPage = () => {
     }, [access]);
 
     if (loadingAccess || loadingProgress) return <SpinnerLoading message="Checking access..." />;
-    if (error || !access) return <ErrorDisplay message="Could not verify access." onBack={() => navigate(-1)} />;
+    if (error || !access) return <ApiErrorDisplay error={error} title="Access verification failed" onRetry={() => refetch()} />;
 
     if (access.source !== "INTERNAL") return <SpinnerLoading message="Redirecting to external reader..." />;
 

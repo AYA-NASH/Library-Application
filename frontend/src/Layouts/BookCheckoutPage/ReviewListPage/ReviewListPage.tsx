@@ -5,13 +5,15 @@ import { Pagination } from "../../Utils/Pagination";
 import { Review } from "../../Utils/Review";
 import { useReviews } from "../../../api/hooks/BookHooks/useReviews";
 
+import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
+
 export const ReviewListPage = () => {
     const { bookId } = useParams<{ bookId: string }>();
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const [reviewsPerPage] = useState(5);
 
-    const { data: reviewsPage, isLoading, isError } = useReviews(
+    const { data: reviewsPage, isLoading, isError, error, refetch } = useReviews(
         bookId || "",
         currentPage,
         reviewsPerPage
@@ -20,12 +22,7 @@ export const ReviewListPage = () => {
     if (isLoading) return <SpinnerLoading />;
 
     if (isError || !reviewsPage) {
-        return (
-            <div className="container shadow-sm p-5 mt-5 bg-white rounded text-center">
-                <h4 className="text-danger">Oops! We couldn't load the reviews.</h4>
-                <button className="btn btn-primary mt-3" onClick={() => navigate(-1)}>Go Back</button>
-            </div>
-        );
+        return <ApiErrorDisplay error={error} title="Failed to load reviews" onRetry={() => refetch()} />;
     }
 
     const { totalElements, totalPages, content } = reviewsPage;

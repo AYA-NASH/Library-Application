@@ -4,6 +4,7 @@ import { SearchBooks } from "./SearchBooks";
 import { useBooks } from "../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../Utils/BookFilterBar";
 import { useCategoriesReferences } from "../../api/hooks/BookHooks/useCategories";
+import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
 
 type SearchParams = {
     text?: string;
@@ -19,7 +20,7 @@ export const SearchBooksPage = () => {
 
     const { data: options } = useCategoriesReferences();
 
-    const { data, isLoading, isError, error } = useBooks(
+    const { data, isLoading, isError, error, refetch } = useBooks(
         currentPage,
         booksPerPage,
         searchParams.text,
@@ -34,7 +35,7 @@ export const SearchBooksPage = () => {
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
     if (isLoading) return <div className="container mt-5">Loading...</div>;
-    if (isError) return <div className="container mt-5 text-danger">Error: {error?.message}</div>;
+    if (isError) return <ApiErrorDisplay error={error} title="Failed to load books" onRetry={() => refetch()} />;
 
 
     const books = data?.content ?? [];

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useParams } from "react-router-dom";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
 import { StarsReview } from "../Utils/StarsReview";
@@ -9,13 +10,15 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useBookDetails } from "../../api/hooks/BookHooks/useBooks";
 import { useIsBookReviewedByUser, useReviews, useSubmitReview } from "../../api/hooks/BookHooks/useReviews";
 import { useCheckout, useCurrentLoansCount, useIsBookCheckedout } from "../../api/hooks/BookHooks/useLoans";
+import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
+import { parseApiError } from "../../errors/parseApiError";
 
 export const BookCheckoutPage = () => {
 
     const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
     const { bookId } = useParams<{ bookId: string }>();
 
-    const { data: book, isLoading: isLoadingBook, isError: isBookError } = useBookDetails(bookId || "");    // Review Sates:
+    const { data: book, isLoading: isLoadingBook, isError: isBookError, error: bookError, refetch: refetchBook } = useBookDetails(bookId || "");    // Review Sates:
     const { data: reviewsPage, isLoading: isLoadingReview } = useReviews(bookId || "", 0, 3);
     const { data: isReviewLeft, isLoading: isLoadingUserReview } = useIsBookReviewedByUser(bookId || "");
     const { data: isBookCheckedout, isLoading: isLoadingCheckedout } = useIsBookCheckedout(bookId || "");
@@ -41,18 +44,30 @@ export const BookCheckoutPage = () => {
     }
 
     if (isBookError || !book) {
-        return <div className="container m-5">Something went wrong or book not found.</div>;
+        return <ApiErrorDisplay error={bookError} title="Failed to load book details" onRetry={() => refetchBook()} />;
     }
 
     const handleCheckout = () => {
         checkout(bookId!, {
-            onError: () => setDisplayError(true),
+            onError: (err) => {
+                const apiError = parseApiError(err);
+                toast.error(apiError.message);
+                setDisplayError(true);
+            },
             onSuccess: () => setDisplayError(false)
         });
     };
 
     const handleSubmitReview = (starInput: number, reviewDescription: string) => {
-        submitReviewMutation({ rating: starInput, reviewDescription });
+        submitReviewMutation({ rating: starInput, reviewDescription }, {
+            onError: (err) => {
+                const apiError = parseApiError(err);
+                toast.error(apiError.message);
+            },
+            onSuccess: () => {
+                toast.success("Review submitted successfully!");
+            }
+        });
     };
 
     return (

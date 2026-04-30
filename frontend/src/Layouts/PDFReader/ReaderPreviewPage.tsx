@@ -1,18 +1,19 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
 import { useBookAccess } from "../../api/hooks/ReaderHooks/useBookAccess";
-import { ErrorDisplay } from "../Utils/ErrorDisplay";
 import { ReaderHeader } from "./components/ReaderHeader";
 import { ReaderProvider } from "./components/ReaderContext";
 import ReaderContainer from "./components/ReaderContainer";
 import { useEffect } from "react";
+
+import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
 
 export const ReaderPreviewPage = () => {
     const { bookId } = useParams<{ bookId: string }>();
     const navigate = useNavigate();
     const { state } = useLocation() as { state: { bookTitle?: string } };
 
-    const { data: access, isLoading } = useBookAccess(Number(bookId), "preview");
+    const { data: access, isLoading, isError, error, refetch } = useBookAccess(Number(bookId), "preview");
 
     useEffect(() => {
         if (access?.source !== "INTERNAL" && access?.url) {
@@ -21,8 +22,8 @@ export const ReaderPreviewPage = () => {
     }, [access]);
 
     if (isLoading) return <SpinnerLoading message="Opening preview..." />;
-    if (!access) return <ErrorDisplay message="Preview unavailable." onBack={() => navigate(-1)} />;
-    
+    if (isError || !access) return <ApiErrorDisplay error={error} title="Preview unavailable" onRetry={() => refetch()} />;
+
     if (access.source !== "INTERNAL") return <SpinnerLoading message="Redirecting..." />;
 
     return (

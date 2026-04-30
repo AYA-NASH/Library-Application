@@ -3,20 +3,17 @@ import { SpinnerLoading } from "../../../Utils/SpinnerLoading";
 import { Link } from "react-router-dom";
 import "./Carousel.css";
 import { useBooks } from "../../../../api/hooks/BookHooks/useBooks";
+import { ApiErrorDisplay } from "../../../Utils/ApiErrorDisplay";
 
 export const Carousel = () => {
-    const { data, isLoading, isError, error } = useBooks(1, 9);
+    const { data, isLoading, isError, error, refetch } = useBooks(1, 9);
 
     if (isLoading) {
         return <SpinnerLoading />;
     }
 
     if (isError) {
-        return (
-            <div className="container mt-5">
-                <p className="text-danger">Error: {error.message}</p>
-            </div>
-        );
+        return <ApiErrorDisplay error={error} title="Failed to load carousel" onRetry={() => refetch()} />;
     }
 
     const books = data?.content ?? [];

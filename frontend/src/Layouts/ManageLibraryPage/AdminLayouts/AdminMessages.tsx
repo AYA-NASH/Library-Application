@@ -4,11 +4,13 @@ import { Pagination } from "../../Utils/Pagination";
 import { AdminMessage } from "../components/AdminMessage";
 import { useAdminOpenMessages } from "../../../api/hooks/LibraryServiceHooks/useMessage";
 
+import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
+
 export const AdminMessages = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const messagesPerPage = 5;
 
-    const { data, isLoading, isError, error } = useAdminOpenMessages(currentPage, messagesPerPage);
+    const { data, isLoading, isError, error, refetch } = useAdminOpenMessages(currentPage, messagesPerPage);
 
     const paginate = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -18,14 +20,7 @@ export const AdminMessages = () => {
     if (isLoading) return <SpinnerLoading />;
 
     if (isError) {
-        return (
-            <div className="container py-5 text-center">
-                <div className="alert alert-danger d-inline-block shadow-sm">
-                    <i className="bi bi-x-circle-fill me-2"></i>
-                    {error instanceof Error ? error.message : "Something went wrong"}
-                </div>
-            </div>
-        );
+        return <ApiErrorDisplay error={error} title="Failed to load admin messages" onRetry={() => refetch()} />;
     }
 
     const messages = data?.content || [];
