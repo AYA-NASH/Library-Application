@@ -5,6 +5,7 @@ import { useBooks } from "../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../Utils/BookFilterBar";
 import { useCategoriesReferences } from "../../api/hooks/BookHooks/useCategories";
 import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
+import { SpinnerLoading } from "../Utils/SpinnerLoading";
 
 type SearchParams = {
     text?: string;
@@ -34,7 +35,7 @@ export const SearchBooksPage = () => {
 
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-    if (isLoading) return <div className="container mt-5">Loading...</div>;
+    if (isLoading) return <SpinnerLoading />
     if (isError) return <ApiErrorDisplay error={error} title="Failed to load books" onRetry={() => refetch()} />;
 
 

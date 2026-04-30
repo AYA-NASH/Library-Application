@@ -1,11 +1,15 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuthActions } from "../../api/hooks/useAuthActions";
 
+import { parseApiError } from "../../errors/parseApiError";
+import { toast } from "sonner";
+
+
 const hasGoogleClient = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 const GoogleAuthButton = () => {
     if (!hasGoogleClient) {
-        return null; // Google is not configured; hide button gracefully
+        return null;
     }
 
     const { googleLogin } = useAuthActions();
@@ -14,9 +18,9 @@ const GoogleAuthButton = () => {
         const token = credentialResponse.credential;
         try {
             await googleLogin(token);
-        } catch (error) {
-            console.error("Google Login Error:", error);
-            alert("Failed to sign in with Google.");
+        } catch (err) {
+            const apiError = parseApiError(err);
+            toast.error(apiError.message);
         }
     };
 
@@ -24,7 +28,7 @@ const GoogleAuthButton = () => {
         <div className="text-center mt-3">
             <GoogleLogin
                 onSuccess={handleSuccess}
-                onError={() => console.log("Google Login Failed")}
+                onError={() => toast.error("Google login failed")}
             />
         </div>
     );

@@ -6,6 +6,9 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuthActions } from "../../api/hooks/useAuthActions";
 
+import { parseApiError } from "../../errors/parseApiError";
+
+
 interface SignupFormInputs {
   username: string;
   email: string;
@@ -43,7 +46,8 @@ const SignupPage = () => {
     try {
       await userRegister(data);
     } catch (err: any) {
-      setServerError(err.response?.data || "Registration failed");
+      const apiError = parseApiError(err);
+      setServerError(apiError.message);
     }
   };
 

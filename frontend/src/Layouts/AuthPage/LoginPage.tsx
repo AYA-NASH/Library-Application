@@ -6,6 +6,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuthActions } from "../../api/hooks/useAuthActions";
+import { parseApiError } from "../../errors/parseApiError";
 
 
 interface LoginFormInputs {
@@ -37,9 +38,12 @@ const LoginPage = () => {
         try {
             await login(data);
         } catch (err: any) {
-            setserverError(err.response?.data || "Invalid credentials");
+            const apiError = parseApiError(err);
+            setserverError(apiError.message);
         }
     };
+
+
     return (
         <div
             className="d-flex justify-content-center align-items-center bg-light"
