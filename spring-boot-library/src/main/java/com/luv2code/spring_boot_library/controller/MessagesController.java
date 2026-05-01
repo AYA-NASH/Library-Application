@@ -1,43 +1,55 @@
 package com.luv2code.spring_boot_library.controller;
 
-import com.luv2code.spring_boot_library.entity.Message;
-import com.luv2code.spring_boot_library.requestmodel.AdminQuestionRequest;
+import com.luv2code.spring_boot_library.dto.MessageDtos;
+import com.luv2code.spring_boot_library.entity.UserPrincipal;
 import com.luv2code.spring_boot_library.service.MessageService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/api/messages/secure")
+@RequiredArgsConstructor
+@Tag(name = "User Interaction", description = "Endpoints for user support messages and admin replies")
 public class MessagesController {
-    private MessageService messageService;
 
-    @Autowired
-    public MessagesController(MessageService messageService){
-        this.messageService = messageService;
+    private final MessageService messageService;
+
+    @GetMapping("/mine")
+    public Page<MessageDtos.MessageResponse> getUserMessages(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            Pageable pageable
+    ) {
+        return messageService.getUserMessages(currentUser.getUser().getId(), pageable);
     }
 
-    @PostMapping("/secure/add/message")
-    public void postMessage(@RequestBody Message messageRequest){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-        messageService.postMessage(messageRequest, userEmail);
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/open")
+    public Page<MessageDtos.AdminMessageView> getOpenedQuestions(Pageable pageable) {
+        return messageService.getOpenedQuestions(pageable);
     }
 
-    @PutMapping("/secure/admin/message")
-    public void putMessage(@RequestBody AdminQuestionRequest adminQuestionRequest) throws Exception{
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
+    @PostMapping("/add/message")
+    public void postMessage(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @Valid @RequestBody MessageDtos.NewMessageRequest messageRequest
+    ) {
+        messageService.postMessage(currentUser.getUser().getId(), messageRequest);
+    }
 
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
-            throw new RuntimeException("Access denied: Administration page only.");
-        }
-
-        messageService.putMessage(adminQuestionRequest, userEmail);
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/reply")
+    public void adminReply(
+            @AuthenticationPrincipal UserPrincipal currentUser,
+            @Valid @RequestBody MessageDtos.AdminReplyRequest adminReply
+    ) {
+        messageService.adminReply(currentUser.getUser().getId(), adminReply);
     }
 }

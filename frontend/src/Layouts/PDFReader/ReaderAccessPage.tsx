@@ -1,87 +1,34 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "../../Auth/AuthContext";
-import { useReaderAccess } from "../../Hooks/ReaderHooks/useReaderAccess";
-import { useReadingProgress } from "../../Hooks/ReaderHooks/useReadingProgress";
-import { useEffect, useState } from "react";
-import { getIsBookOpen } from "../../Hooks/ReaderHooks/useReaderSession";
+import { useReadingProgress } from "../../api/hooks/ReaderHooks/useReadingProgress";
+import { useBookAccess } from "../../api/hooks/ReaderHooks/useBookAccess";
+import { useReaderSession } from "../../api/hooks/ReaderHooks/useReaderSession";
+import { useEffect } from "react";
+import { SpinnerLoading } from "../Utils/SpinnerLoading";
 
-const ReaderAccessPage = () => {
-    console.log("Rendering ReaderAccessPage");
+import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
+
+export const ReaderAccessPage = () => {
     const { bookId } = useParams<{ bookId: string }>();
     const navigate = useNavigate();
-    const location = useLocation();
-    const state = location.state as { bookTitle?: string } | null;
+    const { state } = useLocation() as { state: { bookTitle?: string } };
 
-    const { token } = useAuth();
+    const { data: access, isLoading: loadingAccess, error, refetch } = useBookAccess(Number(bookId), "full");
+    const { lastPage, isLoading: loadingProgress } = useReadingProgress(Number(bookId));
+    const { isBookOpenElsewhere } = useReaderSession(bookId, false);
 
-    const accessState = useReaderAccess(bookId, token, "full");
-    const { lastPage } = useReadingProgress(bookId ?? "");
-    const [isReading, setIsReading] = useState(() =>
-        bookId ? getIsBookOpen(bookId) : false
-    );
-
-    // Listen for session changes (another tab opened/closed)
     useEffect(() => {
-        if (!bookId) return;
-        const check = () => setIsReading(getIsBookOpen(bookId));
-        window.addEventListener("storage", check);
-        return () => window.removeEventListener("storage", check);
-    }, [bookId]);
-
-    // Redirect to Google viewer when source is Google
-    useEffect(() => {
-        if (accessState.status === "success" && accessState.data.source === "GOOGLE") {
-            window.location.href = accessState.data.url;
+        if (access?.source !== "INTERNAL" && access?.url) {
+            window.location.href = access.url;
         }
-    }, [accessState]);
+    }, [access]);
+
+    if (loadingAccess || loadingProgress) return <SpinnerLoading message="Checking access..." />;
+    if (error || !access) return <ApiErrorDisplay error={error} title="Access verification failed" onRetry={() => refetch()} />;
+
+    if (access.source !== "INTERNAL") return <SpinnerLoading message="Redirecting to external reader..." />;
 
     const title = state?.bookTitle ?? "Book";
-    const handleOpenReader = () => navigate("read");
-
-    if (!bookId) {
-        return (
-            <div className="container py-5 text-center">
-                <p className="text-muted">Invalid book.</p>
-                <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
-                    Back
-                </button>
-            </div>
-        );
-    }
-
-    if (accessState.status === "loading") {
-        return (
-            <div className="container py-5 text-center">
-                <div className="spinner-border text-primary" role="status" />
-                <p className="mt-2 text-muted">Loading...</p>
-            </div>
-        );
-    }
-
-    if (accessState.status === "error") {
-        return (
-            <div className="container py-5 text-center">
-                <p className="text-danger">{accessState.message}</p>
-                <button className="btn btn-outline-secondary mt-2" onClick={() => navigate(-1)}>
-                    Back
-                </button>
-            </div>
-        );
-    }
-
-    if (accessState.status !== "success") return null;
-
-    // Google: redirect happens in useEffect; show loading meanwhile
-    if (accessState.data.source === "GOOGLE") {
-        return (
-            <div className="container py-5 text-center">
-                <div className="spinner-border text-primary" role="status" />
-                <p className="mt-2 text-muted">Redirecting to reader...</p>
-            </div>
-        );
-    }
-
-    const statusText = isReading ? "Reading Now" : lastPage > 1 ? "In Progress" : "Not Started";
+    const statusText = isBookOpenElsewhere ? "Reading Now" : lastPage > 1 ? "In Progress" : "Not Started";
 
     return (
         <div className="container py-5">
@@ -94,16 +41,17 @@ const ReaderAccessPage = () => {
                         ← Back
                     </button>
 
-                    <div className="card shadow-sm border-0">
+                    <div className="card shadow-sm border-0 rounded-4">
                         <div className="card-body p-4">
                             <h2 className="h4 card-title fw-bold mb-3">{title}</h2>
 
-                            <div className="d-flex flex-wrap gap-2 mb-3">
-                                <span className="badge bg-secondary">{statusText}</span>
+                            <div className="d-flex justify-content-center gap-2 mb-4">
+                                <span className={`badge ${isBookOpenElsewhere ? 'bg-info' : 'bg-secondary'}`}>{statusText}</span>
                                 {lastPage > 1 && (
                                     <span className="badge bg-primary">Page {lastPage}</span>
                                 )}
                             </div>
+
 
                             <p className="text-muted small mb-4">
                                 {lastPage > 1
@@ -112,17 +60,18 @@ const ReaderAccessPage = () => {
                             </p>
 
                             <button
-                                className={`btn w-100 py-3 fw-bold ${isReading ? "btn-info text-white" : "btn-primary"}`}
-                                onClick={handleOpenReader}
+                                className={`btn w-100 py-3 fw-bold ${lastPage > 1 ? "btn-info text-white" : "btn-primary"}`}
+                                onClick={() => navigate("read", { state })}
                             >
-                                {isReading ? "Resume Reading" : "Open Book"}
+                                {lastPage > 1 ? "Resume Reading" : "Start Reading"}
                             </button>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
-    );
-}
+    )
 
-export default ReaderAccessPage;
+
+};

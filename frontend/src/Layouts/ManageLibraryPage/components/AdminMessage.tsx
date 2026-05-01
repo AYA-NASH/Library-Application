@@ -1,47 +1,79 @@
 import { useState } from "react";
-import MessageModel from "../../../models/MessageModel";
+import { AdminMessageView } from "../../../models/MessageModel";
+import { useAdminReply } from "../../../api/hooks/LibraryServiceHooks/useMessage";
 
-export const AdminMessage: React.FC<{ message: MessageModel,
-    submitResponseToQuestion: any }> = (props)=>
-    {
-
-    const [displayingWarining, setDisplayWarning] = useState(false);
+export const AdminMessage: React.FC<{ message: AdminMessageView }> = ({ message }) => {
     const [response, setResponse] = useState('');
+    const [displayingWarning, setDisplayWarning] = useState(false);
 
-    function submitBtn(){
-        if(props.message.id !== null && response !== ''){
-            props.submitResponseToQuestion(props.message.id, response);
+    const { mutate: sendReply, isPending } = useAdminReply();
+
+    function submitBtn() {
+        if (message.id && response.trim() !== '') {
+            sendReply({ messageId: message.id, response });
             setDisplayWarning(false);
-        }
-        else{
+            setResponse('');
+        } else {
             setDisplayWarning(true);
         }
     }
 
-    return(
-        <div key={props.message.id}>
-            <div className="card mt-2 shadow p-3 bg-body rounded">
-                <h5>Case #{props.message.id}: {props.message.title}</h5>
-                <h6>{props.message.userEmail}</h6>
-                <p>{props.message.question}</p>
-                <hr/>
-                <div>
-                    <h5>Response: </h5>
-                    <form action="PUT">
-                        {displayingWarining && 
-                            <div className="alert alert-danger" role="alert">
-                                All fields must be filled out.
+    return (
+        <div className="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden border-start border-4 border-warning">
+            <div className="card-body p-4">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h5 className="fw-bold mb-0 text-dark">
+                        <span className="text-secondary fw-light me-2">Case #{message.id}</span>
+                        {message.title}
+                    </h5>
+                    <span className="badge bg-warning-subtle text-warning rounded-pill px-3">Pending Action</span>
+                </div>
+
+                <div className="bg-light p-3 rounded-3 mb-4">
+                    <div className="d-flex align-items-center mb-2">
+                        <i className="bi bi-person-circle text-secondary me-2"></i>
+                        <span className="fw-semibold small text-muted">{message.userEmail}</span>
+                    </div>
+                    <p className="mb-0 text-dark">{message.question}</p>
+                </div>
+
+                <hr className="opacity-10" />
+
+                <div className="mt-4">
+                    <h6 className="fw-bold text-primary mb-3">
+                        <i className="bi bi-reply-all-fill me-2"></i>Draft Response
+                    </h6>
+                    <form>
+                        {displayingWarning && (
+                            <div className="alert alert-danger d-flex align-items-center rounded-3" role="alert">
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                <div>Please enter a response before submitting.</div>
                             </div>
-                        }
-                        <div className="col-md-12 mb-3">
-                            <label className="form-label">Description</label>
-                            <textarea className="form-control" id="exampleFormControlTextarea1" rows={3}
-                                onChange={e=> setResponse(e.target.value)} value={response}
+                        )}
+                        <div className="mb-3">
+                            <textarea
+                                className="form-control border-2 shadow-none"
+                                rows={4}
+                                placeholder="Type your official response here..."
+                                onChange={e => setResponse(e.target.value)}
+                                value={response}
+                                disabled={isPending}
+                                style={{ borderRadius: '12px' }}
                             ></textarea>
                         </div>
-                        <div>
-                            <button type="button" className="btn btn-primary mt-3" onClick={submitBtn}>
-                                Submit Response
+                        <div className="d-flex justify-content-end">
+                            <button
+                                type="button"
+                                className="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm"
+                                onClick={submitBtn}
+                                disabled={isPending}
+                            >
+                                {isPending ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        Sending...
+                                    </>
+                                ) : "Send Official Response"}
                             </button>
                         </div>
                     </form>
@@ -49,4 +81,4 @@ export const AdminMessage: React.FC<{ message: MessageModel,
             </div>
         </div>
     );
-}
+};

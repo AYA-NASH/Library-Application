@@ -1,16 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Select from "react-select";
+import { CategoryReference } from "../../models/CategoryModel";
 
-type CategoryOption = {
-    value: number;
-    label: string;
-};
+
 
 type BookFilterBarProps = {
-    categories: CategoryOption[];
+    categories: CategoryReference[];
     initialCategoryId?: number;
     initialText?: string;
     onSearch: (params: { text?: string; categoryId?: number }) => void;
+    isLoading?: boolean;
 };
 
 export const BookFilterBar: React.FC<BookFilterBarProps> = ({
@@ -18,20 +17,24 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
     initialCategoryId,
     initialText = "",
     onSearch,
+    isLoading = false,
 }) => {
     const [searchText, setSearchText] = useState(initialText);
+    const [selectedCategory, setSelectedCategory] = useState<CategoryReference | null>(null);
 
-    const initialSelectedCategory =
-        categories.find((cat) => cat.value === initialCategoryId) || null;
+    useEffect(() => {
+        setSearchText(initialText);
+    }, [initialText]);
 
-    const [selectedCategory, setSelectedCategory] = useState<CategoryOption | null>(
-        initialSelectedCategory
-    );
+    useEffect(() => {
+        const found = categories.find((cat) => cat.id === initialCategoryId);
+        setSelectedCategory(found || null);
+    }, [initialCategoryId, categories]);
 
-    const triggerSearch = (text: string, category: CategoryOption | null) => {
+    const triggerSearch = (text: string, category: CategoryReference | null) => {
         onSearch({
             text: text.trim() || undefined,
-            categoryId: category?.value,
+            categoryId: category?.id,
         });
     };
 
@@ -39,7 +42,7 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
         triggerSearch(searchText, selectedCategory);
     };
 
-    const handleCategoryChange = (selectedOption: CategoryOption | null) => {
+    const handleCategoryChange = (selectedOption: CategoryReference | null) => {
         setSelectedCategory(selectedOption);
         triggerSearch(searchText, selectedOption);
     };
@@ -72,12 +75,16 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
             <div className="col-md-4">
                 <Select
                     options={categories}
+                    getOptionLabel={(option: CategoryReference) => option.name}
+                    getOptionValue={(option: CategoryReference) => option.id.toString()}
                     value={selectedCategory}
                     onChange={(selectedOption) =>
-                        handleCategoryChange(selectedOption as CategoryOption | null)
+                        handleCategoryChange(selectedOption as CategoryReference | null)
                     }
                     isClearable
                     placeholder="Search by category..."
+                    classNamePrefix="react-select"
+                    isLoading={isLoading}
                 />
             </div>
         </div>

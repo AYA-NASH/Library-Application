@@ -5,7 +5,6 @@ import { Route, Routes } from "react-router-dom";
 import { SearchBooksPage } from "./Layouts/SearchBooks/SearchBooksPage";
 import { BookCheckoutPage } from "./Layouts/BookCheckoutPage/BookCheckoutPage";
 
-import { AuthProvider, useAuth } from "./Auth/AuthContext";
 import LoginPage from "./Layouts/AuthPage/LoginPage";
 import SignupPage from "./Layouts/AuthPage/SignupPage";
 import { ReviewListPage } from "./Layouts/BookCheckoutPage/ReviewListPage/ReviewListPage";
@@ -14,109 +13,57 @@ import { ShelfPage } from "./Layouts/ShelfPage/ShelfPage";
 import { MessagesPage } from "./Layouts/MessagesPage/MessagesPage";
 import { ManageLibraryPage } from "./Layouts/ManageLibraryPage/ManageLibraryPage";
 import { PaymentPage } from "./Layouts/PaymentPage/PaymentPage";
-import ReaderPreviewPage from "./Layouts/PDFReader/ReaderPreviewPage";
-import ReaderAccessPage from "./Layouts/PDFReader/ReaderAccessPage";
-import ReaderPage from "./Layouts/PDFReader/ReaderPage";
+import { ReaderPreviewPage } from "./Layouts/PDFReader/ReaderPreviewPage";
+import { ReaderAccessPage } from "./Layouts/PDFReader/ReaderAccessPage";
+import { ReaderPage } from "./Layouts/PDFReader/ReaderPage";
+import { NotFoundPage } from "./Layouts/Utils/NotFoundPage";
 
+import { ErrorBoundary } from "react-error-boundary";
+import { GlobalErrorFallback } from "./Layouts/Utils/GlobalErrorFallback";
 
 function App() {
     return (
-        <AuthProvider>
+        <ErrorBoundary
+            FallbackComponent={GlobalErrorFallback}
+            onReset={() => window.location.replace("/")}
+        >
             <InnerApp />
-        </AuthProvider>
+        </ErrorBoundary>
     );
 }
 
 function InnerApp() {
-    const { alertMessage } = useAuth();
 
     return (
         <div className="d-flex flex-column min-vh-100">
             <Navbar />
-            {alertMessage && (
-                <div
-                    className="alert alert-warning text-center m-0 rounded-0"
-                    role="alert"
-                >
-                    {alertMessage}
-                </div>
-            )}
-            <div className="flex-grow-1">
+            <main className="flex-grow-1">
                 <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={<HomePage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
-                    <Route path="/" element={<HomePage />} />
                     <Route path="/search" element={<SearchBooksPage />} />
-                    <Route
-                        path="/checkout/:bookId"
-                        element={<BookCheckoutPage />}
-                    />
-                    <Route
-                        path="/reviewList/:bookId"
-                        element={<ReviewListPage />}
-                    />
-                    <Route
-                        path="/shelf"
-                        element={
-                            <RequireAuth>
-                                <ShelfPage />
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path="/messages"
-                        element={
-                            <RequireAuth>
-                                <MessagesPage />
-                            </RequireAuth>
-                        }
-                    />
-                    <Route
-                        path="/admin"
-                        element={
-                            <RequireAuth role="ADMIN">
-                                <ManageLibraryPage />
-                            </RequireAuth>
-                        }
-                    />
+                    <Route path="/checkout/:bookId" element={<BookCheckoutPage />} />
+                    <Route path="/reviewList/:bookId" element={<ReviewListPage />} />
 
-                    <Route
-                        path="/fees"
-                        element={
-                            <RequireAuth>
-                                <PaymentPage />
-                            </RequireAuth>
-                        }
-                    />
+                    {/* Protected Routes */}
+                    <Route path="/shelf" element={<RequireAuth><ShelfPage /></RequireAuth>} />
+                    <Route path="/messages" element={<RequireAuth><MessagesPage /></RequireAuth>} />
+                    <Route path="/fees" element={<RequireAuth><PaymentPage /></RequireAuth>} />
 
-                    <Route
-                        path="/reader/:bookId/preview"
-                        element={
-                            <RequireAuth>
-                                <ReaderPreviewPage />
-                            </RequireAuth>
-                        }
-                    />
+                    {/* Admin Routes */}
+                    <Route path="/admin" element={<RequireAuth role="ADMIN"><ManageLibraryPage /></RequireAuth>} />
 
-                    <Route
-                        path="/reader/:bookId"
-                        element={
-                            <RequireAuth>
-                                <ReaderAccessPage />
-                            </RequireAuth>
-                        }
-                    />
-
-                    <Route
-                        path="/reader/:bookId/read"
-                        element={
-                            <RequireAuth>
-                                <ReaderPage />
-                            </RequireAuth>
-                        }
-                    />
+                    {/* Reader Routes */}
+                    <Route path="/reader/:bookId/preview" element={<RequireAuth><ReaderPreviewPage /></RequireAuth>} />
+                    <Route path="/reader/:bookId" element={<RequireAuth><ReaderAccessPage /></RequireAuth>} />
+                    <Route path="/reader/:bookId/read" element={<RequireAuth><ReaderPage /></RequireAuth>} />
+                    
+                    {/* Catch-all Route */}
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
-            </div>
+            </main>
             <Footer />
         </div>
     );

@@ -22,9 +22,15 @@ public class JwtService {
     @Value("${app.jwt.expiration-ms:3600000}")
     private long expirationMs; // default 1 hour
 
-    public String generateToken(String email, String role) {
+    public String generateToken(Long userId, String email, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+
+        String cleanRole = role != null && role.startsWith("ROLE_")
+                ? role.replace("ROLE_", "")
+                : role;
+
+        claims.put("role", cleanRole);
+        claims.put("userId", userId);
 
         long now = System.currentTimeMillis();
         long expiration = now + expirationMs;
@@ -56,6 +62,11 @@ public class JwtService {
     public String extractRole(String token) {
         Claims claims = extractAllClaims(token);
         return claims.get("role", String.class);
+    }
+
+    public Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("userId", Long.class);
     }
 
     public boolean isTokenExpired(String token) {

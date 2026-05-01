@@ -1,33 +1,30 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import { BookModel } from "../../../models/BookModel";
 import defaultBookImg from "../../../Images/BooksImages/book_cover_default_dark.png";
 import { BookForm } from "./BookForm";
-
-import { useAdminBooks } from "../../../Hooks/BookHooks/useAdminBooks";
-
-import type {
-  AdminBookRequest,
-
-} from "../../../models/AdminBookRequest";
+import { useFetchEditInfo, useUpdateBook } from "../../../api/hooks/BookHooks/useAdminBooks";
+import { AdminBookRequest } from "../../../models/Admin";
+import { toast } from "sonner";
 
 export const EditBookData: React.FC<{
   book: BookModel;
   updateBook: () => void;
 }> = (props) => {
-
   const [showModal, setShowModal] = useState(false);
 
-  const [editInitialData, setEditInitialData] = useState<AdminBookRequest | null>(null);
-  const [editInfoLoading, setEditInfoLoading] = useState(false);
-  const [editInfoError, setEditInfoError] = useState<string | null>(null);
 
-  const { updateBook, fetchEditInfo } = useAdminBooks();
+  const {
+    data: editInfo,
+    isLoading: editInfoLoading,
+    error: editInfoError
+  } = useFetchEditInfo(props.book.id);
 
-  useEffect(() => {
-    if (!showModal || !props.book) return;
+  const { mutate: updateMutation } = useUpdateBook();
+
+  const editInitialData: AdminBookRequest | null = useMemo(() => {
+    if (!showModal) return null;
 
     const categories = props.book.categories?.map((cat) => cat.id);
-
     const baseInitial: AdminBookRequest = {
       id: props.book.id,
       title: props.book.title,
@@ -39,38 +36,37 @@ export const EditBookData: React.FC<{
       imageUrl: props.book.img,
     };
 
-    fetchEditInfo(props.book.id).then((editInfo) => {
-      if (editInfo) {
-        setEditInitialData({
-          ...baseInitial,
-          hasPdf: editInfo.hasPdf,
-          hasImage: editInfo.hasImage,
-          imageUrl: editInfo.imageUrl ?? props.book.img,
-          pdfFilename: editInfo.pdfFilename,
-          imageFilename: editInfo.imageFilename,
-        });
-      } else {
-        setEditInitialData({ ...baseInitial });
+    if (editInfo) {
+      return {
+        ...baseInitial,
+        hasPdf: editInfo.hasPdf,
+        hasImage: editInfo.hasImage,
+        imageUrl: editInfo.imageUrl ?? props.book.img,
+        pdfFilename: editInfo.pdfFilename,
+        imageFilename: editInfo.imageFilename,
+      };
+    }
+    return baseInitial;
+  }, [showModal, props.book, editInfo]);
+
+  const handleUpdateDetails = async (formData: FormData) => {
+    updateMutation(
+      { bookId: props.book.id, formData },
+      {
+        onSuccess: () => {
+          setShowModal(false);
+          props.updateBook();
+          toast.success("Book updated successfully");
+        },
+        onError: () => {
+          toast.error("Error updating book");
+        },
       }
-    });
-  }, [showModal, props.book, fetchEditInfo]);
+    );
+  };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setEditInitialData(null);
-    setEditInfoError(null);
-  };
-
-  const handleUpdateDetails = async (formData: FormData) => {
-    try {
-      const success = await updateBook(props.book.id, formData);
-      if (success) {
-        handleCloseModal();
-        props.updateBook()
-      };
-    } catch (error) {
-      alert("Error updating book");
-    }
   };
 
   return (
@@ -139,7 +135,7 @@ export const EditBookData: React.FC<{
                 )}
                 {editInfoError && (
                   <div className="alert alert-warning mb-3">
-                    {editInfoError}. You can still edit and save.
+                    Error loading extra info. You can still edit and save.
                   </div>
                 )}
                 {editInitialData && !editInfoLoading && (

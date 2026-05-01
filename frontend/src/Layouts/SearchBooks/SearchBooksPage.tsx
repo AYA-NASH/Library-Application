@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Pagination } from "../Utils/Pagination";
 import { SearchBooks } from "./SearchBooks";
-import { useBooks } from "../../Hooks/BookHooks/useBooks";
+import { useBooks } from "../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../Utils/BookFilterBar";
-import { useCategories } from "../../Hooks/BookHooks/useCategories";
+import { useCategoriesReferences } from "../../api/hooks/BookHooks/useCategories";
+import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
+import { SpinnerLoading } from "../Utils/SpinnerLoading";
 
 type SearchParams = {
     text?: string;
@@ -11,19 +13,20 @@ type SearchParams = {
 };
 
 export const SearchBooksPage = () => {
-    const { categories } = useCategories();
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [searchParams, setSearchParams] = useState<SearchParams>();
+    const [searchParams, setSearchParams] = useState<SearchParams>({});
 
     const booksPerPage = 5;
 
-    const options = useMemo(() =>
-        categories.map(cat => ({ value: cat.id, label: cat.name })),
-        [categories]);
+    const { data: options, isLoading: isCategoriesLoading } = useCategoriesReferences();
 
-    const { books, isLoading, httpError, totalPages, totalElements } =
-        useBooks(currentPage, booksPerPage, searchParams);
+    const { data, isLoading, isError, error, refetch } = useBooks(
+        currentPage,
+        booksPerPage,
+        searchParams.text,
+        searchParams.categoryId
+    );
 
     const handleSearch = (params: SearchParams) => {
         setCurrentPage(1);
@@ -32,8 +35,13 @@ export const SearchBooksPage = () => {
 
     const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-    if (isLoading) return <div>Loading...</div>;
-    if (httpError) return <div>{httpError}</div>;
+    if (isLoading) return <SpinnerLoading />
+    if (isError) return <ApiErrorDisplay error={error} title="Failed to load books" onRetry={() => refetch()} />;
+
+
+    const books = data?.content ?? [];
+    const totalElements = data?.totalElements ?? 0;
+    const totalPages = data?.totalPages ?? 0;
 
     const lastItem =
         currentPage * booksPerPage <= totalElements
@@ -43,8 +51,11 @@ export const SearchBooksPage = () => {
     return (
         <div className="container mt-5">
             <BookFilterBar
-                categories={options}
+                categories={options ?? []}
+                initialCategoryId={searchParams.categoryId}
+                initialText={searchParams.text}
                 onSearch={handleSearch}
+                isLoading={isCategoriesLoading}
             />
 
             {totalElements > 0 ? (

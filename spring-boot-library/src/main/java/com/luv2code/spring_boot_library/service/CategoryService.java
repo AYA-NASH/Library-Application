@@ -1,10 +1,14 @@
 package com.luv2code.spring_boot_library.service;
 
-import com.luv2code.spring_boot_library.dao.CategoryRepository;
+import com.luv2code.spring_boot_library.dto.CategoryDto;
 import com.luv2code.spring_boot_library.entity.Category;
-import com.luv2code.spring_boot_library.requestmodel.AdminCategoryRequest;
-import com.luv2code.spring_boot_library.responsemodel.CategoryResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.luv2code.spring_boot_library.exception.DuplicateResourceException;
+import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
+import com.luv2code.spring_boot_library.mapper.CategoryMapper;
+import com.luv2code.spring_boot_library.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,57 +17,39 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
 
-    @Autowired
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
-
-    public CategoryResponse createCategory(AdminCategoryRequest request) {
-        if (categoryRepository.existsByName(request.getName())) {
-            throw new RuntimeException("Category already exists");
+    public CategoryDto.DetailsResponse createCategory(CategoryDto.CreateRequest request) {
+        if (categoryRepository.existsByName(request.name())) {
+            throw new DuplicateResourceException("Category already exists");
         }
 
-        Category newCategory = new Category();
-        newCategory.setName(request.getName());
+        Category newCategory = categoryMapper.toEntity(request);
+
         Category savedCategory = categoryRepository.save(newCategory);
 
-        return new CategoryResponse(savedCategory.getId(),
-                savedCategory.getName(),
-                0L
-        );
+        return categoryMapper.toDetailsResponse(savedCategory);
     }
 
-    public CategoryResponse updateCategory(Long id, AdminCategoryRequest request) throws Exception {
+    public CategoryDto.DetailsResponse updateCategory(Long id, CategoryDto.CreateRequest request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category Not Found"));
 
-        String name = request.getName();
+        categoryMapper.updateEntityFromDto(request, category);
 
-        if (name == null || name.isBlank()) {
-            throw new RuntimeException("Invalid Category Update, Provide a proper name");
-        }
-
-        category.setName(name);
         Category updatedCategory = categoryRepository.save(category);
 
-        long booksCount = updatedCategory.getBooks() != null ? updatedCategory.getBooks().size() : 0L;
-
-        return new CategoryResponse(
-                updatedCategory.getId(),
-                updatedCategory.getName(),
-                booksCount
-        );
+        return categoryMapper.toDetailsResponse(updatedCategory);
     }
 
-    public void deleteCategory(Long id) throws Exception {
-        Category category = categoryRepository.findById(id).orElseThrow();
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category Not Found"));
 
-        new HashSet<>(category.getBooks()).forEach(book -> {
-            book.removeCategory(category);
-        });
+        new HashSet<>(category.getBooks()).forEach(book -> book.removeCategory(category));
 
         categoryRepository.delete(category);
     }
@@ -74,7 +60,16 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAllWithCount();
+    public Page<CategoryDto.DetailsResponse> getAllCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable)
+                .map(categoryMapper::toDetailsResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryDto.Reference> getCategoriesReferences() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(categoryMapper::toCategoryReference)
+                .toList();
     }
 }

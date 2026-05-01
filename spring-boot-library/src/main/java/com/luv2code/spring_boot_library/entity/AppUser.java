@@ -3,9 +3,13 @@ package com.luv2code.spring_boot_library.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "users")
-@Data
 public class AppUser {
 
     @Id
@@ -24,4 +28,8 @@ public class AppUser {
 
     @Column(name = "role", nullable = false, columnDefinition = "varchar(255) default 'USER'")
     private String role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<History> history;
+
 }

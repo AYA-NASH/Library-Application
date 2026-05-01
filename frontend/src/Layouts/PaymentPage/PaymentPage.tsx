@@ -1,170 +1,103 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
-import { useAuth } from "../../Auth/AuthContext";
+import { useState } from "react";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { Link } from "react-router-dom";
-import PaymentInfoRequest from "../../models/PaymentInfoRequest";
+import { useCreatePaymentIntent, useFetchFees, useStripePaymentComplete } from "../../api/hooks/PaymentHooks/usePayment";
+import { toast } from "sonner";
+import { StripeNotConfigured } from "./components/StripeNotConfigured";
+import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
+import { NoFeesEmptyState } from "./components/NoFeesEmptyState";
+import { parseApiError } from "../../errors/parseApiError";
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const hasStripe = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 export const PaymentPage = () => {
-    const { user, token } = useAuth();
-
-    const [httpError, setHttpError] = useState(false);
-    const [submitDisabled, setSubmitDisabled] = useState(false);
-    const [fees, setFees] = useState(0);
-    const [loadingFees, setLoadingFees] = useState(true);
-
-    useEffect(() => {
-        const fetchFees = async () => {
-            if (token) {
-                const url = `${baseUrl}/payments/search/findByUserEmail?userEmail=${user.email}`;
-
-                const requestOptions = {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                };
-
-                const paymentResponse = await fetch(url, requestOptions);
-
-                if (paymentResponse.status === 404) {
-                    setFees(0); // no payment record yet
-                } else if (!paymentResponse.ok) {
-                    throw new Error("Something went wrong!");
-                } else {
-                    const paymentResponseJson = await paymentResponse.json();
-                    setFees(paymentResponseJson.amount);
-                }
-
-                setLoadingFees(false);
-            }
-        };
-
-        fetchFees().catch((error: any) => {
-            setLoadingFees(false);
-            setHttpError(error.message);
-        });
-    }, [token]);
-
-    const elements = useElements();
     const stripe = useStripe();
+    const elements = useElements();
 
-    async function checkout() {
-        if (!stripe || !elements || !elements.getElement(CardElement)) {
-            return;
-        }
+    const { data: feeData, isLoading: loadingFees, error: feeError, refetch } = useFetchFees();
 
-        setSubmitDisabled(true);
+    const { mutateAsync: createIntent } = useCreatePaymentIntent();
+    const { mutateAsync: completePayment } = useStripePaymentComplete();
 
-        let paymentInfo = new PaymentInfoRequest(Math.round(fees * 100), 'USD', user.email);
+    const [isProcessing, setIsProcessing] = useState(false);
 
-        const url = `${baseUrl}/payment/secure/payment-intent`;
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(paymentInfo)
-        };
+    const fees = feeData?.lateFeesInDollars ?? 0;
 
-        const stripeResponse = await fetch(url, requestOptions);
+    async function handleCheckout() {
+        if (!stripe || !elements || !elements.getElement(CardElement)) return;
 
-        if (!stripeResponse.ok) {
-            setHttpError(true);
-            setSubmitDisabled(false);
-            throw new Error('Something went wrong!');
-        }
+        setIsProcessing(true);
 
-        const stripeResponseJson = await stripeResponse.json();
+        try {
+            // get client secret
+            const intentData = await createIntent();
 
-        stripe.confirmCardPayment(
-            stripeResponseJson.client_secret, {
+            // confirm payment with stripe
+            const result = await stripe.confirmCardPayment(intentData.clientSecret, {
                 payment_method: {
                     card: elements.getElement(CardElement)!,
-                    billing_details: {
-                        email: user.email
-                    }
                 }
-            }, {handleActions: false}
-        ).then(async function (result: any) {
+            });
+
             if (result.error) {
-                setSubmitDisabled(false)
-                alert('There was an error')
-            } else {
-                const url = `${baseUrl}/payment/secure/payment-complete`;
-                const requestOptions = {
-                    method: 'PUT',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                };
-                const stripeResponse = await fetch(url, requestOptions);
-                if (!stripeResponse.ok) {
-                    setHttpError(true)
-                    setSubmitDisabled(false)
-                    throw new Error('Something went wrong!')
-                }
-                setFees(0);
-                setSubmitDisabled(false);
+                toast.error(result.error.message || "Payment Failed");
+                setIsProcessing(false);
+            } else if (result.paymentIntent?.status === "succeeded") {
+                await completePayment();
+                toast.success("Payment Completed Successfully, Now you can checkout any books")
+                setIsProcessing(false);
             }
-        });
-        setHttpError(false);
+
+        } catch (err: any) {
+            const apiError = parseApiError(err);
+            toast.error(apiError.message);
+            setIsProcessing(false);
+        }
     }
 
-    if (!hasStripe) {
-        return (
-            <div className="container m-5">
-                <h5>Payments are not configured</h5>
-                <p>You can still use the app without payments. To enable payments, set VITE_STRIPE_PUBLISHABLE_KEY on the frontend build and STRIPE_KEY_SECRET on the backend.</p>
-            </div>
-        );
-    }
+    if (!hasStripe) return <StripeNotConfigured />;
 
-    if (loadingFees) {
-        return <SpinnerLoading />;
-    }
+    if (loadingFees) return <SpinnerLoading message="Checking for outstanding fees..." />;
 
-    if (httpError) {
-        return (
-            <div className="container m-5">
-                <p>{httpError}</p>
-            </div>
-        );
-    }
+    if (feeError) return <ApiErrorDisplay error={feeError} title="Could not retrieve fee information" onRetry={() => refetch()} />;
 
-    return(
-        <div className='container'>
-            {fees !== null && fees > 0 && <div className='card mt-3'>
-                <h5 className='card-header'>Fees pending: <span className='text-danger'>${fees}</span></h5>
-                <div className='card-body'>
-                    <h5 className='card-title mb-3'>Credit Card</h5>
-                    <CardElement id='card-element' />
-                    <button disabled={submitDisabled} type='button' className='btn btn-md btn-dark text-white mt-3' 
-                        onClick={checkout}>
-                        Pay fees
-                    </button>
+    return (
+        <div className='container py-5'>
+            <div className="row justify-content-center">
+                <div className="col-md-6">
+                    {fees > 0 ? (
+                        <div className='card shadow-sm border-0 rounded-4 overflow-hidden'>
+                            <div className='card-header bg-danger text-white py-3'>
+                                <h5 className='mb-0 fw-bold'>Outstanding Fees: ${fees.toFixed(2)}</h5>
+                            </div>
+                            <div className='card-body p-4'>
+                                <p className="text-muted small mb-4">
+                                    Please settle your late return fees to continue borrowing books.
+                                </p>
+
+                                <div className="p-3 border rounded-3 mb-4 bg-light">
+                                    <label className="form-label fw-bold small text-uppercase">Credit or Debit Card</label>
+                                    <CardElement options={{ style: { base: { fontSize: '16px' } } }} />
+                                </div>
+
+
+                                <button
+                                    disabled={isProcessing}
+                                    className='btn btn-dark w-100 py-3 fw-bold rounded-3'
+                                    onClick={handleCheckout}
+                                >
+                                    {isProcessing ? (
+                                        <span className="spinner-border spinner-border-sm me-2" />
+                                    ) : `Pay $${fees.toFixed(2)}`}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <NoFeesEmptyState />
+                    )}
                 </div>
-            </div>}
-
-            {fees !== null && fees === 0 && (
-                <div className="mt-3">
-                    <h5>No fees yet 🎉</h5>
-                    <p>
-                        This page tracks any late return fees for borrowed books.
-                        Make sure to return books on time to keep it empty!
-                    </p>
-                    <Link type="button" className="btn btn-dark text-white" to="/search">
-                        Explore top books
-                    </Link>
-                </div>
-            )}
-            
-            {submitDisabled && <SpinnerLoading/>}
+            </div>
         </div>
     );
 };

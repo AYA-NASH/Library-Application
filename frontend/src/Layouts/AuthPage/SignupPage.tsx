@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import GoogleAuthButton from "../Utils/GoogleAuthButton";
 
 import { useForm, SubmitHandler } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useAuthActions } from "../../api/hooks/useAuthActions";
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import { parseApiError } from "../../errors/parseApiError";
+
 
 interface SignupFormInputs {
   username: string;
@@ -15,7 +16,7 @@ interface SignupFormInputs {
   confirmPassword: string;
 }
 
-const formSchema: yup.Schema<SignupFormInputs> = yup.object({
+const formSchema: yup.ObjectSchema<SignupFormInputs> = yup.object({
   username: yup
     .string()
     .required("Add your name.")
@@ -37,10 +38,18 @@ const formSchema: yup.Schema<SignupFormInputs> = yup.object({
 });
 
 const SignupPage = () => {
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const { register: userRegister, isRegistering } = useAuthActions();
+  const [serverError, setServerError] = useState("");
 
-  const navigate = useNavigate();
+  const submitRegister: SubmitHandler<SignupFormInputs> = async (data) => {
+    setServerError("");
+    try {
+      await userRegister(data);
+    } catch (err: any) {
+      const apiError = parseApiError(err);
+      setServerError(apiError.message);
+    }
+  };
 
   const {
     register,
@@ -49,38 +58,6 @@ const SignupPage = () => {
   } = useForm<SignupFormInputs>({
     resolver: yupResolver(formSchema),
   });
-
-  const submitRegister: SubmitHandler<SignupFormInputs> = async (formData) => {
-    setError("");
-    setSubmitting(true);
-
-    const payload = {
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-    };
-
-    try {
-      const response = await fetch(`${baseUrl}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        navigate("/login", {
-          state: { message: "Great! Now login with your account." },
-        });
-      } else {
-        const message = await response.text();
-        setError(message || "Failed to register.");
-      }
-    } catch (err) {
-      setError("An error occurred while registering.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   return (
     <div
@@ -100,9 +77,8 @@ const SignupPage = () => {
               <label className="form-label">Email</label>
               <input
                 type="email"
-                className={`form-control form-control-lg rounded-3 ${
-                  errors.email ? "is-invalid" : ""
-                }`}
+                className={`form-control form-control-lg rounded-3 ${errors.email ? "is-invalid" : ""
+                  }`}
                 placeholder="Enter your email"
                 {...register("email")}
               />
@@ -117,9 +93,8 @@ const SignupPage = () => {
               <label className="form-label">Username</label>
               <input
                 type="text"
-                className={`form-control form-control-lg rounded-3 ${
-                  errors.username ? "is-invalid" : ""
-                }`}
+                className={`form-control form-control-lg rounded-3 ${errors.username ? "is-invalid" : ""
+                  }`}
                 placeholder="Choose a username"
                 {...register("username")}
               />
@@ -134,9 +109,8 @@ const SignupPage = () => {
               <label className="form-label">Password</label>
               <input
                 type="password"
-                className={`form-control form-control-lg rounded-3 ${
-                  errors.password ? "is-invalid" : ""
-                }`}
+                className={`form-control form-control-lg rounded-3 ${errors.password ? "is-invalid" : ""
+                  }`}
                 placeholder="Create a password"
                 {...register("password")}
               />
@@ -151,9 +125,8 @@ const SignupPage = () => {
               <label className="form-label">Confirm Password</label>
               <input
                 type="password"
-                className={`form-control form-control-lg rounded-3 ${
-                  errors.confirmPassword ? "is-invalid" : ""
-                }`}
+                className={`form-control form-control-lg rounded-3 ${errors.confirmPassword ? "is-invalid" : ""
+                  }`}
                 placeholder="Confirm your password"
                 {...register("confirmPassword")}
               />
@@ -164,9 +137,9 @@ const SignupPage = () => {
               )}
             </div>
 
-            {error && (
+            {serverError && (
               <div className="alert alert-danger py-2 text-center">
-                {error}
+                {serverError}
               </div>
             )}
 
@@ -174,9 +147,9 @@ const SignupPage = () => {
               <button
                 type="submit"
                 className="btn btn-success btn-lg rounded-3"
-                disabled={submitting}
+                disabled={isRegistering}
               >
-                {submitting ? "Creating Account..." : "Sign Up"}
+                {isRegistering ? "Creating Account..." : "Sign Up"}
               </button>
             </div>
           </form>

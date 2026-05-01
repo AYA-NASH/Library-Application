@@ -4,128 +4,108 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.luv2code.spring_boot_library.dao.UserRepository;
-import com.luv2code.spring_boot_library.responsemodel.LoginResponse;
+import com.luv2code.spring_boot_library.dto.UserDtos;
 import com.luv2code.spring_boot_library.entity.AppUser;
-import com.luv2code.spring_boot_library.requestmodel.SignupRequest;
+import com.luv2code.spring_boot_library.exception.DuplicateResourceException;
+import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
+import com.luv2code.spring_boot_library.exception.UnauthenticatedException;
+import com.luv2code.spring_boot_library.mapper.UserMapper;
+import com.luv2code.spring_boot_library.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class UserService {
 
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
     @Autowired
     private UserRepository userRepo;
-
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private JwtService jwtService;
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtService jwtService;
-
     @Value("${google.client.id:}")
     private String clientId;
-
     private boolean isNewUser = true;
 
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-
-    public void register(SignupRequest newUser) {
-
-        if(userRepo.existsByEmail(newUser.getEmail())){
-            throw new RuntimeException("User already registered");
+    public Long getUserIdByEmail(String email) {
+        AppUser user = userRepo.findByEmail(email);
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found with email: " + email);
         }
+        return user.getId();
+    }
 
-        AppUser user = new AppUser();
-        user.setUsername(newUser.getUsername());
-        user.setEmail(newUser.getEmail());
-        user.setPassword(encoder.encode(newUser.getPassword()));
-
-        user.setRole("USER");
-
+    public void register(UserDtos.SignupRequest request) {
+        if (userRepo.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("An account with this email already exists");
+        }
+        AppUser user = userMapper.toEntity(request);
+        user.setPassword(encoder.encode(request.password()));
         userRepo.save(user);
     }
 
-    public LoginResponse verify(AppUser user) {
+    public UserDtos.LoginResponse verify(UserDtos.LoginRequest loginRequest) {
         Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.email(),
+                        loginRequest.password()
+                )
+        );
 
         if (auth.isAuthenticated()) {
-            AppUser foundUser = userRepo.findByEmail(user.getEmail());
+            AppUser foundUser = userRepo.findByEmail(loginRequest.email());
 
             if (foundUser == null) {
-                throw new RuntimeException("User not found after authentication");
+                throw new ResourceNotFoundException("User could not be found in the database");
             }
 
-            String token = jwtService.generateToken(foundUser.getEmail(), foundUser.getRole());
+            String token = jwtService.generateToken(foundUser.getId(), foundUser.getEmail(), foundUser.getRole());
 
-            LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
-                    foundUser.getUsername(),
-                    foundUser.getEmail(),
-                    foundUser.getRole()
-            );
-            return new LoginResponse(token, userInfo);
+            return userMapper.toLoginResponse(foundUser, token, false);
         }
-
-        throw new RuntimeException("Invalid credentials");
+        throw new UnauthenticatedException("Incorrect email or password");
     }
 
-    public ResponseEntity<?> loginWithGoogle(String googleToken) {
+    public UserDtos.LoginResponse loginWithGoogle(String googleToken) throws GeneralSecurityException, IOException {
         if (clientId == null || clientId.isBlank()) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Google login is not configured");
+            throw new IllegalStateException("Google Client ID is missing");
         }
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(clientId))
                 .build();
 
-        try {
-            GoogleIdToken idToken = verifier.verify(googleToken);
-            if (idToken != null) {
-                GoogleIdToken.Payload payload = idToken.getPayload();
-                String email = payload.getEmail();
-                String name = (String) payload.get("name");
+        GoogleIdToken idToken = verifier.verify(googleToken);
 
-                AppUser user = userRepo.findByEmail(email);
-                if (user == null) {
-                    user = new AppUser();
-                    user.setEmail(email);
-                    user.setUsername(name);
-                    user.setPassword("");
-                    user.setRole("USER");
-                    userRepo.save(user);
+        if (idToken == null) throw new UnauthenticatedException("Invalid Google token");
 
-                    isNewUser = false;
-                }
+        GoogleIdToken.Payload payload = idToken.getPayload();
+        String email = payload.getEmail();
+        boolean isNewUser = false;
 
-                String jwt = jwtService.generateToken(user.getEmail(), user.getRole());
+        AppUser user = userRepo.findByEmail(email);
+        if (user == null) {
+            var googleData = new UserDtos.GoogleUser(email, (String) payload.get("name"));
 
-                Map<String, Object> response = new HashMap<>();
-                response.put("token", jwt);
-                response.put("user", Map.of(
-                        "email", user.getEmail(),
-                        "username", user.getUsername(),
-                        "role", user.getRole()
-                ));
-                response.put("isNewUser", isNewUser);
+            user = userMapper.fromGoogle(googleData);
 
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google token");
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error verifying Google token");
+            userRepo.save(user);
+            isNewUser = true;
         }
+
+        String jwt = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole());
+        return userMapper.toLoginResponse(user, jwt, isNewUser);
     }
 }

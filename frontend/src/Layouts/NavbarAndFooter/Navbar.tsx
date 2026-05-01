@@ -1,14 +1,11 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../Auth/AuthContext";
+import { Link } from "react-router-dom";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useAuthActions } from "../../api/hooks/useAuthActions";
 
 function Navbar() {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = ()=>{
-        logout("You've been Logged out Successfully");
-        navigate("/");
-    }
+    const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+    const isAdmin = useAuthStore((s) => s.isAdmin);
+    const { logout } = useAuthActions();
 
     return (
         <>
@@ -41,8 +38,8 @@ function Navbar() {
                                     Search Books
                                 </Link>
                             </li>
-                        
-                            {user &&
+
+                            {isAuthenticated() &&
                                 <li className="nav-item">
                                     <Link className="nav-link" to="/shelf">
                                         Shelf
@@ -50,7 +47,7 @@ function Navbar() {
                                 </li>
                             }
 
-                            {user &&
+                            {isAuthenticated() &&
                                 <li className="nav-item">
                                     <Link className="nav-link" to="/fees">
                                         Fees
@@ -58,7 +55,7 @@ function Navbar() {
                                 </li>
                             }
 
-                            {(user && user.role === 'ADMIN') &&
+                            {isAdmin() &&
                                 <li className="nav-item">
                                     <Link className="nav-link" to="/admin">
                                         Admin
@@ -69,21 +66,21 @@ function Navbar() {
 
                         <ul className="navbar-nav ms-auto">
                             <li className="nav-item m-1">
-                            {!user ? (
-                                <Link
-                                    to="/login"
-                                    className="btn btn-outline-light"
-                                >
-                                    Sign in
-                                </Link>
-                            ):(
-                                <button
-                                    className="btn btn-outline-warning"
-                                    onClick={handleLogout}
-                                >
-                                    Logout
-                                </button>
-                            )}
+                                {!isAuthenticated() ? (
+                                    <Link
+                                        to="/login"
+                                        className="btn btn-outline-light"
+                                    >
+                                        Sign in
+                                    </Link>
+                                ) : (
+                                    <button
+                                        className="btn btn-outline-warning"
+                                        onClick={logout}
+                                    >
+                                        Logout
+                                    </button>
+                                )}
                             </li>
                         </ul>
                     </div>

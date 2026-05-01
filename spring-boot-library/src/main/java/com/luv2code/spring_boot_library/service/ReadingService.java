@@ -1,44 +1,33 @@
 package com.luv2code.spring_boot_library.service;
 
-import com.luv2code.spring_boot_library.dao.BookRepository;
+import com.luv2code.spring_boot_library.dto.BookDtos;
 import com.luv2code.spring_boot_library.entity.Book;
-import com.luv2code.spring_boot_library.responsemodel.DigitalAccessResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
+import com.luv2code.spring_boot_library.mapper.BookMapper;
+import com.luv2code.spring_boot_library.repository.BookRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ReadingService {
 
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
 
-    @Autowired
-    public ReadingService(BookRepository bookRepository){
-        this.bookRepository = bookRepository;
-    }
-
-    public DigitalAccessResponse getBookUrl(Long bookId) throws Exception {
+    public BookDtos.DigitalAccessResponse getBookUrl(Long bookId) {
         // for now let's just stick with the user is authorized.
         // authorized user can reach to the content.
-       Book book = bookRepository.findById(bookId)
-          .orElseThrow(() -> new Exception("Book not found"));
-          
-        String bookUrl = book.getBookUrl();
-        String bookSource = book.getDataSource().toString();
-        return new DigitalAccessResponse(bookUrl, bookSource, "full");
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+        return bookMapper.toFullAccessResponse(book);
     }
 
-    public DigitalAccessResponse getBookPreviewUrl(Long bookId) throws Exception{
+    public BookDtos.DigitalAccessResponse getBookPreviewUrl(Long bookId) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new Exception("Book not found"));
-
-        String previewUrl = book.getPreviewUrl();
-        if (previewUrl == null || previewUrl.isBlank()) {
-            previewUrl = book.getBookUrl();
-        }
-
-        String bookSource = book.getDataSource().toString();
-        return new DigitalAccessResponse(previewUrl, bookSource, "preview");
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+        return bookMapper.toPreviewAccessResponse(book);
     }
 }

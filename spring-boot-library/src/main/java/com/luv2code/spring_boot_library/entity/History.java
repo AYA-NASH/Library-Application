@@ -1,37 +1,26 @@
 package com.luv2code.spring_boot_library.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "history")
 public class History {
-    public History() {
-    }
-
-    public History(String userEmail, String checkoutDate, String returnedDate, String title, String author, String description, String img) {
-        this.userEmail = userEmail;
-        this.checkoutDate = checkoutDate;
-        this.returnedDate = returnedDate;
-        this.title = title;
-        this.author = author;
-        this.description = description;
-        this.img = img;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_email")
-    private String userEmail;
-
-    @Column(name = "checkout_date")
-    private String checkoutDate;
-
-    @Column(name = "returned_date")
-    private String returnedDate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private AppUser user;
 
     @Column(name = "title")
     private String title;
@@ -45,4 +34,9 @@ public class History {
     @Column(name = "img", columnDefinition = "MEDIUMTEXT")
     private String img;
 
+    @Column(name = "checkout_date")
+    private LocalDate checkoutDate;
+
+    @Column(name = "returned_date")
+    private LocalDate returnedDate;
 }

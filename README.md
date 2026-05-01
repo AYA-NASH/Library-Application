@@ -1,95 +1,96 @@
 # Full-Stack Library Application
+
+[![Spring Boot](https://img.shields.io/badge/Spring--Boot-3.x-green.svg)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18.x-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](https://www.docker.com/)
+
+A full-stack library management application built with React and Spring Boot, focusing on clean architecture, maintainability, and production-oriented practices.
+
 ## Overview
 
-This is a practical, hands-on full-stack web application for managing a library system, built using **Spring Boot** (backend) and **React** (frontend).  
-It allows users to browse books, view details, and check them out through a clean and user-friendly interface.
+This application enables users to browse and borrow books, manage their personal library, preview digital content, and interact through reviews and messaging. Administrators can manage inventory, categories, and user requests.
 
-## Technologies Used
-- **Backend:** Spring Boot, Spring Data JPA, Spring Data REST, Spring Security with JWT  
-- **Database:** MySQL  
-- **Frontend:** React.js, TypeScript, Bootstrap  
-- **Docker**
+From a technical perspective, the system follows a layered backend architecture and a modular frontend structure, with secure authentication (JWT, OAuth 2.0) and resilient integration with external services such as Stripe and Cloudinary.
 
+### Tech Stack
+- **Frontend**: React, TypeScript, Vite, Zustand (State), React Query (Server State).
+- **Backend**: Spring Boot 3, Spring Security (JWT), Spring Data JPA, Hibernate.
+- **Resilience**: Resilience4j (Retry/Circuit Breaker).
+- **Infrastructure**: Docker & Docker Compose, MySQL, Nginx.
 
-## Project Structure
+## App Structure
+Technical guides are provided for both frontend and backend to explain architecture and data flow:
 
-### Backend (`spring-boot-library/`)
-- `src/main/java/com/luv2code/`  
-  - `config/`: Security configuration and Spring Data REST customization.
-  - `dao/`: JPA repositories.  
-  - `entity/`: Entity classes representing database tables.
-  - `requestmodel/`: Request payload classes (e.g., signup, payment).
-  - `responsemodel`: Response payload classes (e.g., login response).
-  - `service`: Application business logic (books, users, payments).
-  - `SpringBootLibraryApplication.java`: Main application entry point.
-  - `Dockerfile`: builds the backend container image (multi‑stage Maven → runtime).
-  - `wait-for-mysql.sh`: helper that waits for MySQL to be ready (not needed when using compose healthcheck).
+- [**Frontend Technical Guide**](./docs/frontend.md): Detailed look at React patterns, state management, routing, and the normalized error-handling system.
 
+- [**Backend Technical Guide**](./docs/backend.md): Overview of the Spring Boot architecture, security model, resilience patterns, and API contracts.
 
-### Frontend (`frontend/`)
-- `src/Auth/`: Auth context, guards, and helpers.
-- `src/layouts/`: Page-level components and layout containers.  
-- `src/models/`: TypeScript interfaces for backend entities.  
-- `src/App.tsx`: Main routing logic.  
-- `src/main.tsx`: Root file for React.
-- `Dockerfile`: builds the frontend image (Node build → Nginx serve).
-- `nginx.conf`: serves static assets and proxies `/api/*` to the backend.
-
-### Seed Data (`mysql-init/`)
-   - MySQL scripts that initialize schema and demo data on first run.
-### Docker Compose:
-   `docker-compose.yml`: builds and runs MySQL, backend, and frontend; sets env/build args, healthcheck, ports, and mounts seed SQL.
-
-## Features
-   - **Browse books** – with pagination, full details, and search/filter by category, author, or title.
-   - Explore detailed book information.
-   - Enable role-based accesses.
-   - **User functionality:**
-      - Personal shelf: view all currently checked-out books.
-      - History page: track previously borrowed books.
-      - Submit reviews and ratings.
-      - Contact form: report issues to admins.
-   - **Admin functiolaity:**
-      - Add, update, and delete books.
-      - View and respond to user-reported issues.
-   - **Authentication:** Secure login using JWT (email/password + Google Sign-In).
-   - **Payments:** Integrate payment functionality via Stripe.
-
-   - **Frontend-backend integration:** SPA frontend fetches data dynamically via Spring Data REST API.
+## Features:
+#### Core Features
+- Browse books with pagination, filtering, and search (title, author, category)
+- View detailed book information, ratings, and reviews
+- Role-based access control
+#### User Functionalities 
+- Borrow, return, and renew books
+- Access book previews and full digital content
+- Track loan history
+- Submit ratings and reviews
+- Contact administrators
+#### Admin Functionalities
+- Manage books (CRUD operations and inventory tracking)
+- Manage categories
+- Handle user-reported issues
+#### System Capabilities
+- Secure authentication using JWT and Google OAuth
+- Integration with Stripe (payments) and Cloudinary (media storage)
+- Fault-tolerant external communication using Resilience4j
 
 ## Getting Started
-   Docker is supported in this app to make it easy to run, so to run this app, make sure that your device supports docker.
 
-   From the project root:
-   ```
-      docker compose up -d
-   ```
-   Then open:
-   - http://localhost:3000
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+- Read the Environment Configuration section to Support System's secrets.
 
-   To reset DB and re-run seeds in `mysql-init/`:
-   ```
-   docker compose down -v
-   docker compose up -d
-   ```
-   **Note**:
-   The app supports Google OAuth and Stripe Payments. These need keys to work. To enable them, set the environment variables as described below.
+### Quick Start with Docker
+The easiest way to run the entire stack (Database, Backend, and Frontend) is via Docker Compose:
 
-   ## Secrets and third‑party setup
-   - Backend reads sensitive values from environment variables (not hardcoded):
-   - GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET (backend)
-   - STRIPE_KEY_SECRET (backend)
-   - APP_JWT_SECRET (backend, Base64 secret; a demo value is included in docker-compose.yml for local use only)
-   - APP_CORS_ALLOWED_ORIGINS (backend, default http://localhost:3000)
-   - VITE_STRIPE_PUBLISHABLE_KEY (frontend build arg; compose passes a demo test key)
-   - Set them in `docker-compose.yml` under the `backend.environment` section when enabling Google/Stripe or changing JWT.
-   - Frontend hides Google login if `VITE_GOOGLE_CLIENT_ID` isn’t provided. Payment pages will return an error if Stripe secret isn’t configured, but the app continues to work otherwise.
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/AYA-NASH/Library-Application.git
 
+    cd Library-Application
+    ```
+2.  **Launch the stack**:
+    ```bash
+    docker compose up -d
+    ```
+3.  **Access the Application**:
+    - **Frontend**: [http://localhost:3000](http://localhost:3000)
+    - **Backend API**: [http://localhost:8080/api](http://localhost:8080/api)
+    - **API Documentation (Swagger)**: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
+### Environment Configuration
+The application supports external integrations (Google Auth, Stripe, Cloudinary) which require API keys.
 
-## **Future Improvements/Features:**
-   - Preview and full reading functionality.  
-   - Enhanced user profiles – favorites, reading lists, bookmarks, and reading progress tracking.
-   - Notifications – reminders for due dates, overdue books, and new arrivals (email or in-app).  
-   - Analytics & admin dashboards – track popular books, user activity, and system usage.
-   - Host the app on a cloud server for live deployment. 
+### Frontend
+Copy the example file and provide your keys:
+`cp frontend/.env.example frontend/.env`
+- `VITE_API_BASE_URL`: URL of the backend (default: http://localhost:8080/api).
+- `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth Client ID.
+- `VITE_STRIPE_PUBLISHABLE_KEY`: Your Stripe test public key.
+
+### Backend
+Sensitive backend variables also are managed via `.env` file in the root.\
+Copy the example file and provide your keys: `cp spring-boot-library/.env.example spring-boot-library/.env`
+- `STRIPE_KEY_SECRET`: Your Stripe secret key.
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: Backend Google OAuth credentials.
+- `APP_JWT_SECRET`: Base64 string used to sign JWTs.
+- `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY`/ `CLOUDINARY_API_SECRET`: Backend Cloudinary Secrets.
+
+## Future Improvements/Features:
+- Enhanced Search – enables search filters combinations, and multi-category search selections.
+- Enhanced user profiles – favorites, reading lists, bookmarks, and reading progress tracking.
+- Notifications – reminders for Admin responses, due dates, overdue books, and new arrivals (email or in-app).
+- Analytics & admin dashboards – track popular books, user activity, and system usage.
+- Host the app on a cloud server for live deployment.

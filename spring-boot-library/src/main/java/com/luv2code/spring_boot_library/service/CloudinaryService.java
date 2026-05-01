@@ -4,7 +4,11 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.luv2code.spring_boot_library.exception.CloudinaryDeleteException;
 import com.luv2code.spring_boot_library.exception.CloudinaryUploadException;
+import com.luv2code.spring_boot_library.exception.ExternalServiceException;
 import com.luv2code.spring_boot_library.exception.InvalidFileTypeException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class CloudinaryService {
 
     private final Cloudinary cloudinary;
@@ -24,13 +29,10 @@ public class CloudinaryService {
             "image/webp"
     );
 
-    @Autowired
-    public CloudinaryService(Cloudinary cloudinary) {
-        this.cloudinary = cloudinary;
-    }
-
     public record UploadResult(String url, String publicId) {}
 
+    @Retry(name = "cloudinaryService")
+    @CircuitBreaker(name = "cloudinaryService", fallbackMethod = "uploadImageFallback")
     public UploadResult uploadImage(MultipartFile image){
 
         if(!ALLOWED_IMAGE_TYPES.contains(image.getContentType())){
@@ -56,6 +58,8 @@ public class CloudinaryService {
         }
     }
 
+    @Retry(name = "cloudinaryService")
+    @CircuitBreaker(name = "cloudinaryService", fallbackMethod = "uploadPdfFallback")
     public UploadResult uploadPdf(MultipartFile pdf) {
 
         if(!PDF_TYPE.equals(pdf.getContentType())){
@@ -80,6 +84,8 @@ public class CloudinaryService {
         }
     }
 
+    @Retry(name = "cloudinaryService")
+    @CircuitBreaker(name = "cloudinaryService", fallbackMethod = "deleteFileFallback")
     public void deleteFile(String publicId, String resourceType) {
         if (publicId == null || publicId.isBlank()) return;
 
@@ -95,5 +101,17 @@ public class CloudinaryService {
 
     public boolean isEnabled() {
         return cloudinary != null;
+    }
+
+    private UploadResult uploadImageFallback(MultipartFile image, Throwable t) {
+        throw new ExternalServiceException("Image upload service is temporarily unavailable. Please try again.");
+    }
+
+    private UploadResult uploadPdfFallback(MultipartFile pdf, Throwable t) {
+        throw new ExternalServiceException("PDF upload service is temporarily unavailable. Please try again.");
+    }
+
+    private void deleteFileFallback(String publicId, String resourceType, Throwable t) {
+        throw new ExternalServiceException("File deletion service is temporarily unavailable. Please try again.");
     }
 }
