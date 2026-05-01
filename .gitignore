@@ -1,1 +1,5 @@
 mysql-init/node_modules/*
+.vscode/settings.json
+frontend/.env.production
+spring-boot-library/src/main/resources/application-prod.properties
+spring-boot-library/src/main/resources/application-test.properties
