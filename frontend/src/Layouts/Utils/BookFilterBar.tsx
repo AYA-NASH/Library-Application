@@ -9,6 +9,7 @@ type BookFilterBarProps = {
     initialCategoryId?: number;
     initialText?: string;
     onSearch: (params: { text?: string; categoryId?: number }) => void;
+    isLoading?: boolean;
 };
 
 export const BookFilterBar: React.FC<BookFilterBarProps> = ({
@@ -16,6 +17,7 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
     initialCategoryId,
     initialText = "",
     onSearch,
+    isLoading = false,
 }) => {
     const [searchText, setSearchText] = useState(initialText);
     const [selectedCategory, setSelectedCategory] = useState<CategoryReference | null>(null);
@@ -73,6 +75,8 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
             <div className="col-md-4">
                 <Select
                     options={categories}
+                    getOptionLabel={(option: CategoryReference) => option.name}
+                    getOptionValue={(option: CategoryReference) => option.id.toString()}
                     value={selectedCategory}
                     onChange={(selectedOption) =>
                         handleCategoryChange(selectedOption as CategoryReference | null)
@@ -80,6 +84,7 @@ export const BookFilterBar: React.FC<BookFilterBarProps> = ({
                     isClearable
                     placeholder="Search by category..."
                     classNamePrefix="react-select"
+                    isLoading={isLoading}
                 />
             </div>
         </div>

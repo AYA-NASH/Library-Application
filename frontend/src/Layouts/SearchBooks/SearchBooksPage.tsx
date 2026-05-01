@@ -19,7 +19,7 @@ export const SearchBooksPage = () => {
 
     const booksPerPage = 5;
 
-    const { data: options } = useCategoriesReferences();
+    const { data: options, isLoading: isCategoriesLoading } = useCategoriesReferences();
 
     const { data, isLoading, isError, error, refetch } = useBooks(
         currentPage,
@@ -55,6 +55,7 @@ export const SearchBooksPage = () => {
                 initialCategoryId={searchParams.categoryId}
                 initialText={searchParams.text}
                 onSearch={handleSearch}
+                isLoading={isCategoriesLoading}
             />
 
             {totalElements > 0 ? (
