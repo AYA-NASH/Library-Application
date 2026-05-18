@@ -1,0 +1,617 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1779091878439-1
+      author: ayana (generated)
+      changes:
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: title
+                  value: Zero to Production In Rust
+              - column:
+                  name: author
+                  value: Luca Palmieri
+              - column:
+                  name: description
+                  value: A hands-on guide to building and deploying a production-ready Rust
+                    backend, from project setup through observability.
+              - column:
+                  name: copies
+                  valueNumeric: 6
+              - column:
+                  name: copies_available
+                  valueNumeric: 4
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=x7C4EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=x7C4EAAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=x7C4EAAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: title
+                  value: Practical C++ Backend Programming
+              - column:
+                  name: author
+                  value: Justin Barbara
+              - column:
+                  name: description
+                  value: Build scalable C++ services with modern tooling, networking, and
+                    persistence patterns for real-world backends.
+              - column:
+                  name: copies
+                  valueNumeric: 10
+              - column:
+                  name: copies_available
+                  valueNumeric: 2
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=bznOEAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=bznOEAAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=bznOEAAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 3
+              - column:
+                  name: title
+                  value: JavaScript from Frontend to Backend
+              - column:
+                  name: author
+                  value: Eric Sarrion
+              - column:
+                  name: description
+                  value: Full-stack JavaScript with Vue, Node, and MongoDB—client and server
+                    concepts for web developers.
+              - column:
+                  name: copies
+                  valueNumeric: 7
+              - column:
+                  name: copies_available
+                  valueNumeric: 3
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=qOV5EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=qOV5EAAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=qOV5EAAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 4
+              - column:
+                  name: title
+                  value: Designing Data-Intensive Applications
+              - column:
+                  name: author
+                  value: Martin Kleppmann
+              - column:
+                  name: description
+                  value: The big ideas behind reliable, scalable, and maintainable systems—storage,
+                    messaging, and stream processing.
+              - column:
+                  name: copies
+                  valueNumeric: 9
+              - column:
+                  name: copies_available
+                  valueNumeric: 9
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=p1heDgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=p1heDgAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=p1heDgAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 5
+              - column:
+                  name: title
+                  value: The DevOps Handbook
+              - column:
+                  name: author
+                  value: Gene Kim
+              - column:
+                  name: description
+                  value: How to create world-class agility, reliability, and security in
+                    technology organizations.
+              - column:
+                  name: copies
+                  valueNumeric: 10
+              - column:
+                  name: copies_available
+                  valueNumeric: 6
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=6L9KDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=6L9KDwAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=6L9KDwAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 6
+              - column:
+                  name: title
+                  value: Clean Code
+              - column:
+                  name: author
+                  value: Robert C. Martin
+              - column:
+                  name: description
+                  value: A handbook of agile software craftsmanship—readable code, meaningful
+                    names, and disciplined refactoring.
+              - column:
+                  name: copies
+                  valueNumeric: 4
+              - column:
+                  name: copies_available
+                  valueNumeric: 1
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=hjEFCAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=hjEFCAAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=hjEFCAAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 7
+              - column:
+                  name: title
+                  value: Learning React
+              - column:
+                  name: author
+                  value: Alex Banks
+              - column:
+                  name: description
+                  value: Modern patterns for building user interfaces with React, hooks,
+                    and component architecture.
+              - column:
+                  name: copies
+                  valueNumeric: 6
+              - column:
+                  name: copies_available
+                  valueNumeric: 5
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=6eZADwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=6eZADwAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=6eZADwAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 8
+              - column:
+                  name: title
+                  value: Spring in Action
+              - column:
+                  name: author
+                  value: Craig Walls
+              - column:
+                  name: description
+                  value: Covers Spring Boot, REST, security, and data access for Java enterprise
+                    applications.
+              - column:
+                  name: copies
+                  valueNumeric: 6
+              - column:
+                  name: copies_available
+                  valueNumeric: 1
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=5iBTEAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=5iBTEAAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=5iBTEAAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 9
+              - column:
+                  name: title
+                  value: The Pragmatic Programmer
+              - column:
+                  name: author
+                  value: David Thomas
+              - column:
+                  name: description
+                  value: Your journey to mastery—tips on design, debugging, and continuous
+                    learning for developers.
+              - column:
+                  name: copies
+                  valueNumeric: 4
+              - column:
+                  name: copies_available
+                  valueNumeric: 3
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=LhOlDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=LhOlDwAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=LhOlDwAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 10
+              - column:
+                  name: title
+                  value: Pride and Prejudice
+              - column:
+                  name: author
+                  value: Jane Austen
+              - column:
+                  name: description
+                  value: A classic novel of manners, marriage, and social standing in Regency
+                    England.
+              - column:
+                  name: copies
+                  valueNumeric: 4
+              - column:
+                  name: copies_available
+                  valueNumeric: 4
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=0dQ6EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=0dQ6EAAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=0dQ6EAAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 11
+              - column:
+                  name: title
+                  value: Kubernetes Up and Running
+              - column:
+                  name: author
+                  value: Kelsey Hightower
+              - column:
+                  name: description
+                  value: Dive into Kubernetes—deploy, scale, and manage containerized applications
+                    in production.
+              - column:
+                  name: copies
+                  valueNumeric: 5
+              - column:
+                  name: copies_available
+                  valueNumeric: 2
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=1L-bcQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=1L-bcQAACAAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=1L-bcQAACAAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 12
+              - column:
+                  name: title
+                  value: You Don't Know JS Yet
+              - column:
+                  name: author
+                  value: Kyle Simpson
+              - column:
+                  name: description
+                  value: Deep dive into JavaScript scope, closures, prototypes, and the
+                    language beneath the frameworks.
+              - column:
+                  name: copies
+                  valueNumeric: 7
+              - column:
+                  name: copies_available
+                  valueNumeric: 2
+              - column:
+                  name: img_url
+                  value: https://books.google.com/books/content?id=6BP6DwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: book_source
+                  value: GOOGLE
+              - column:
+                  name: book_url
+                  value: http://play.google.com/books/reader?id=6BP6DwAAQBAJ&hl=&source=gbs_api
+              - column:
+                  name: image_public_id
+              - column:
+                  name: pdf_public_id
+              - column:
+                  name: preview_url
+                  value: http://play.google.com/books/reader?id=6BP6DwAAQBAJ&hl=&source=gbs_api
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 22
+              - column:
+                  name: title
+                  value: The Art of War
+              - column:
+                  name: author
+                  value: Sun Tzu
+              - column:
+                  name: description
+                  value: An ancient Chinese military treatise focused on strategy, leadership,
+                    and tactical thinking.
+              - column:
+                  name: copies
+                  valueNumeric: 5
+              - column:
+                  name: copies_available
+                  valueNumeric: 5
+              - column:
+                  name: img_url
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1779090582/library-books-covers/hrtbq4hstnhvqxf4klkn.png
+              - column:
+                  name: book_source
+                  value: INTERNAL
+              - column:
+                  name: book_url
+                  value: https://res.cloudinary.com/dg3qdvk22/raw/upload/v1779090584/library-books/hmql7f0x0mcbmhutilmv
+              - column:
+                  name: image_public_id
+                  value: library-books-covers/hrtbq4hstnhvqxf4klkn
+              - column:
+                  name: pdf_public_id
+                  value: library-books/hmql7f0x0mcbmhutilmv
+              - column:
+                  name: preview_url
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 23
+              - column:
+                  name: title
+                  value: Frankenstein
+              - column:
+                  name: author
+                  value: Mary Shelley
+              - column:
+                  name: description
+                  value: A classic horror novel exploring science, ambition, and the consequences
+                    of creation.
+              - column:
+                  name: copies
+                  valueNumeric: 5
+              - column:
+                  name: copies_available
+                  valueNumeric: 5
+              - column:
+                  name: img_url
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1779090800/library-books-covers/l6kb24dwsilmihlh0ouk.png
+              - column:
+                  name: book_source
+                  value: INTERNAL
+              - column:
+                  name: book_url
+                  value: https://res.cloudinary.com/dg3qdvk22/raw/upload/v1779090802/library-books/yyhaztc5tstex6oxxrt5
+              - column:
+                  name: image_public_id
+                  value: library-books-covers/l6kb24dwsilmihlh0ouk
+              - column:
+                  name: pdf_public_id
+                  value: library-books/yyhaztc5tstex6oxxrt5
+              - column:
+                  name: preview_url
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 24
+              - column:
+                  name: title
+                  value: Alice's Adventures in Wonderland
+              - column:
+                  name: author
+                  value: Lewis Carroll
+              - column:
+                  name: description
+                  value: A fantasy novel following Alice through a strange and imaginative
+                    world.
+              - column:
+                  name: copies
+                  valueNumeric: 6
+              - column:
+                  name: copies_available
+                  valueNumeric: 6
+              - column:
+                  name: img_url
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1779090985/library-books-covers/saj5qxcy1tc4tuyct3fs.png
+              - column:
+                  name: book_source
+                  value: INTERNAL
+              - column:
+                  name: book_url
+                  value: https://res.cloudinary.com/dg3qdvk22/raw/upload/v1779090987/library-books/snrnptlrah5263enri9l
+              - column:
+                  name: image_public_id
+                  value: library-books-covers/saj5qxcy1tc4tuyct3fs
+              - column:
+                  name: pdf_public_id
+                  value: library-books/snrnptlrah5263enri9l
+              - column:
+                  name: preview_url
+            tableName: book
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 25
+              - column:
+                  name: title
+                  value: The Adventures of Sherlock Holmes
+              - column:
+                  name: author
+                  value: Arthur Conan Doyle
+              - column:
+                  name: description
+                  value: A mystery collection featuring the investigations of Sherlock Holmes
+                    and Dr. Watson.
+              - column:
+                  name: copies
+                  valueNumeric: 10
+              - column:
+                  name: copies_available
+                  valueNumeric: 10
+              - column:
+                  name: img_url
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1779091121/library-books-covers/kmeiooz1wqncumqde2xr.png
+              - column:
+                  name: book_source
+                  value: INTERNAL
+              - column:
+                  name: book_url
+                  value: https://res.cloudinary.com/dg3qdvk22/raw/upload/v1779091123/library-books/rzcodpiaoubecoonngfv
+              - column:
+                  name: image_public_id
+                  value: library-books-covers/kmeiooz1wqncumqde2xr
+              - column:
+                  name: pdf_public_id
+                  value: library-books/rzcodpiaoubecoonngfv
+              - column:
+                  name: preview_url
+            tableName: book

@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/seeds/seed-books.yaml
+  - include:
+      file: db/changelog/seeds/seed-categories.yaml
+  - include:
+      file: db/changelog/seeds/seed-book-categories.yaml
+  - include:
+      file: db/changelog/seeds/seed-users.yaml
+  - include:
+      file: db/changelog/seeds/seed-history.yaml
+  - include:
+      file: db/changelog/seeds/seed-messages.yaml
+  - include:
+      file: db/changelog/seeds/seed-payments.yaml
+  - include:
+      file: db/changelog/seeds/seed-reviews.yaml
+  - include:
+      file: db/changelog/seeds/seed-interactions.yaml
+  - include:
+      file: db/changelog/seeds/seed-checkouts.yaml

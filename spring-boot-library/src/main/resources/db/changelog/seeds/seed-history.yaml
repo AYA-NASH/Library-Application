@@ -1,0 +1,537 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1779091878439-5
+      author: ayana (generated)
+      changes:
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: author
+                  value: Craig Walls
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-08-14
+              - column:
+                  name: description
+                  value: Covers Spring Boot, REST, security, and data access for Java enterprise
+                    applications.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=5iBTEAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-08-19
+              - column:
+                  name: title
+                  value: Spring in Action
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: author
+                  value: Regional Writers Guild
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-11-11
+              - column:
+                  name: description
+                  value: A diverse anthology featuring short stories and poems from local
+                    authors; exclusively available in our physical collection.
+              - column:
+                  name: img
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1778904171/library-books-covers/seed_community-showcase-2025.jpg
+              - column:
+                  name: returned_date
+                  valueDate: 2025-11-16
+              - column:
+                  name: title
+                  value: Community Author Showcase 2025
+              - column:
+                  name: user_id
+                  valueNumeric: 9
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 3
+              - column:
+                  name: author
+                  value: Compliance Office
+              - column:
+                  name: checkout_date
+                  valueDate: 2026-03-12
+              - column:
+                  name: description
+                  value: Internal policy document outlining the lifecycle of loan records,
+                    messages, and payment metadata under GDPR guidelines.
+              - column:
+                  name: img
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1778904175/library-books-covers/seed_data-retention-privacy.jpg
+              - column:
+                  name: returned_date
+                  valueDate: 2026-03-19
+              - column:
+                  name: title
+                  value: Data Retention & Privacy (Member Records)
+              - column:
+                  name: user_id
+                  valueNumeric: 11
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 4
+              - column:
+                  name: author
+                  value: Gene Kim
+              - column:
+                  name: checkout_date
+                  valueDate: 2026-04-14
+              - column:
+                  name: description
+                  value: How to create world-class agility, reliability, and security in
+                    technology organizations.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=6L9KDwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2026-05-09
+              - column:
+                  name: title
+                  value: The DevOps Handbook
+              - column:
+                  name: user_id
+                  valueNumeric: 5
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 5
+              - column:
+                  name: author
+                  value: DBA Team
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-09-05
+              - column:
+                  name: description
+                  value: Internal guide for optimizing queries and indexing strategies for
+                    the book catalog and history tables.
+              - column:
+                  name: img
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1778904181/library-books-covers/seed_mysql-optimization-guide.jpg
+              - column:
+                  name: returned_date
+                  valueDate: 2025-09-19
+              - column:
+                  name: title
+                  value: MySQL Performance Tuning for Large Catalogs
+              - column:
+                  name: user_id
+                  valueNumeric: 8
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 6
+              - column:
+                  name: author
+                  value: Frontend Lead
+              - column:
+                  name: checkout_date
+                  valueDate: 2026-01-23
+              - column:
+                  name: description
+                  value: Technical deep-dive into how we migrated the member dashboard to
+                    a micro-frontend architecture using Module Federation.
+              - column:
+                  name: img
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1778904180/library-books-covers/seed_react-micro-frontends.jpg
+              - column:
+                  name: returned_date
+                  valueDate: 2026-01-31
+              - column:
+                  name: title
+                  value: 'Architecture: React Micro-Frontends in the Library'
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 7
+              - column:
+                  name: author
+                  value: Martin Kleppmann
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-05-22
+              - column:
+                  name: description
+                  value: The big ideas behind reliable, scalable, and maintainable systems—storage,
+                    messaging, and stream processing.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=p1heDgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-05-31
+              - column:
+                  name: title
+                  value: Designing Data-Intensive Applications
+              - column:
+                  name: user_id
+                  valueNumeric: 5
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 8
+              - column:
+                  name: author
+                  value: Kelsey Hightower
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-09-14
+              - column:
+                  name: description
+                  value: Dive into Kubernetes—deploy, scale, and manage containerized applications
+                    in production.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=1L-bcQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-09-21
+              - column:
+                  name: title
+                  value: Kubernetes Up and Running
+              - column:
+                  name: user_id
+                  valueNumeric: 8
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 9
+              - column:
+                  name: author
+                  value: Kelsey Hightower
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-09-11
+              - column:
+                  name: description
+                  value: Dive into Kubernetes—deploy, scale, and manage containerized applications
+                    in production.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=1L-bcQAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-09-27
+              - column:
+                  name: title
+                  value: Kubernetes Up and Running
+              - column:
+                  name: user_id
+                  valueNumeric: 12
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 10
+              - column:
+                  name: author
+                  value: Eric Sarrion
+              - column:
+                  name: checkout_date
+                  valueDate: 2026-05-07
+              - column:
+                  name: description
+                  value: Full-stack JavaScript with Vue, Node, and MongoDB—client and server
+                    concepts for web developers.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=qOV5EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2026-05-12
+              - column:
+                  name: title
+                  value: JavaScript from Frontend to Backend
+              - column:
+                  name: user_id
+                  valueNumeric: 11
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 11
+              - column:
+                  name: author
+                  value: Eric Sarrion
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-08-07
+              - column:
+                  name: description
+                  value: Full-stack JavaScript with Vue, Node, and MongoDB—client and server
+                    concepts for web developers.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=qOV5EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-08-12
+              - column:
+                  name: title
+                  value: JavaScript from Frontend to Backend
+              - column:
+                  name: user_id
+                  valueNumeric: 6
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 12
+              - column:
+                  name: author
+                  value: Eric Sarrion
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-10-09
+              - column:
+                  name: description
+                  value: Full-stack JavaScript with Vue, Node, and MongoDB—client and server
+                    concepts for web developers.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=qOV5EAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-10-14
+              - column:
+                  name: title
+                  value: JavaScript from Frontend to Backend
+              - column:
+                  name: user_id
+                  valueNumeric: 7
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 13
+              - column:
+                  name: author
+                  value: Historical Society
+              - column:
+                  name: checkout_date
+                  valueDate: 2026-02-01
+              - column:
+                  name: description
+                  value: An archival collection of letters and photographs documenting the
+                    early days of the city's library system.
+              - column:
+                  name: img
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1778904179/library-books-covers/seed_local-history-vol-1.jpg
+              - column:
+                  name: returned_date
+                  valueDate: 2026-02-20
+              - column:
+                  name: title
+                  value: 'Local History: The Founders of our Library'
+              - column:
+                  name: user_id
+                  valueNumeric: 5
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 14
+              - column:
+                  name: author
+                  value: Justin Barbara
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-12-23
+              - column:
+                  name: description
+                  value: Build scalable C++ services with modern tooling, networking, and
+                    persistence patterns for real-world backends.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=bznOEAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-12-28
+              - column:
+                  name: title
+                  value: Practical C++ Backend Programming
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 15
+              - column:
+                  name: author
+                  value: Justin Barbara
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-09-07
+              - column:
+                  name: description
+                  value: Build scalable C++ services with modern tooling, networking, and
+                    persistence patterns for real-world backends.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=bznOEAAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-09-30
+              - column:
+                  name: title
+                  value: Practical C++ Backend Programming
+              - column:
+                  name: user_id
+                  valueNumeric: 11
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 16
+              - column:
+                  name: author
+                  value: Frontend Lead
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-06-15
+              - column:
+                  name: description
+                  value: Technical deep-dive into how we migrated the member dashboard to
+                    a micro-frontend architecture using Module Federation.
+              - column:
+                  name: img
+                  value: https://res.cloudinary.com/dg3qdvk22/image/upload/v1778904180/library-books-covers/seed_react-micro-frontends.jpg
+              - column:
+                  name: returned_date
+                  valueDate: 2025-06-24
+              - column:
+                  name: title
+                  value: 'Architecture: React Micro-Frontends in the Library'
+              - column:
+                  name: user_id
+                  valueNumeric: 4
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 17
+              - column:
+                  name: author
+                  value: Kyle Simpson
+              - column:
+                  name: checkout_date
+                  valueDate: 2025-11-07
+              - column:
+                  name: description
+                  value: Deep dive into JavaScript scope, closures, prototypes, and the
+                    language beneath the frameworks.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=6BP6DwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2025-11-12
+              - column:
+                  name: title
+                  value: You Don't Know JS Yet
+              - column:
+                  name: user_id
+                  valueNumeric: 11
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 18
+              - column:
+                  name: author
+                  value: Alex Banks
+              - column:
+                  name: checkout_date
+                  valueDate: 2026-05-07
+              - column:
+                  name: description
+                  value: Modern patterns for building user interfaces with React, hooks,
+                    and component architecture.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=6eZADwAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2026-05-16
+              - column:
+                  name: title
+                  value: Learning React
+              - column:
+                  name: user_id
+                  valueNumeric: 5
+            tableName: history
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 19
+              - column:
+                  name: author
+                  value: Martin Kleppmann
+              - column:
+                  name: checkout_date
+                  valueDate: 2026-05-13
+              - column:
+                  name: description
+                  value: The big ideas behind reliable, scalable, and maintainable systems—storage,
+                    messaging, and stream processing.
+              - column:
+                  name: img
+                  value: https://books.google.com/books/content?id=p1heDgAAQBAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api
+              - column:
+                  name: returned_date
+                  valueDate: 2026-05-18
+              - column:
+                  name: title
+                  value: Designing Data-Intensive Applications
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+            tableName: history

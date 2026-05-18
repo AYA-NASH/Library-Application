@@ -1,0 +1,253 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1779091878439-2
+      author: ayana (generated)
+      changes:
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 3
+              - column:
+                  name: category_id
+                  valueNumeric: 1
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 7
+              - column:
+                  name: category_id
+                  valueNumeric: 1
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 12
+              - column:
+                  name: category_id
+                  valueNumeric: 1
+            tableName: book_category
+
+
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 1
+              - column:
+                  name: category_id
+                  valueNumeric: 2
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 2
+              - column:
+                  name: category_id
+                  valueNumeric: 2
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 3
+              - column:
+                  name: category_id
+                  valueNumeric: 2
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 4
+              - column:
+                  name: category_id
+                  valueNumeric: 2
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 8
+              - column:
+                  name: category_id
+                  valueNumeric: 2
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 11
+              - column:
+                  name: category_id
+                  valueNumeric: 2
+            tableName: book_category
+
+
+
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 5
+              - column:
+                  name: category_id
+                  valueNumeric: 3
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 11
+              - column:
+                  name: category_id
+                  valueNumeric: 3
+            tableName: book_category
+
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 4
+              - column:
+                  name: category_id
+                  valueNumeric: 4
+            tableName: book_category
+
+
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 1
+              - column:
+                  name: category_id
+                  valueNumeric: 5
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 2
+              - column:
+                  name: category_id
+                  valueNumeric: 5
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 5
+              - column:
+                  name: category_id
+                  valueNumeric: 5
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 6
+              - column:
+                  name: category_id
+                  valueNumeric: 5
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 9
+              - column:
+                  name: category_id
+                  valueNumeric: 5
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 12
+              - column:
+                  name: category_id
+                  valueNumeric: 5
+            tableName: book_category
+
+
+
+
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 10
+              - column:
+                  name: category_id
+                  valueNumeric: 6
+            tableName: book_category
+
+
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 23
+              - column:
+                  name: category_id
+                  valueNumeric: 6
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 25
+              - column:
+                  name: category_id
+                  valueNumeric: 6
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 22
+              - column:
+                  name: category_id
+                  valueNumeric: 7
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 22
+              - column:
+                  name: category_id
+                  valueNumeric: 8
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 23
+              - column:
+                  name: category_id
+                  valueNumeric: 9
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 24
+              - column:
+                  name: category_id
+                  valueNumeric: 11
+            tableName: book_category
+        - insert:
+            columns:
+              - column:
+                  name: book_id
+                  valueNumeric: 25
+              - column:
+                  name: category_id
+                  valueNumeric: 12
+            tableName: book_category

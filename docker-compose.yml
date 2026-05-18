@@ -10,9 +10,7 @@ services:
       MYSQL_ROOT_PASSWORD: rootpassword
     ports:
       - "3306:3306"
-    # volumes:
-    #   - mysql-data:/var/lib/mysql
-    #   - ./mysql-init/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword" ]
       interval: 5s
@@ -22,20 +20,6 @@ services:
     networks:
       - library-net
 
-  # db-seeder:
-  #   build:
-  #     context: ./mysql-init
-  #   container_name: library-db-seeder
-  #   environment:
-  #     DB_HOST: mysql
-  #     DB_PORT: 3306
-  #     DB_USER: library
-  #     DB_PASSWORD: library
-  #     DB_NAME: books_library
-  #   depends_on:
-  #     mysql:
-  #       condition: service_healthy
-
   backend:
     build: ./spring-boot-library
     env_file:
@@ -44,6 +28,7 @@ services:
     restart: on-failure
     environment:
       SPRING_PROFILES_ACTIVE: docker-dev
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/books_library?allowPublicKeyRetrieval=true&useSSL=false"
     ports:
       - "8080:8080"
     depends_on:
@@ -63,9 +48,6 @@ services:
         - backend
       networks:
         - library-net
-
-volumes:
-  mysql-data:
 
 networks:
   library-net:      

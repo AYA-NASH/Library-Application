@@ -1,0 +1,240 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1779091878439-6
+      author: ayana (generated)
+      changes:
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: title
+                  value: Late fee not cleared
+              - column:
+                  name: question
+                  value: Returned 'Designing Data-Intensive Applications' Tuesday—fee still
+                    shows $8.
+              - column:
+                  name: response
+                  value: Checked in; fee waived. Refresh your payments page.
+              - column:
+                  name: closed
+                  valueBoolean: true
+              - column:
+                  name: admin_id
+                  valueNumeric: 1
+              - column:
+                  name: user_id
+                  valueNumeric: 4
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: title
+                  value: Cannot open Google preview
+              - column:
+                  name: question
+                  value: Preview link spins forever on Spring in Action.
+              - column:
+                  name: response
+                  value: Try another browser; we are checking the embed token.
+              - column:
+                  name: closed
+                  valueBoolean: false
+              - column:
+                  name: admin_id
+                  valueNumeric: 1
+              - column:
+                  name: user_id
+                  valueNumeric: 7
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 3
+              - column:
+                  name: title
+                  value: 'Request: Rust books'
+              - column:
+                  name: question
+                  value: Please add more Rust titles to the backend shelf.
+              - column:
+                  name: response
+              - column:
+                  name: closed
+                  valueBoolean: false
+              - column:
+                  name: admin_id
+                  valueNumeric: 1
+              - column:
+                  name: user_id
+                  valueNumeric: 6
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 4
+              - column:
+                  name: title
+                  value: Password reset
+              - column:
+                  name: question
+                  value: Reset email never arrived (checked spam).
+              - column:
+                  name: response
+                  value: Sent a new link—expires in 24 hours.
+              - column:
+                  name: closed
+                  valueBoolean: true
+              - column:
+                  name: admin_id
+                  valueNumeric: 1
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 5
+              - column:
+                  name: title
+                  value: Hold on checked-out book
+              - column:
+                  name: question
+                  value: Can I reserve Kubernetes Up and Running while someone has it?
+              - column:
+                  name: response
+              - column:
+                  name: closed
+                  valueBoolean: false
+              - column:
+                  name: admin_id
+              - column:
+                  name: user_id
+                  valueNumeric: 7
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 6
+              - column:
+                  name: title
+                  value: Kids weekend program
+              - column:
+                  name: question
+                  value: What age range for Saturday story hour?
+              - column:
+                  name: response
+                  value: Ages 5–10; registration opens Friday noon.
+              - column:
+                  name: closed
+                  valueBoolean: true
+              - column:
+                  name: admin_id
+                  valueNumeric: 1
+              - column:
+                  name: user_id
+                  valueNumeric: 6
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 7
+              - column:
+                  name: title
+                  value: Wrong book on shelf
+              - column:
+                  name: question
+                  value: Barcode 8842 scanned a different title than the cover.
+              - column:
+                  name: response
+              - column:
+                  name: closed
+                  valueBoolean: false
+              - column:
+                  name: admin_id
+              - column:
+                  name: user_id
+                  valueNumeric: 3
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 8
+              - column:
+                  name: title
+                  value: Receipt for payment
+              - column:
+                  name: question
+                  value: Need email receipt for last month's late fee payment.
+              - column:
+                  name: response
+                  value: Receipt sent to your account email.
+              - column:
+                  name: closed
+                  valueBoolean: true
+              - column:
+                  name: admin_id
+                  valueNumeric: 1
+              - column:
+                  name: user_id
+                  valueNumeric: 11
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 9
+              - column:
+                  name: title
+                  value: Extend loan
+              - column:
+                  name: question
+                  value: Traveling next week—may I renew Clean Code once more?
+              - column:
+                  name: response
+                  value: Renewed until next Friday if no holds.
+              - column:
+                  name: closed
+                  valueBoolean: false
+              - column:
+                  name: admin_id
+                  valueNumeric: 1
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+            tableName: messages
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 10
+              - column:
+                  name: title
+                  value: Accessibility
+              - column:
+                  name: question
+                  value: Do you have large-print copies of Pride and Prejudice?
+              - column:
+                  name: response
+              - column:
+                  name: closed
+                  valueBoolean: false
+              - column:
+                  name: admin_id
+                  valueNumeric: 1
+              - column:
+                  name: user_id
+                  valueNumeric: 6
+            tableName: messages

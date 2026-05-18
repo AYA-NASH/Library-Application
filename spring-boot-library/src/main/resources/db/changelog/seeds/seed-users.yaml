@@ -1,0 +1,222 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1779091878439-10
+      author: ayana (generated)
+      changes:
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: username
+                  value: App Admin
+              - column:
+                  name: email
+                  value: admin@example.com
+              - column:
+                  name: password
+                  value: $2b$12$YUMbeaSiwOiqLTzWGI8uheCkNWsXDKA8bOM0EJe5KkXom5almV7xy
+              - column:
+                  name: role
+                  value: ADMIN
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: username
+                  value: Demo Patron
+              - column:
+                  name: email
+                  value: demo@example.com
+              - column:
+                  name: password
+                  value: $2b$12$tOPTzEcf.tvXVNZq3X2IKevavyGRTlGoVKwBTWqBEdklxR1YHofyu
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 3
+              - column:
+                  name: username
+                  value: Darrin Hettinger
+              - column:
+                  name: email
+                  value: darrin_renner@gmail.com
+              - column:
+                  name: password
+                  value: $2b$12$RvPfmbNu1VkjV3q42MkLsezgrwuEs3.nigS0J0dAM5748/KVzapAK
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 4
+              - column:
+                  name: username
+                  value: Guadalupe Kuhic
+              - column:
+                  name: email
+                  value: guadalupe_prosacco@yahoo.com
+              - column:
+                  name: password
+                  value: $2b$12$v.myZOY0vMch1q42Byh4buJ8/wwk0dCCMghJoGm0gx52HZZfwbcly
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 5
+              - column:
+                  name: username
+                  value: Gertrude Rodriguez DDS
+              - column:
+                  name: email
+                  value: gertrude.robel@gmail.com
+              - column:
+                  name: password
+                  value: $2b$12$9hR8Hif8AfbAcZaZXBq8sOEXxiPNJEOaKmlfhMEQMIQTRt4PHjhYW
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 6
+              - column:
+                  name: username
+                  value: Lillie McKenzie IV
+              - column:
+                  name: email
+                  value: lillie_sipes39@yahoo.com
+              - column:
+                  name: password
+                  value: $2b$12$HaYTpvcjlPYEiNhLOYIrY.eJ5RPKDGAp37tTtzGvTiXKD8ienXlQ6
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 7
+              - column:
+                  name: username
+                  value: Wilbur Dare
+              - column:
+                  name: email
+                  value: wilbur.bahringer14@hotmail.com
+              - column:
+                  name: password
+                  value: $2b$12$zx5AcgSbE5VFgywctHJB9ehVbEP3IZLAq.U4Zvzks/89VRC/K5tqu
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 8
+              - column:
+                  name: username
+                  value: Mack Von MD
+              - column:
+                  name: email
+                  value: mack_heidenreich63@hotmail.com
+              - column:
+                  name: password
+                  value: $2b$12$./2Dzgsya2hM0T0J.34L/OLF6ZNqjXsEGh7md3MfifoaSIZynbDoO
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 9
+              - column:
+                  name: username
+                  value: Kerry Herman
+              - column:
+                  name: email
+                  value: kerry.lynch8@yahoo.com
+              - column:
+                  name: password
+                  value: $2b$12$jJBmz/kXWHfaVnYxXdOvFO011WlLgQcpfKyeah5Kn82jCK5IMw9ju
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 10
+              - column:
+                  name: username
+                  value: Ann McClure V
+              - column:
+                  name: email
+                  value: ann_stroman66@hotmail.com
+              - column:
+                  name: password
+                  value: $2b$12$am30fNBLxQZk6BVpbeSnTOaYfQS2O0VZ14HYnssuyTBOmTznUURYS
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 11
+              - column:
+                  name: username
+                  value: Katrina Reichert
+              - column:
+                  name: email
+                  value: katrina.ortiz67@yahoo.com
+              - column:
+                  name: password
+                  value: $2b$12$PZ8lVL80fnx.Fs9sdYp0d.TPZ/gxW869kcjr6mwsMHzC7nokFv9a6
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+        - insert:
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 12
+              - column:
+                  name: username
+                  value: Andre Prosacco
+              - column:
+                  name: email
+                  value: andre35@hotmail.com
+              - column:
+                  name: password
+                  value: $2b$12$eYcMJGHOR0Bw.qBq4P0qYOezZNiD09WhZB22CTIz1foWsJB2rqX/m
+              - column:
+                  name: role
+                  value: USER
+            tableName: users
+

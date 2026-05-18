@@ -1,0 +1,600 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1778600905397-1
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: author
+                  type: VARCHAR(255)
+              - column:
+                  name: description
+                  type: MEDIUMTEXT
+              - column:
+                  name: copies
+                  type: INT
+              - column:
+                  name: copies_available
+                  type: INT
+              - column:
+                  name: img_url
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: book_source
+                  type: ENUM('GOOGLE', 'INTERNAL')
+              - column:
+                  name: book_url
+                  type: VARCHAR(255)
+              - column:
+                  name: image_public_id
+                  type: VARCHAR(255)
+              - column:
+                  name: pdf_public_id
+                  type: VARCHAR(255)
+              - column:
+                  name: preview_url
+                  type: VARCHAR(255)
+            tableName: book
+  - changeSet:
+      id: 1778600905397-2
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: book_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: category_id
+                  type: BIGINT
+            tableName: book_category
+  - changeSet:
+      id: 1778600905397-3
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    unique: true
+                  name: name
+                  type: VARCHAR(255)
+            tableName: category
+  - changeSet:
+      id: 1778600905397-4
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: user_email
+                  type: VARCHAR(255)
+              - column:
+                  name: checkout_date
+                  type: date
+              - column:
+                  name: return_date
+                  type: date
+              - column:
+                  name: book_id
+                  type: BIGINT
+              - column:
+                  name: user_id
+                  type: BIGINT
+            tableName: checkout
+  - changeSet:
+      id: 1778600905397-5
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: author
+                  type: VARCHAR(255)
+              - column:
+                  name: checkout_date
+                  type: date
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: img
+                  type: MEDIUMTEXT
+              - column:
+                  name: returned_date
+                  type: date
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: history
+  - changeSet:
+      id: 1778600905397-6
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+              - column:
+                  name: question
+                  type: VARCHAR(255)
+              - column:
+                  name: response
+                  type: VARCHAR(255)
+              - column:
+                  defaultValueNumeric: 0
+                  name: closed
+                  type: BIT(1)
+              - column:
+                  name: admin_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: messages
+  - changeSet:
+      id: 1778600905397-7
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: late_fees
+                  type: BIGINT
+              - column:
+                  constraints:
+                    unique: true
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: last_payment_completion_key
+                  type: VARCHAR(120)
+            tableName: payment
+  - changeSet:
+      id: 1778600905397-8
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: date
+                  type: datetime
+              - column:
+                  name: rating
+                  type: DOUBLE
+              - column:
+                  name: book_id
+                  type: BIGINT
+              - column:
+                  name: review_description
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: BIGINT
+            tableName: review
+  - changeSet:
+      id: 1778600905397-9
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: book_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  defaultValueNumeric: 1
+                  name: last_page
+                  type: INT
+              - column:
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  name: last_opened_at
+                  type: timestamp
+              - column:
+                  defaultValueComputed: CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP
+                  name: updated_at
+                  type: timestamp
+            tableName: user_book_interaction
+  - changeSet:
+      id: 1778600905397-10
+      author: ayana (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    unique: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    unique: true
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    unique: true
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValue: USER
+                  name: role
+                  type: VARCHAR(255)
+            tableName: users
+  - changeSet:
+      id: 1778600905397-11
+      author: ayana (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: book_id, user_id
+            constraintName: uniqueUserBookReview
+            tableName: review
+  - changeSet:
+      id: 1778600905397-12
+      author: ayana (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: user_id, book_id
+            constraintName: unique_user_book
+            tableName: user_book_interaction
+  - changeSet:
+      id: 1778600905397-13
+      author: ayana (generated)
+      changes:
+        - createIndex:
+            associatedWith: ''
+            columns:
+              - column:
+                  name: user_id
+            indexName: FK5euvb0r4pm0p3bb3t8rc232iu
+            tableName: checkout
+  - changeSet:
+      id: 1778600905397-14
+      author: ayana (generated)
+      changes:
+        - createIndex:
+            associatedWith: ''
+            columns:
+              - column:
+                  name: user_id
+            indexName: FK6cpw2nlklblpvc7hyt7ko6v3e
+            tableName: review
+  - changeSet:
+      id: 1778600905397-15
+      author: ayana (generated)
+      changes:
+        - createIndex:
+            associatedWith: ''
+            columns:
+              - column:
+                  name: admin_id
+            indexName: FK_AdminUser
+            tableName: messages
+  - changeSet:
+      id: 1778600905397-16
+      author: ayana (generated)
+      changes:
+        - createIndex:
+            associatedWith: ''
+            columns:
+              - column:
+                  name: user_id
+            indexName: FK_NormalUser
+            tableName: messages
+  - changeSet:
+      id: 1778600905397-17
+      author: ayana (generated)
+      changes:
+        - createIndex:
+            associatedWith: ''
+            columns:
+              - column:
+                  name: category_id
+            indexName: FKam8llderp40mvbbwceqpu6l2s
+            tableName: book_category
+  - changeSet:
+      id: 1778600905397-18
+      author: ayana (generated)
+      changes:
+        - createIndex:
+            associatedWith: ''
+            columns:
+              - column:
+                  name: book_id
+            indexName: FKevulql1hb5nvb6eoedasiqr0g
+            tableName: checkout
+  - changeSet:
+      id: 1778600905397-19
+      author: ayana (generated)
+      changes:
+        - createIndex:
+            associatedWith: ''
+            columns:
+              - column:
+                  name: user_id
+            indexName: FKq4kh99ws9lhtls5i3o73gw30t
+            tableName: history
+  - changeSet:
+      id: 1778600905397-20
+      author: ayana (generated)
+      changes:
+        - createIndex:
+            associatedWith: ''
+            columns:
+              - column:
+                  name: book_id
+            indexName: fk_ubi_book
+            tableName: user_book_interaction
+  - changeSet:
+      id: 1778600905397-21
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: checkout
+            constraintName: FK5euvb0r4pm0p3bb3t8rc232iu
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1778600905397-22
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: review
+            constraintName: FK6cpw2nlklblpvc7hyt7ko6v3e
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1778600905397-23
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: book_id
+            baseTableName: review
+            constraintName: FK70yrt09r4r54tcgkrwbeqenbs
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: book
+            validate: true
+  - changeSet:
+      id: 1778600905397-24
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: admin_id
+            baseTableName: messages
+            constraintName: FK_AdminUser
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1778600905397-25
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: messages
+            constraintName: FK_NormalUser
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1778600905397-26
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: book_category
+            constraintName: FKam8llderp40mvbbwceqpu6l2s
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: category
+            validate: true
+  - changeSet:
+      id: 1778600905397-27
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: book_id
+            baseTableName: checkout
+            constraintName: FKevulql1hb5nvb6eoedasiqr0g
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: book
+            validate: true
+  - changeSet:
+      id: 1778600905397-28
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: payment
+            constraintName: FKmi2669nkjesvp7cd257fptl6f
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1778600905397-29
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: book_id
+            baseTableName: book_category
+            constraintName: FKnyegcbpvce2mnmg26h0i856fd
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: book
+            validate: true
+  - changeSet:
+      id: 1778600905397-30
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: history
+            constraintName: FKq4kh99ws9lhtls5i3o73gw30t
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1778600905397-31
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: book_id
+            baseTableName: user_book_interaction
+            constraintName: fk_ubi_book
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: book
+            validate: true
+  - changeSet:
+      id: 1778600905397-32
+      author: ayana (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_book_interaction
+            constraintName: fk_ubi_user
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
