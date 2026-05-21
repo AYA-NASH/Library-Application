@@ -44,6 +44,9 @@ services:
       restart: on-failure
       ports:
         - "3000:80"
+      environment:
+        - BACKEND_URL=http://spring-boot-library:8080
+        - BACKEND_HOST=spring-boot-library
       depends_on:
         - backend
       networks:
