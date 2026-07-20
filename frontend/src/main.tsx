@@ -10,6 +10,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { Toaster } from 'sonner';
 
 import "./types/pdfjs-worker";
+import './index.css';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
@@ -38,21 +39,19 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-            <Toaster position="top-center" richColors closeButton />
-            {GOOGLE_CLIENT_ID ? (
-                <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-                    {stripePromise ? (
-                        <Elements stripe={stripePromise}>
-                            <App />
-                        </Elements>
-                    ) : (
+        <Toaster position="top-center" richColors closeButton />
+        {GOOGLE_CLIENT_ID ? (
+            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+                {stripePromise ? (
+                    <Elements stripe={stripePromise}>
                         <App />
-                    )}
-                </GoogleOAuthProvider>
-            ) : (
-                <App />
-            )}
-        </BrowserRouter>
+                    </Elements>
+                ) : (
+                    <App />
+                )}
+            </GoogleOAuthProvider>
+        ) : (
+            <App />
+        )}
     </QueryClientProvider>
 );

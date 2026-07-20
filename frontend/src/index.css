@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@import "shadcn/tailwind.css";
+
+/* Prevent Tailwind's .collapse utility from hiding active Bootstrap collapses */
+.collapse.show,
+.navbar-expand-lg .navbar-collapse.collapse {
+    visibility: visible;
+}

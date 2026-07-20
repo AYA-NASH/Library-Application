@@ -6,6 +6,7 @@ function Navbar() {
     const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
     const isAdmin = useAuthStore((s) => s.isAdmin);
     const { logout } = useAuthActions();
+    console.log("Navbar render");
 
     return (
         <>
