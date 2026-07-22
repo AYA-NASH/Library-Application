@@ -2,9 +2,9 @@ import { LayoutDashboard, HandHelping, BookOpen, User2Icon, ListTree, MessageSqu
 
 export const sidebarItems = [
     { title: "Dashboard", url: "/admin-dashboard", icon: LayoutDashboard },
-//     { title: "Books", url: "/dashboard/books", icon: BookOpen },
-//     { title: "Categories", url: "/dashboard/categories", icon: ListTree },
-//     { title: "Members", url: "/dashboard/members", icon: User2Icon },
-//     { title: "Loans", url: "/dashboard/recent-loans", icon: HandHelping },
-//     { title: "Messages", url: "/dashboard/messages", icon: MessageSquareText },
+    { title: "Books", url: "/admin-dashboard/books", icon: BookOpen },
+    //     { title: "Categories", url: "/dashboard/categories", icon: ListTree },
+    // { title: "Members", url: "/admin-dashboard/members", icon: User2Icon },
+    { title: "Recent Loans", url: "/admin-dashboard/recent-loans", icon: HandHelping },
+    { title: "Messages", url: "/admin-dashboard/messages", icon: MessageSquareText },
 ]

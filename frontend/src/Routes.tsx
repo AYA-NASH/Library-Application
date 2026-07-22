@@ -20,6 +20,9 @@ import { GlobalErrorFallback } from "./Layouts/Utils/GlobalErrorFallback";
 import { ErrorBoundary } from "react-error-boundary";
 import { DashboardLayout } from "./Layouts/AdminDashboard/DashboardLayout";
 import { MainPage } from "./Layouts/AdminDashboard/pages/MainPage";
+import { Books } from "./Layouts/AdminDashboard/pages/Books";
+import { RecentLoans } from "./Layouts/AdminDashboard/pages/RecentLoans";
+import { Messages } from "./Layouts/AdminDashboard/pages/Messages";
 
 export const router = createBrowserRouter([
     {
@@ -39,14 +42,6 @@ export const router = createBrowserRouter([
             { path: "search", element: <SearchBooksPage /> },
             { path: "checkout/:bookId", element: <BookCheckoutPage /> },
             { path: "reviewList/:bookId", element: <ReviewListPage /> },
-
-            {
-                path: "admin-dashboard",
-                element: <DashboardLayout />,
-                children: [
-                    { index: true, element: <MainPage /> }
-                ]
-            },
 
             {
                 element: <RequireAuth />,
@@ -71,5 +66,15 @@ export const router = createBrowserRouter([
             { path: "*", element: <NotFoundPage /> },
 
         ]
-    }
+    },
+    {
+        path: "admin-dashboard",
+        element: <DashboardLayout />,
+        children: [
+            { index: true, element: <MainPage /> },
+            { path: "books", element: <Books /> },
+            { path: "recent-loans", element: <RecentLoans /> },
+            { path: "messages", element: <Messages /> },
+        ]
+    },
 ]);

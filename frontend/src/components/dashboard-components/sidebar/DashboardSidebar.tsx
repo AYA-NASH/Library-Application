@@ -13,10 +13,10 @@ import { sidebarItems } from "@/constants/admin-dashboard/sidebarItems";
 import { Link, useLocation } from "react-router-dom";
 
 export function DashboardSidebar() {
-    // const location = useLocation();
+    const location = useLocation();
     return (
         <Sidebar>
-            <SidebarContent>
+            <SidebarContent className="p-3">
                 <SidebarGroup>
                     <SidebarGroupLabel>
                         Library Application
@@ -25,19 +25,27 @@ export function DashboardSidebar() {
 
                 <SidebarGroupContent>
                     <SidebarMenu>
-                        {sidebarItems.map(item => {
-                            return (
-                                <SidebarMenuItem>
-                                    <SidebarMenuButton>
-                                        <Link to={item.url}>
-                                            <item.icon />
-                                        </Link>
-                                        <span>{item.title}</span>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            )
-                        })}
+                        {sidebarItems.map((item) => {
+                            const isActive =
+                                item.url === "/admin-dashboard"
+                                    ? location.pathname === item.url
+                                    : location.pathname.startsWith(item.url);
 
+                            return (
+                                <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuButton
+                                        isActive={isActive}
+                                        className="gap-3 m-1"
+                                        render={
+                                            <Link to={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        }
+                                    />
+                                </SidebarMenuItem>
+                            );
+                        })}
                     </SidebarMenu>
                 </SidebarGroupContent>
             </SidebarContent>
