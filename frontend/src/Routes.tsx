@@ -23,6 +23,7 @@ import { MainPage } from "./Layouts/AdminDashboard/pages/MainPage";
 import { Books } from "./Layouts/AdminDashboard/pages/Books";
 import { RecentLoans } from "./Layouts/AdminDashboard/pages/RecentLoans";
 import { Messages } from "./Layouts/AdminDashboard/pages/Messages";
+import { Categories } from "./Layouts/AdminDashboard/pages/Categories";
 
 export const router = createBrowserRouter([
     {
@@ -73,6 +74,7 @@ export const router = createBrowserRouter([
         children: [
             { index: true, element: <MainPage /> },
             { path: "books", element: <Books /> },
+            {path: "categories", element: <Categories />},
             { path: "recent-loans", element: <RecentLoans /> },
             { path: "messages", element: <Messages /> },
         ]
