@@ -9,17 +9,23 @@ import { Button } from "@/components/ui/button";
 
 interface Props<TData> {
     table: Table<TData>;
+    totalElements?: number;
 }
 
 export function DataTablePagination<TData>({
     table,
+    totalElements,
 }: Props<TData>) {
+
+    const { pageIndex } = table.getState().pagination;
+    const totalRows = totalElements ?? table.getFilteredRowModel().rows.length;
+
     return (
         <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
                 Showing{" "}
                 {table.getRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} rows
+                {table.getFilteredRowModel().rows.length} items
             </p>
 
             <div className="flex items-center gap-2">
@@ -33,8 +39,7 @@ export function DataTablePagination<TData>({
                 </Button>
 
                 <span className="text-sm">
-                    {table.getState().pagination.pageIndex + 1} /{" "}
-                    {table.getPageCount()}
+                    {pageIndex + 1} / {table.getPageCount() > 0 ? table.getPageCount() : 1}
                 </span>
 
                 <Button

@@ -16,6 +16,7 @@ export function Categories() {
     const table = useDashboardTable({
         data: categories,
         columns: categoriesColumns,
+        pageCount: 5
     });
 
     return (

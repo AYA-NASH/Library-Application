@@ -2,11 +2,33 @@ import type { Table } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CategoryDetails } from "@/models/CategoryModel";
+import { categorySortOptions } from "@/constants/admin-dashboard/CategoriesSortOptions";
 
 interface CategoriesToolbarProps {
     table: Table<CategoryDetails>;
 }
 export function CategoriesToolbar({ table }: CategoriesToolbarProps) {
+    const sorting = table.getState().sorting;
+
+    const currentSortValue =
+        sorting.length > 0
+            ? `${sorting[0].id}-${sorting[0].desc ? "desc" : "asc"}`
+            : "none";
+
+    const selectedOption = categorySortOptions.find(
+        (opt: any) => opt.value === currentSortValue
+    ); 
+
+    const handleSortChange = (value: string | null) => {
+        if (!value || value === "none") {
+            table.resetSorting();
+            return;
+        }
+
+        const [id, dir] = value.split("-");
+        table.setSorting([{ id, desc: dir === "desc" }]);
+    };
+
     return (
         <div className="flex items-center justify-between gap-4 pb-4">
             <Input
@@ -16,32 +38,20 @@ export function CategoriesToolbar({ table }: CategoriesToolbarProps) {
                 onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
             />
 
-            <Select
-                onValueChange={(value) => {
-                    switch (value) {
-                        case "name":
-                            table.setSorting([{ id: "name", desc: false }]);
-                            break;
-                        case "booksCount":
-                            table.setSorting([{ id: "booksCount", desc: false }]);
-                            break;
-                        default:
-                            table.resetSorting();
-                    }
-                }}
-            >
+            <Select value={currentSortValue} onValueChange={handleSortChange}>
                 <SelectTrigger className="w-md">
-                    <SelectValue placeholder="Srot By ..." />
+                    <SelectValue placeholder="Sort By ...">
+                        {selectedOption ? selectedOption.label : "Default (No Sort)"}
+                    </SelectValue>
                 </SelectTrigger>
 
                 <SelectContent>
-                    <SelectItem value="name">
-                        Name (A-Z)
-                    </SelectItem>
-
-                    <SelectItem value="booksCount">
-                        Books Count
-                    </SelectItem>
+                    <SelectItem value="none">Default (No Sort)</SelectItem>
+                    {categorySortOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                        </SelectItem>
+                    ))}
                 </SelectContent>
             </Select>
         </div>
