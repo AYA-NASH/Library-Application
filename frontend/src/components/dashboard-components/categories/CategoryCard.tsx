@@ -3,6 +3,7 @@ import { CategoryCardInfo } from "./CategoryCardInfo";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryModal } from "./catrgory-actions/CategoryModal";
+import { DeleteCategory } from "./catrgory-actions/DeleteCategory";
 
 interface Props {
     category: CategoryDetails;
@@ -24,13 +25,18 @@ export function CategoryCard({ category }: Props) {
                     }
                 />
 
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Delete ${category.name}`}
-                >
-                    <Trash2 className="size-4 text-destructive" />
-                </Button>
+                <DeleteCategory
+                    categoryToDelete={category}
+                    trigger={
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={`Delete ${category.name}`}
+                        >
+                            <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                    }
+                />
             </div>
         </div>
     );
