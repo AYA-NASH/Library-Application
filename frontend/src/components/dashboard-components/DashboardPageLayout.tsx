@@ -7,6 +7,8 @@ interface DashboardPageLayoutProps {
     children: React.ReactNode;
     summaryCards?: SummaryCardItem[];
     isLoadingSummary?: boolean;
+    isErrorSummary?: boolean;
+    onRetrySummary?: () => void;
     topHeader?: string;
     topSubDescription?: string;
     contentHeader?: string;
@@ -17,6 +19,8 @@ export function DashboardPageLayout({
     children,
     summaryCards,
     isLoadingSummary,
+    isErrorSummary,
+    onRetrySummary,
     topHeader,
     topSubDescription,
     contentHeader,
@@ -30,7 +34,13 @@ export function DashboardPageLayout({
                 header={topHeader}
                 subDescription={topSubDescription}
             />
-            {summaryCards && <SummaryCardsGrid items={summaryCards} isLoading={isLoadingSummary}/>}
+            {summaryCards && (
+                <SummaryCardsGrid
+                    items={summaryCards}
+                    isLoading={isLoadingSummary}
+                    isError={isErrorSummary}
+                    onRetry={onRetrySummary}
+                />)}
             {contentHeader && (
                 <ContentHeaders
                     header={contentHeader}

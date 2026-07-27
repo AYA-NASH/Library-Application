@@ -5,19 +5,40 @@ import { CategoriesToolbar } from "./CategoriesToolbar";
 import { DataTablePagination } from "../table-components/DataTablePagination";
 import { CategoryDetails } from "@/models/CategoryModel";
 import { CategoryCardsGridSkeleton } from "./catgory-skeleton/CategoryCardsGridSkeleton";
+import { QueryErrorAlert } from "@/components/error-handling/QueryErrorAlert";
 
 
 interface Props {
     table: Table<CategoryDetails>;
     totalElements?: number;
     isLoading: boolean;
+    isError?: boolean;
+    error?: Error | null;
+    onRetry?: () => void;
 }
 
 export function CategoriesGrid({
     table,
     totalElements,
-    isLoading
+    isLoading,
+    isError,
+    error,
+    onRetry,
 }: Props) {
+    if (isError) {
+        return (
+            <div className="rounded-xl border bg-card p-6 shadow-sm">
+                <QueryErrorAlert
+                    title="Failed to load categories"
+                    description={
+                        error?.message ||
+                        "Unable to fetch the category list from the server. Please check your connection and try again."
+                    }
+                    onRetry={onRetry}
+                />
+            </div>
+        );
+    }
     if (isLoading) {
         return <CategoryCardsGridSkeleton cardCount={6} />;
     }
