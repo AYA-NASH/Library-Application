@@ -4,20 +4,31 @@ import { CategoryCard } from "./CategoryCard";
 import { CategoriesToolbar } from "./CategoriesToolbar";
 import { DataTablePagination } from "../table-components/DataTablePagination";
 import { CategoryDetails } from "@/models/CategoryModel";
+import { CategoryCardsGridSkeleton } from "./catgory-skeleton/CategoryCardsGridSkeleton";
 
 
 interface Props {
     table: Table<CategoryDetails>;
+    totalElements?: number;
+    isLoading: boolean;
 }
 
-export function CategoriesCards({ table }: Props) {
+export function CategoriesGrid({
+    table,
+    totalElements,
+    isLoading
+}: Props) {
+    if (isLoading) {
+        return <CategoryCardsGridSkeleton cardCount={6} />;
+    }
+
     const rows = table.getRowModel().rows;
 
     return (
-        <div>
+        <div className="space-y-4">
             <CategoriesToolbar table={table} />
 
-            <div className="grid gap-6 lg:grid-cols-[1fr_1fr] space-y-4">
+            <div className="grid gap-6 md:grid-cols-2">
                 {rows.map((row) => (
                     <CategoryCard
                         key={row.original.id}
@@ -26,7 +37,7 @@ export function CategoriesCards({ table }: Props) {
                 ))}
             </div>
 
-            <DataTablePagination table={table} />
+            <DataTablePagination table={table} totalElements={totalElements} />
         </div>
     );
 }

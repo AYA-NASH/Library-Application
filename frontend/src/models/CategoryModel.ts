@@ -12,3 +12,12 @@ export interface CategoryReference {
     id: number;
     name: string;
 }
+
+export interface CategorySummaryResponse {
+    totalCategories: number;
+    largestCategoryName: string;
+    largestCategoryCount: number;
+    avgBooksPerCategory: number;
+    emptyCategoriesCount: number;
+    uncategorizedBooksCount: number;
+}

@@ -1,9 +1,14 @@
 import { CategoryDetails } from "@/models/CategoryModel";
-import { CategoryCardInfo } from "./CategoryCardInfo";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { CategoryModal } from "./catrgory-actions/CategoryModal";
 import { DeleteCategory } from "./catrgory-actions/DeleteCategory";
+import {
+    Card,
+    CardDescription,
+    CardHeader,
+    CardTitle
+} from "@/components/ui/card";
 
 interface Props {
     category: CategoryDetails;
@@ -11,33 +16,46 @@ interface Props {
 
 export function CategoryCard({ category }: Props) {
     return (
-        <div className="flex items-center justify-between rounded-xl border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-            <CategoryCardInfo category={category} />
+        <Card className="transition-shadow hover:shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-6">
+                <div className="space-y-1">
+                    <CardTitle>{category.name}</CardTitle>
 
-            <div className="ml-4 flex shrink-0 items-center gap-1">
+                    <CardDescription>
+                        {category.booksCount === 1
+                            ? "1 book"
+                            : `${category.booksCount} books`}
+                    </CardDescription>
+                </div>
 
-                <CategoryModal
-                    categoryToEdit={category}
-                    trigger={
-                        <Button variant="ghost" size="icon" aria-label={`Edit ${category.name}`}>
-                            <Pencil className="size-4" />
-                        </Button>
-                    }
-                />
+                <div className="flex items-center gap-1">
+                    <CategoryModal
+                        categoryToEdit={category}
+                        trigger={
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Edit ${category.name}`}
+                            >
+                                <Pencil className="size-4" />
+                            </Button>
+                        }
+                    />
 
-                <DeleteCategory
-                    categoryToDelete={category}
-                    trigger={
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={`Delete ${category.name}`}
-                        >
-                            <Trash2 className="size-4 text-destructive" />
-                        </Button>
-                    }
-                />
-            </div>
-        </div>
+                    <DeleteCategory
+                        categoryToDelete={category}
+                        trigger={
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                aria-label={`Delete ${category.name}`}
+                            >
+                                <Trash2 className="size-4 text-destructive" />
+                            </Button>
+                        }
+                    />
+                </div>
+            </CardHeader>
+        </Card>
     );
 }

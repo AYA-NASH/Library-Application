@@ -26,4 +26,14 @@ public sealed interface CategoryDto {
             String name
     ) implements CategoryDto {
     }
+
+    record CategorySummaryResponse(
+            long totalCategories,
+            String largestCategoryName,
+            long largestCategoryCount,
+            double avgBooksPerCategory,
+            long emptyCategoriesCount,
+            long uncategorizedBooksCount
+    ) implements CategoryDto {
+    }
 }

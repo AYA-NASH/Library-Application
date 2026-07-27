@@ -72,4 +72,33 @@ public class CategoryService {
                 .map(categoryMapper::toCategoryReference)
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public CategoryDto.CategorySummaryResponse getCategorySummary() {
+        long totalCategories = categoryRepository.countTotalCategories();
+        long emptyCategoriesCount = categoryRepository.countEmptyCategories();
+        long uncategorizedBooksCount = categoryRepository.countUncategorizedBooks();
+        Double avgBooks = categoryRepository.findAverageBooksPerCategory();
+
+        List<Object[]> largestResult = categoryRepository.findLargestCategory();
+        String largestCategoryName = "N/A";
+        long largestCategoryCount = 0;
+
+        if (!largestResult.isEmpty()) {
+            Object[] row = largestResult.get(0);
+            largestCategoryName = (String) row[0];
+            largestCategoryCount = (Long) row[1];
+        }
+
+        double formattedAvg = (avgBooks != null) ? Math.round(avgBooks * 10.0) / 10.0 : 0.0;
+
+        return new CategoryDto.CategorySummaryResponse(
+                totalCategories,
+                largestCategoryName,
+                largestCategoryCount,
+                formattedAvg,
+                emptyCategoriesCount,
+                uncategorizedBooksCount
+        );
+    }
 }

@@ -23,11 +23,9 @@ export function DataTablePagination<TData>({
     return (
         <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-                Showing{" "}
-                {table.getRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} items
+                Showing {table.getRowModel().rows.length} of {totalRows} items
             </p>
-
+            
             <div className="flex items-center gap-2">
                 <Button
                     variant="outline"

@@ -9,18 +9,18 @@ import { Outlet } from "react-router-dom";
 export function DashboardLayout() {
     return (
         <SidebarProvider >
+            <div className="flex h-screen w-screen bg-background">
+                <DashboardSidebar />
+                <main className="flex flex-1 flex-col overflow-y-auto relative">
+                    <div className="absolute top-6 left-2 z-50 md:block">
+                        <SidebarTrigger />
+                    </div>
 
-            <DashboardSidebar />
-            <main >
-                <div >
-                    <SidebarTrigger />
-                </div>
-
-                <div>
-                    <Outlet />
-                </div>
-            </main>
-
+                    <div className="flex flex-1">
+                        <Outlet />
+                    </div>
+                </main>
+            </div>
         </SidebarProvider>
     )
 }

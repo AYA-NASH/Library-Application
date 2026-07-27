@@ -24,6 +24,14 @@ export const useGetBookCountByCategory = (categoryId: number, showDeleteConfirm:
     });
 };
 
+export const useCategorySummary = () => {
+    return useQuery({
+        queryFn: () => categoryService.getCategorySummary(),
+        queryKey: ["categories-summary"],
+        staleTime: 5 * 60 * 1000,
+    })
+}
+
 export const useCreateCategory = () => {
     const queryClient = useQueryClient();
     return useMutation({

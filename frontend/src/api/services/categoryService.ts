@@ -1,4 +1,4 @@
-import { CategoryCreateRequest, CategoryDetails, CategoryReference } from "../../models/CategoryModel";
+import { CategoryCreateRequest, CategoryDetails, CategoryReference, CategorySummaryResponse } from "../../models/CategoryModel";
 import { PageParams, PageResponse } from "../../models/PageResponse";
 import apiClient from "../client"
 
@@ -22,6 +22,11 @@ export const categoryService = {
         const response = await apiClient.get(`/categories/public/${categoryId}/books/count`);
         return response.data;
     },
+    
+    getCategorySummary: async(): Promise<CategorySummaryResponse> =>{
+        const response = await apiClient.get(`categories/public/summary`);
+        return response.data;
+    },
 
     createCategory: async (newCategory: CategoryCreateRequest): Promise<CategoryDetails> => {
         const response = await apiClient.post("/admin/secure/add/category", newCategory);
@@ -35,5 +40,5 @@ export const categoryService = {
 
     deleteCategory: async (categoryId: number | string): Promise<void> => {
         return await apiClient.delete(`/admin/secure/delete/category/${categoryId}`);
-    }
+    },
 }

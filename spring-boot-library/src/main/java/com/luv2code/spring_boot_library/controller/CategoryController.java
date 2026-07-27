@@ -40,4 +40,8 @@ public class CategoryController {
         return categoryService.getCategoriesReferences();
     }
 
+    @GetMapping("/summary")
+    public ResponseEntity<CategoryDto.CategorySummaryResponse> getCategorySummary() {
+        return ResponseEntity.ok(categoryService.getCategorySummary());
+    }
 }

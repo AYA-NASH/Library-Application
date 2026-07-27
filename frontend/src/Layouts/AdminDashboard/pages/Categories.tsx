@@ -1,17 +1,21 @@
-import { useCategories } from "@/api/hooks/BookHooks/useCategories";
-import { CategoriesCards } from "@/components/dashboard-components/categories/CategoriesCards";
+import { useCategories, useCategorySummary } from "@/api/hooks/BookHooks/useCategories";
 import { categoriesColumns } from "@/components/dashboard-components/categories/categoriesColumns";
+import { CategoriesGrid } from "@/components/dashboard-components/categories/CategoriesGrid";
 import { CategoryModal } from "@/components/dashboard-components/categories/catrgory-actions/CategoryModal";
 import { DashboardPageLayout } from "@/components/dashboard-components/DashboardPageLayout";
 import { Button } from "@/components/ui/button";
-import { categoriesCards } from "@/constants/admin-dashboard/fakeCategoriesCards";
+import { buildCategorySummaryCards } from "@/constants/admin-dashboard/buildCategorySummaryCards";
 import { useDashboardTable } from "@/hooks/useDashboardTable";
 import { Plus } from "lucide-react";
 
 export function Categories() {
-    const { data, isLoading, isError, error } = useCategories(1, 20);
+    const { data, isLoading: isCategoriesLoading, isError, error } = useCategories(1, 20);
+    const { data: categoriesSummary, isLoading: isLoadingSummary } = useCategorySummary();
 
     const categories = data?.content ?? [];
+    const totalElements = data?.totalElements;
+
+    const categoriesSummaryCards = categoriesSummary ? buildCategorySummaryCards(categoriesSummary) : [];
 
     const table = useDashboardTable({
         data: categories,
@@ -21,7 +25,8 @@ export function Categories() {
 
     return (
         <DashboardPageLayout
-            summaryCards={categoriesCards}
+            summaryCards={categoriesSummaryCards}
+            isLoadingSummary={isLoadingSummary}
             contentHeader="Categories Management"
             contentAction={
                 <CategoryModal trigger={
@@ -32,7 +37,11 @@ export function Categories() {
                 } />
             }
         >
-            <CategoriesCards table={table} />
+            <CategoriesGrid
+                table={table}
+                totalElements={totalElements}
+                isLoading={isCategoriesLoading}
+            />
 
         </DashboardPageLayout>
     );
