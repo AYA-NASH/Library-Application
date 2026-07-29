@@ -48,7 +48,8 @@ public sealed interface BookDtos {
             @Schema(example = "10")
             Integer copies,
             @Schema(example = "7")
-            Integer copiesAvailable
+            Integer copiesAvailable,
+            String status
     ) implements BookDtos {
     }
 

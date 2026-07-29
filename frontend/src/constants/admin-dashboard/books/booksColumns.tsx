@@ -1,7 +1,8 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { BookModel } from "@/models/BookModel";
 import { ColumnDef } from "@tanstack/react-table";
-import { BookCell, CategoryCell } from "./booksColumnsUtils";
+import { BookActionsCell, BookCell, CategoryCell, categoryFilterFn, statusFilterFn } from "./booksColumnsUtils";
+import { Badge } from "@/components/ui/badge";
 
 export const BookColumns: ColumnDef<BookModel>[] = [
     {
@@ -25,39 +26,53 @@ export const BookColumns: ColumnDef<BookModel>[] = [
     {
         id: "book",
         header: "Book",
-        cell: ({ row }) => <BookCell {...row.original}/>
+        cell: ({ row }) => <BookCell {...row.original} />
     },
     {
         accessorKey: "categories",
         id: "categories",
         header: "Category",
-        filterFn: (row, columnId, filterValue: string[]) => {
-            if (!filterValue || filterValue.length === 0) return true
-
-            const categories = row.getValue(columnId) as Array<{ id: string; name: string }> | undefined
-            if (!categories || categories.length === 0) return false
-
-            return filterValue.some((val) =>
-                categories.some((cat) => cat.id === val || cat.name === val)
-            )
-        },
+        filterFn: categoryFilterFn,
         cell: ({ row }) => <CategoryCell categories={row.original.categories ?? []} />,
     },
-    
     {
-        accessorKey: "copiesAvailable",
-        header: "Copies Available"
+        accessorKey: "status",
+        header: "Status",
+        filterFn: statusFilterFn,
+        cell: ({ row }) => {
+            const copiesAvailable = row.original.copiesAvailable ?? 0;
+            const isAvailable = copiesAvailable > 0;
+
+            return (
+                <Badge
+                    variant={isAvailable ? "outline" : "destructive"}
+                    className={isAvailable
+                        ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800"
+                        : ""}
+                >
+                    {isAvailable ? "Available" : "Out of Stock"}
+                </Badge>
+            );
+        },
     },
     {
-        accessorKey: "borrowedCopies",
+        accessorKey: "availableCopies",
+        header: "Available",
+        cell: ({ row }) => <span className="ml-6">{row.original.copiesAvailable}</span>
+    },
+    {
+        id: "borrowedCopies",
         header: "Borrowed",
         cell: ({ row }) => {
-            const book = row.original;
-            return (book.copies && book.copiesAvailable) ? (book.copies - book.copiesAvailable) : "-";
-        }
+            const totalCopies = row.original.copies ?? 0;
+            const availableCopies = row.original.copiesAvailable ?? 0;
+
+            return <span className="ml-6">{totalCopies - availableCopies}</span>
+        },
     },
     {
-        accessorKey: "copies",
-        header: "Total Copies"
-    },
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => (<BookActionsCell {...row.original} />)
+    }
 ]

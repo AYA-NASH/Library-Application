@@ -1,37 +1,39 @@
+import { BookModel } from "@/models/BookModel";
 import { TableFilterConfig } from "../TableFilterConfig";
+import { CategoryDetails } from "@/models/CategoryModel";
+import { useMemo } from "react";
 
-export const booksFiltersData: TableFilterConfig[] = [
-    {
-        id: "status",
-        title: "Status",
-        type: "checkbox",
-        options: [
-            { value: "available", label: "Available", count: 3 },    // Clean Code, Pragmatic, Brief History
-            { value: "out_of_stock", label: "Out of Stock", count: 2 }, // Atomic Habits, Ancient World
-            { value: "low_stock", label: "Low Stock", count: 2 },       // Dune, Thinking Fast/Slow
-            { value: "archived", label: "Archived", count: 1 },        // Old Library Manual
-        ],
-    },
-    {
-        id: "category",
-        title: "Categories",
-        type: "checkbox",
-        options: [
-            { value: "computer_science", label: "Computer Science", count: 2 },
-            { value: "fiction", label: "Fiction", count: 1 },
-            { value: "history", label: "History", count: 2 },
-            { value: "biography", label: "Biography", count: 2 }, // Atomic Habits, Thinking Fast/Slow
-            { value: "science", label: "Science", count: 2 },     // Brief History, Thinking Fast/Slow
-        ],
-    },
-    {
-        id: "format",
-        title: "Format",
-        type: "radio",
-        options: [
-            { value: "digital", label: "Digital Only", count: 2 }, // Atomic Habits, Brief History
-            { value: "physical", label: "Physical Only", count: 3 }, // Dune, Ancient World, Manual
-            { value: "both", label: "Both Formats", count: 3 },    // Clean Code, Pragmatic, Thinking
-        ],
-    },
-];
+export function useBookFilters(
+    books: BookModel[],
+    categories: CategoryDetails[] = []
+): TableFilterConfig[] {
+    return useMemo(() => {
+        const availableCount = books.filter(b => b.status === "AVAILABLE" || b.status === "available").length;
+        const outOfStockCount = books.filter(b => b.status === "OUT_OF_STOCK" || b.status === "out_of_stock").length;
+
+        const categoryOptions = categories.map((cat) => ({
+            value: cat.name,
+            label: cat.name,
+            count: cat.booksCount,
+        }));
+
+        return [
+            {
+                id: "status",
+                title: "Status",
+                type: "radio",
+                options: [
+                    { value: "AVAILABLE", label: `Available (${availableCount})` },
+                    { value: "OUT_OF_STOCK", label: `Out of Stock (${outOfStockCount})` },
+                ],
+            },
+            {
+                id: "categories",
+                title: "Categories",
+                type: "radio",
+                options: categoryOptions,
+            },
+        ];
+    }, [books, categories]);
+}
+

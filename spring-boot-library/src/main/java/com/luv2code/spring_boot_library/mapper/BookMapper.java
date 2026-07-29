@@ -18,6 +18,7 @@ import java.util.Set;
 public interface BookMapper {
 
     @Mapping(source = "img", target = "imgUrl")
+    @Mapping(target = "status", expression = "java(calculateStatus(book))")
     BookDtos.BookResponse toResponse(Book book);
 
     @Mapping(target = "id", ignore = true)
@@ -75,5 +76,12 @@ public interface BookMapper {
             return q > 0 ? segment.substring(0, q) : segment;
         }
         return "file";
+    }
+
+    default String calculateStatus(Book book) {
+        if (book == null || book.getCopiesAvailable() == null) {
+            return "OUT_OF_STOCK";
+        }
+        return book.getCopiesAvailable() > 0 ? "AVAILABLE" : "OUT_OF_STOCK";
     }
 }

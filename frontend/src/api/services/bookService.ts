@@ -31,9 +31,10 @@ export const bookService = {
             copiesAvailable: b.copiesAvailable,
             categories: b.categories,
             img: b.imgUrl,
-            dataSource: b.dataSource
+            dataSource: b.dataSource,
+            status: b.status
         }));
-
+        console.log("Fetch Books: ", transformedContent)
         return {
             content: transformedContent,
             totalPages: response.data.page.totalPages,
@@ -48,6 +49,7 @@ export const bookService = {
         return {
             id: b.id,
             title: b.title,
+            status: b.status,
             author: b.author,
             description: b.description,
             copies: b.copies,

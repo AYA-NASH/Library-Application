@@ -13,9 +13,9 @@ export function DataTableColumnToggle<TData>({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger render={
-                <Button>
-                    <Columns3 className="mr-2 h-4 w-4" />
-                    Columns
+                <Button className="hover:bg-secondary px-4 py-1 hover:rounded-2xl">
+                    <Columns3 className="mr-2 h-4 w-4 inline" />
+                    Column Visibility
                 </Button>
             } />
 
@@ -27,6 +27,7 @@ export function DataTableColumnToggle<TData>({
                     .map((column) => (
                         <DropdownMenuCheckboxItem
                             key={column.id}
+                            className="p-2"
                             checked={column.getIsVisible()}
                             onCheckedChange={(value) =>
                                 column.toggleVisibility(!!value)
