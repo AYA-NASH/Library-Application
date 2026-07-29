@@ -1,10 +1,10 @@
 import { useCategories, useCategorySummary } from "@/api/hooks/BookHooks/useCategories";
-import { categoriesColumns } from "@/components/dashboard-components/categories/categoriesColumns";
+import { categoriesColumns } from "@/constants/admin-dashboard/categories/categoriesColumns";
 import { CategoriesGrid } from "@/components/dashboard-components/categories/CategoriesGrid";
 import { CategoryModal } from "@/components/dashboard-components/categories/catrgory-actions/CategoryModal";
 import { DashboardPageLayout } from "@/components/dashboard-components/DashboardPageLayout";
 import { Button } from "@/components/ui/button";
-import { buildCategorySummaryCards } from "@/constants/admin-dashboard/buildCategorySummaryCards";
+import { buildCategorySummaryCards } from "@/constants/admin-dashboard/categories/buildCategorySummaryCards";
 import { useDashboardTable } from "@/hooks/useDashboardTable";
 import { Plus } from "lucide-react";
 

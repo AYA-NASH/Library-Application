@@ -2,7 +2,7 @@ import type { Table } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CategoryDetails } from "@/models/CategoryModel";
-import { categorySortOptions } from "@/constants/admin-dashboard/CategoriesSortOptions";
+import { categorySortOptions } from "@/constants/admin-dashboard/categories/CategoriesSortOptions";
 
 interface CategoriesToolbarProps {
     table: Table<CategoryDetails>;
