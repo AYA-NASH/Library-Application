@@ -4,6 +4,7 @@ import com.luv2code.spring_boot_library.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import org.springframework.stereotype.Repository;
@@ -19,6 +20,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     Page<Book> findByCategories_IdIn(@Param("categoryIds") List<Long> categoryIds, Pageable pageable);
 
-    List<Book> findByIdIn(List<Long> bookIds);
+    long count();
 
+    @Query("SELECT COALESCE(SUM(b.copies), 0) FROM Book b")
+    long countTotalPhysicalCopies();
+
+    @Query("SELECT COUNT(b) FROM Book b WHERE(b.pdfPublicId IS NOT NULL AND b.pdfPublicId <> '')")
+    long countDigitalBooks();
+
+    @Query("SELECT COUNT(b) FROM Book b WHERE b.copiesAvailable = 0 OR b.copiesAvailable IS NULL")
+    long countOutOfStockBooks();
 }

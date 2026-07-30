@@ -59,4 +59,12 @@ public sealed interface BookDtos {
             String mode
     ) implements BookDtos {
     }
+
+    record BookSummaryResponse(
+            long totalTitles,
+            long totalPhysicalCopies,
+            long digitalBooks,
+            long outOfStock
+    ) implements  BookDtos{
+    }
 }

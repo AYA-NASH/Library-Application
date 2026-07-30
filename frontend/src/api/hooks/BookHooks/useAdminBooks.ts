@@ -18,6 +18,13 @@ export const useFetchEditInfo = (bookId: number) => {
     });
 };
 
+export const useFetchBookSummary = () => {
+    return useQuery({
+        queryFn: () => adminBookService.fetchBookSummary(),
+        queryKey: ["books-summary"]
+    })
+}
+
 export const useUpdateBook = () => {
     const queryClient = useQueryClient();
     return useMutation({

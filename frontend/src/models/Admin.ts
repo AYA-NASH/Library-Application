@@ -25,3 +25,10 @@ export interface AdminMessageRequest {
     id: number;
     response: string;
 }
+
+export interface BookSummaryResponse {
+    totalTitles: number;
+    totalPhysicalCopies: number;
+    digitalBooks: number;
+    outOfStock: number
+}

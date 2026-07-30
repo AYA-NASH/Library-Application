@@ -19,26 +19,29 @@ import { DataTableToolbar } from "./DataTableToolbar";
 import { DataTableColumnToggle } from "./DataTableColumnToggle";
 import { DataTableBulkActions } from "./DataTableBulkActions";
 import { DataTablePagination } from "./DataTablePagination";
-
-
-
+import { DataTableSkeleton } from "./DataTableSkeleton";
+import { QueryErrorAlert } from "@/components/error-handling/QueryErrorAlert";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
-
+    isLoading?: boolean;
+    isError?: boolean;
+    error?: Error | null;
+    onRetry: () => void;
     searchPlaceholder?: string;
-
     filters: TableFilterConfig[];
-
     searchFn?: (row: TData, search: string) => boolean;
-
     bulkActions?: (table: Table<TData>) => React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    isLoading,
+    isError,
+    error,
+    onRetry,
     searchPlaceholder,
     filters,
     searchFn,
@@ -50,6 +53,24 @@ export function DataTable<TData, TValue>({
         searchFn,
     });
 
+    if (isLoading) {
+        return <DataTableSkeleton columnCount={columns.length} />
+    }
+
+    if (isError) {
+        return (
+            <div className="rounded-xl border bg-card p-6 shadow-sm">
+                <QueryErrorAlert
+                    title="Failed to load categories"
+                    description={
+                        error?.message ||
+                        "Unable to fetch the Books from the server. Please check your connection and try again."
+                    }
+                    onRetry={onRetry}
+                />
+            </div>
+        );
+    }
     return (
         <div>
             <div className="mb-4 flex items-center justify-between">

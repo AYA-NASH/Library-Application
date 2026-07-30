@@ -20,7 +20,7 @@ export function SummaryCardsGrid({
         return (
             <QueryErrorAlert
                 title="Failed to load summary statistics"
-                description="Could not retrieve category metrics. Please check your network or try again."
+                description="Could not retrieve Summary metrics. Please check your network or try again."
                 onRetry={onRetry}
             />
         );

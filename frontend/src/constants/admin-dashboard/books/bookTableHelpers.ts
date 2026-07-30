@@ -2,6 +2,9 @@ import { BookModel } from "@/models/BookModel";
 import { TableFilterConfig } from "../TableFilterConfig";
 import { CategoryDetails } from "@/models/CategoryModel";
 import { useMemo } from "react";
+import { BookSummaryResponse } from "@/models/Admin";
+import { SummaryCardItem } from "@/models/dashboard/SummaryCard";
+import { AlertTriangle, BookOpen, FileText, Library } from "lucide-react";
 
 export function useBookFilters(
     books: BookModel[],
@@ -37,3 +40,29 @@ export function useBookFilters(
     }, [books, categories]);
 }
 
+export function buildBooksSummaryCards(data?: BookSummaryResponse): SummaryCardItem[] {
+    if (!data) return [];
+
+    return [
+        {
+            title: "Total Books",
+            value: data.totalTitles.toLocaleString(),
+            icon: BookOpen,
+        },
+        {
+            title: "Physical Inventory",
+            value: data.totalPhysicalCopies.toLocaleString(),
+            icon: Library,
+        },
+        {
+            title: "Digital Books",
+            value: data.digitalBooks.toLocaleString(),
+            icon: FileText,
+        },
+        {
+            title: "Out of Stock",
+            value: data.outOfStock.toLocaleString(),
+            icon: AlertTriangle,
+        },
+    ];
+}

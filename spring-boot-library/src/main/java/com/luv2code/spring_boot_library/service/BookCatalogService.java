@@ -1,5 +1,6 @@
 package com.luv2code.spring_boot_library.service;
 
+import com.luv2code.spring_boot_library.dto.BookDtos;
 import com.luv2code.spring_boot_library.dto.BookDtos.BookResponse;
 import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.BookMapper;
@@ -41,5 +42,19 @@ public class BookCatalogService {
     public Page<BookResponse> getBooksByCategories(List<Long> categoryIds, Pageable pageable) {
         return bookRepository.findByCategories_IdIn(categoryIds, pageable)
                 .map(bookMapper::toResponse);
+    }
+
+    public BookDtos.BookSummaryResponse getBookSummary() {
+        long totalTitles = bookRepository.count();
+        long totalPhysicalCopies = bookRepository.countTotalPhysicalCopies();
+        long digitalBooks = bookRepository.countDigitalBooks();
+        long outOfStock = bookRepository.countOutOfStockBooks();
+
+        return new BookDtos.BookSummaryResponse(
+                totalTitles,
+                totalPhysicalCopies,
+                digitalBooks,
+                outOfStock
+        );
     }
 }

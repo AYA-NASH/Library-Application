@@ -1,4 +1,4 @@
-import { AdminBookEditInfoResponse } from "../../models/Admin";
+import { AdminBookEditInfoResponse, BookSummaryResponse } from "../../models/Admin";
 import apiClient from "../client";
 
 export const adminBookService = {
@@ -10,7 +10,10 @@ export const adminBookService = {
         const response = await apiClient.get(`/admin/secure/book/${bookId}/edit-info`);
         return response.data;
     },
-
+    fetchBookSummary: async (): Promise<BookSummaryResponse> => {
+        const response = await apiClient.get(`/admin/secure/books/summary`);
+        return response.data;
+    },
     updateBook: async (bookId: number, formData: FormData): Promise<void> => {
         return await apiClient.put(`/admin/secure/update/book/data/${bookId}`, formData);
     },

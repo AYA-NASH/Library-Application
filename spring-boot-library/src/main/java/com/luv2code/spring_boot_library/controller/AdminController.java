@@ -2,6 +2,7 @@ package com.luv2code.spring_boot_library.controller;
 
 import com.luv2code.spring_boot_library.dto.BookDtos;
 import com.luv2code.spring_boot_library.dto.CategoryDto;
+import com.luv2code.spring_boot_library.service.BookCatalogService;
 import com.luv2code.spring_boot_library.service.BookInventoryService;
 import com.luv2code.spring_boot_library.service.BookManagementService;
 import com.luv2code.spring_boot_library.service.CategoryService;
@@ -31,6 +32,7 @@ public class AdminController {
     private final CategoryService categoryService;
     private final BookManagementService bookManagementService;
     private final BookInventoryService bookInventoryService;
+    private final BookCatalogService bookCatalogService;
 
     @PutMapping("/update/book/quantity")
     @Operation(summary = "Update book quantity", description = "Adjusts the available stock of a specific book.")
@@ -109,5 +111,12 @@ public class AdminController {
     @DeleteMapping("/delete/category/{id}")
     public void deleteCategory(@PathVariable @Positive Long id) {
         categoryService.deleteCategory(id);
+    }
+
+    @GetMapping("/books/summary")
+    @Operation(summary = "Get book catalog summary metrics", description = "Retrieves aggregate statistics for administrative dashboard summary cards.")
+    public ResponseEntity<BookDtos.BookSummaryResponse> getBookSummary() {
+        BookDtos.BookSummaryResponse summary = bookCatalogService.getBookSummary();
+        return ResponseEntity.ok(summary);
     }
 }
