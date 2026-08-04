@@ -25,6 +25,7 @@
     "bootstrap-icons": "^1.13.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^1.24.0",
     "pdfjs-dist": "^5.4.624",

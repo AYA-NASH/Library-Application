@@ -1,6 +1,7 @@
 import { useFetchBookSummary } from "@/api/hooks/BookHooks/useAdminBooks";
 import { useBooks } from "@/api/hooks/BookHooks/useBooks";
 import { useCategories } from "@/api/hooks/BookHooks/useCategories";
+import { BookFormModal } from "@/components/dashboard-components/books/books-actions/BookFormModal";
 import { DashboardPageLayout } from "@/components/dashboard-components/DashboardPageLayout";
 import { DataTable } from "@/components/dashboard-components/table-components/DataTable";
 import { Button } from "@/components/ui/button";
@@ -38,10 +39,12 @@ export function Books() {
             contentHeader="Books"
             contentSubDescription="Manage your library catalog"
             contentAction={
-                <Button>
-                    <Plus />
-                    Add Book
-                </Button>
+                <BookFormModal trigger={
+                    <Button >
+                        <Plus />
+                        Add Book
+                    </Button>
+                } />
             }
         >
             <DataTable
