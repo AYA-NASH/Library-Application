@@ -1,3 +1,4 @@
+import { ViewDetails } from "@/components/dashboard-components/books/books-actions/ViewDetails";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +30,7 @@ import {
     TrashIcon
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 interface CategoryCellProps {
@@ -104,34 +105,46 @@ export function BookCell(book: BookModel) {
 }
 
 export function BookActionsCell(book: BookModel) {
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    useEffect(() => {
+        console.log(detailsOpen);
+    }, [detailsOpen]);
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger render={
-                <Button variant={"ghost"} className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
-                </Button>
-            } />
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger render={
+                    <Button variant={"ghost"} className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                } />
 
-            <DropdownMenuContent>
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <PanelLeftOpen />
-                        Open Details
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <PencilIcon />
-                        Edit
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem variant="destructive">
-                        <TrashIcon />
-                        Delete
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuGroup>
+                        <DropdownMenuItem onClick={() => setDetailsOpen(true)}>
+                            <PanelLeftOpen />
+                            Open Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <PencilIcon />
+                            Edit
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                        <DropdownMenuItem variant="destructive">
+                            <TrashIcon />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ViewDetails
+                book={book}
+                open={detailsOpen}
+                onOpenChange={setDetailsOpen}
+            />
+        </>
     )
 }
 
