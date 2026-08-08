@@ -18,8 +18,8 @@ interface ConfirmActionProps {
     onOpenChange?: (open: boolean) => void;
     title?: string;
     confirmText?: string;
-    description: React.ReactNode;
-    trigger: React.ReactElement;
+    description?: React.ReactNode;
+    trigger?: React.ReactElement;
     isProcessing?: boolean;
     disabled?: boolean;
     onConfirm: () => void;
@@ -43,9 +43,11 @@ export function ConfirmAction({
 
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-            <AlertDialogTrigger
-                render={trigger}
-            />
+            {trigger && (
+                <AlertDialogTrigger
+                    render={trigger}
+                />
+            )}
 
             <AlertDialogContent size="sm">
                 <AlertDialogHeader>

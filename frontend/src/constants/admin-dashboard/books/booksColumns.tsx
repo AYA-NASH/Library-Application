@@ -1,7 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { BookModel } from "@/models/BookModel";
 import { ColumnDef } from "@tanstack/react-table";
-import { BookActionsCell, BookCell, CategoryCell, categoryFilterFn, statusFilterFn } from "./booksColumnsUtils";
+import { BookCell, CategoryCell, categoryFilterFn, sourceFilterFn, statusFilterFn } from "./booksColumnsUtils";
 import { Badge } from "@/components/ui/badge";
 
 export const BookColumns: ColumnDef<BookModel>[] = [
@@ -71,8 +71,14 @@ export const BookColumns: ColumnDef<BookModel>[] = [
         },
     },
     {
-        id: "actions",
-        header: "Actions",
-        cell: ({ row }) => (<BookActionsCell {...row.original} />)
+        accessorKey: "dataSource",
+        header: "Book Source",
+        filterFn: sourceFilterFn,
+        cell: ({ row }) => {
+            const source = row.original.dataSource;
+            return <Badge variant={`${(source === "INTERNAL") ? "default" : "secondary"}`}>
+                {source}
+            </Badge>
+        }
     }
 ]

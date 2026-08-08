@@ -4,10 +4,25 @@ import { Separator } from "@/components/ui/separator";
 import { FormPdfUploadField } from "../../form-fields/FormPdfUploadField";
 
 interface MediaSectionProps {
-    pdfFileName?: string;
-    imageName?: string;
+    isEdit?: boolean;
+    dataSource?: string;
+    hasImage?: boolean;
+    imageUrl?: string;
+    imageFilename?: string;
+    hasPdf?: boolean;
+    pdfFilename?: string;
 }
-export function MediaSection({ pdfFileName, imageName }: MediaSectionProps) {
+
+export function MediaSection({
+    isEdit = false,
+    dataSource,
+    hasImage,
+    imageUrl,
+    imageFilename,
+    hasPdf,
+    pdfFilename,
+}: MediaSectionProps) {
+    const showPdfSection = !(isEdit && dataSource && dataSource !== "INTERNAL");
     return (
         <Card className="flex h-full flex-col p-6">
             <div className="flex flex-1 flex-col">
@@ -15,18 +30,29 @@ export function MediaSection({ pdfFileName, imageName }: MediaSectionProps) {
                     name="imageFile"
                     label="Book Cover Image"
                     removeImage="removeImage"
-                    initialImageUrl={imageName}
+                    initialImageUrl={(isEdit && hasImage) ? imageUrl : undefined}
+                    initialImageName={
+                        isEdit && hasImage
+                            ? imageFilename
+                            : undefined
+                    }
                 />
             </div>
-            <Separator />
-            <div className="flex flex-1 flex-col">
-                <FormPdfUploadField
-                    name="pdfFile"
-                    removeName="removePdf"
-                    label="Book Digital PDF"
-                    initialPdfFilename={pdfFileName}
-                />
-            </div>
+
+
+            {showPdfSection && (
+                <>
+                    <Separator />
+                    <div className="flex flex-1 flex-col">
+                        <FormPdfUploadField
+                            name="pdfFile"
+                            removeName="removePdf"
+                            label="Book Digital PDF"
+                            initialPdfFilename={(isEdit && hasPdf ? pdfFilename : undefined)}
+                        />
+                    </div>
+                </>
+            )}
         </Card>
     )
 }

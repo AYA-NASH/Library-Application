@@ -6,16 +6,20 @@ import React, { useEffect, useState } from "react";
 import { FieldPath, FieldValues, useController, useFormContext } from "react-hook-form";
 
 interface FormImageUploadFieldProps<TFieldValues extends FieldValues> {
+    isEdit?: boolean;
     name: FieldPath<TFieldValues>;
     label?: string;
     initialImageUrl?: string;
+    initialImageName?: string;
     removeImage?: FieldPath<TFieldValues>;
 }
 
 export function FormImageUploadField<TFieldValues extends FieldValues>({
+    isEdit,
     name,
     label = "Cover Image",
     initialImageUrl,
+    initialImageName,
     removeImage,
 }: FormImageUploadFieldProps<TFieldValues>) {
     const { control, setValue } = useFormContext<TFieldValues>();
@@ -27,6 +31,12 @@ export function FormImageUploadField<TFieldValues extends FieldValues>({
 
     const [previewUrl, setPreviewUrl] = useState<string | null>(initialImageUrl || null);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (!value) {
+            setPreviewUrl(initialImageUrl || null);
+        }
+    }, [initialImageUrl, value]);
 
     useEffect(() => {
         return () => {
@@ -84,7 +94,7 @@ export function FormImageUploadField<TFieldValues extends FieldValues>({
                         </AttachmentMedia>
                         <AttachmentContent>
                             <AttachmentTitle>
-                                {value ? value.name : "Current Cover"}
+                                {value ? value.name : initialImageName ?? "Current Cover"}
                             </AttachmentTitle>
                             <AttachmentDescription>
                                 {value
@@ -107,7 +117,7 @@ export function FormImageUploadField<TFieldValues extends FieldValues>({
                     <div onClick={() => fileInputRef.current?.click()}
                         className="
                             flex
-                            min-h-[180px]
+                            min-h-45
                             flex-col
                             w-full
                             items-center

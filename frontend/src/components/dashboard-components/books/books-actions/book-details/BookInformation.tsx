@@ -15,16 +15,20 @@ import {
     TrashIcon
 } from "lucide-react";
 import defaultBookImg from "@/Images/BooksImages/book_cover_default_dark.png";
-import { BookFormModal } from "../BookFormModal";
+import { useState } from "react";
+import { EditBookModal } from "../EditBookModal";
+import { DeleteBook } from "../DeleteBook";
+import { getBookStatusConfig } from "@/constants/admin-dashboard/books/bookTableHelpers";
 
 interface BookInformationProps {
     book: BookModel
 }
 export function BookInformation({ book }: BookInformationProps) {
-    const bookStatus = book.status;
-    const statusVariant = bookStatus === "AVAILABLE"
-        ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800"
-        : "destructive";
+    const bookStatus = getBookStatusConfig(book.status);
+
+    const [editOpen, setEditOpen] = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+
     return (
         <Card>
             <CardContent className="flex gap-5 p-5">
@@ -47,7 +51,7 @@ export function BookInformation({ book }: BookInformationProps) {
                         </div>
 
                         <Badge
-                            className={`${statusVariant} shrink-0`}
+                            className={`${bookStatus?.variant} shrink-0`}
                         >
                             {book.status}
                         </Badge>
@@ -66,19 +70,14 @@ export function BookInformation({ book }: BookInformationProps) {
                             />
 
                             <DropdownMenuContent className="w-40! pt-4">
-                                <DropdownMenuItem>
-                                    <BookFormModal trigger={
-                                        <>
-                                            <EditIcon className="mr-2 h-4 w-4" />
-                                            Edit Information
-                                        </>
-                                    }
-                                    />
+                                <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                                    <EditIcon className="mr-2 h-4 w-4" />
+                                    Edit Information
                                 </DropdownMenuItem>
 
                                 <DropdownMenuSeparator />
 
-                                <DropdownMenuItem variant="destructive">
+                                <DropdownMenuItem variant="destructive" onClick={() => setDeleteOpen(true)}>
                                     <TrashIcon className="mr-2 h-4 w-4" />
                                     Delete Book
                                 </DropdownMenuItem>
@@ -107,6 +106,18 @@ export function BookInformation({ book }: BookInformationProps) {
                     </CardDescription>
                 </div>
 
+                <EditBookModal
+                    book={book}
+                    open={editOpen}
+                    onOpenChange={setEditOpen}
+                />
+
+                <DeleteBook
+                    bookName={book.title}
+                    bookId={book.id}
+                    open={deleteOpen}
+                    onOpenChange={setDeleteOpen}
+                />
             </CardContent>
         </Card>
     )

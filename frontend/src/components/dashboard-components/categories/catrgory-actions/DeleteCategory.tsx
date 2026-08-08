@@ -24,8 +24,6 @@ export function DeleteCategory({
     );
 
     const confirmDeleteCategory = () => {
-        if (categoryToDelete.id === null) return;
-
         deleteCategoryMutation.mutate(categoryToDelete.id, {
             onSuccess: () => {
                 toast.success("Category deleted");
@@ -57,7 +55,7 @@ export function DeleteCategory({
             open={open}
             onOpenChange={setOpen}
             title={`Delete "${categoryToDelete.name}"?`}
-            confirmText="Delete Category"
+            confirmText="Delete Book"
             description={renderDescription()}
             trigger={trigger}
             disabled={isCountingBooks || booksCount === undefined}

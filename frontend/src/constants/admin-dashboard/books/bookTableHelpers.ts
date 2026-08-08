@@ -8,7 +8,7 @@ import { AlertTriangle, BookOpen, FileText, Library } from "lucide-react";
 
 export function useBookFilters(
     books: BookModel[],
-    categories: CategoryDetails[] = []
+    categories: CategoryDetails[] = [],
 ): TableFilterConfig[] {
     return useMemo(() => {
         const availableCount = books.filter(b => b.status === "AVAILABLE" || b.status === "available").length;
@@ -36,6 +36,15 @@ export function useBookFilters(
                 type: "radio",
                 options: categoryOptions,
             },
+            {
+                id: "dataSource",
+                title: "Book Source",
+                type: "radio",
+                options: [
+                    { value: "INTERNAL", label: "Internal Books" },
+                    { value: "GOOGLE", label: "Out Source Books" },
+                ],
+            }
         ];
     }, [books, categories]);
 }
@@ -65,4 +74,22 @@ export function buildBooksSummaryCards(data?: BookSummaryResponse): SummaryCardI
             icon: AlertTriangle,
         },
     ];
+}
+
+export function getBookStatusConfig(status: BookModel["status"]) {
+    switch (status) {
+        case "AVAILABLE":
+            return {
+                label: "AVAILABLE",
+                variant: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800",
+                description: "Book is available for checkout.",
+            };
+
+        case "OUT_OF_STOCK":
+            return {
+                label: "OUT_OF_STOCK",
+                variant: "bg-destructive/10 text-destructive",
+                description: "Book is UnAvailable for checkout"
+            }
+    }
 }

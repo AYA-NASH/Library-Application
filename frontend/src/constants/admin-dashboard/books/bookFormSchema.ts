@@ -8,8 +8,7 @@ const MAX_PDF_SIZE = 50 * 1024 * 1024; // 50MB
 export const bookFormSchema = z.object({
     title: z
         .string()
-        .min(5, "Book title must be at least 5 characters.")
-        .max(32, "Book title must be at most 32 characters."),
+        .min(5, "Book title must be at least 5 characters."),
     author: z
         .string()
         .min(5, "Author Name must be at least 5 characters.")

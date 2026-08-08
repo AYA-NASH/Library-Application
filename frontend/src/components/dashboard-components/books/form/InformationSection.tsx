@@ -9,11 +9,12 @@ import { FileText } from "react-bootstrap-icons";
 import { FormTextareaField } from "../../form-fields/FormTextareaField";
 
 interface InformationSectionProps {
+    isEdit?: boolean;
     categories: CategoryReference[],
     isCategoriesLoading?: boolean,
 }
 
-export function InformationSection({ categories, isCategoriesLoading }: InformationSectionProps) {
+export function InformationSection({ categories, isCategoriesLoading, isEdit }: InformationSectionProps) {
     return (
         <div className="flex flex-col gap-6">
             <Card>
@@ -26,7 +27,7 @@ export function InformationSection({ categories, isCategoriesLoading }: Informat
                             required
                         />
 
-                        <FieldGroup className="grid grid-cols-2">
+                        <FieldGroup className={isEdit ? "grid grid-cols-1" : "grid grid-cols-2"}>
                             <FormInputField
                                 name="author"
                                 label="Author"
@@ -34,11 +35,13 @@ export function InformationSection({ categories, isCategoriesLoading }: Informat
                                 required
                             />
 
-                            <FormStepperField
-                                name="initialCopies"
-                                label="Initial Copies"
-                                required
-                            />
+                            {!isEdit && (
+                                <FormStepperField
+                                    name="initialCopies"
+                                    label="Initial Copies"
+                                    required
+                                />
+                            )}
                         </FieldGroup>
 
                         <FormMultiSelectField

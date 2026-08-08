@@ -1,15 +1,5 @@
 import { ViewDetails } from "@/components/dashboard-components/books/books-actions/ViewDetails";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-
 import {
     Item,
     ItemContent,
@@ -30,7 +20,7 @@ import {
     TrashIcon
 } from "lucide-react";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 
 interface CategoryCellProps {
@@ -76,68 +66,35 @@ export function CategoryCell({
 
 export function BookCell(book: BookModel) {
     const [imgError, setImgError] = useState(false);
-
-    return (
-        <Item>
-            <ItemMedia className="h-16 w-11">
-                {!imgError && book.img ? (
-                    <img
-                        src={book.img}
-                        alt={book.title}
-                        className="h-full w-full object-cover"
-                        onError={() => setImgError(true)}
-                    />
-                ) : (
-                    <BookOpen className="h-5 w-5 opacity-70 text-muted-foreground" />
-                )}
-            </ItemMedia>
-
-            <ItemContent>
-                <ItemTitle className="font-medium cursor-pointer hover:underline">
-                    {book.title}
-                </ItemTitle>
-                <ItemDescription>
-                    {book.author}
-                </ItemDescription>
-            </ItemContent>
-        </Item>
-    );
-}
-
-export function BookActionsCell(book: BookModel) {
     const [detailsOpen, setDetailsOpen] = useState(false);
-    useEffect(() => {
-        console.log(detailsOpen);
-    }, [detailsOpen]);
+
     return (
         <>
-            <DropdownMenu>
-                <DropdownMenuTrigger render={
-                    <Button variant={"ghost"} className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                } />
+            <Item>
+                <ItemMedia className="h-16 w-11">
+                    {!imgError && book.img ? (
+                        <img
+                            src={book.img}
+                            alt={book.title}
+                            className="h-full w-full object-cover"
+                            onError={() => setImgError(true)}
+                        />
+                    ) : (
+                        <BookOpen className="h-5 w-5 opacity-70 text-muted-foreground" />
+                    )}
+                </ItemMedia>
 
-                <DropdownMenuContent align="end">
-                    <DropdownMenuGroup>
-                        <DropdownMenuItem onClick={() => setDetailsOpen(true)}>
-                            <PanelLeftOpen />
-                            Open Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <PencilIcon />
-                            Edit
-                        </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                        <DropdownMenuItem variant="destructive">
-                            <TrashIcon />
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                <ItemContent>
+                    <ItemTitle className="font-medium cursor-pointer hover:underline"
+                        onClick={() => setDetailsOpen(true)}
+                    >
+                        {book.title}
+                    </ItemTitle>
+                    <ItemDescription>
+                        {book.author}
+                    </ItemDescription>
+                </ItemContent>
+            </Item>
 
             <ViewDetails
                 book={book}
@@ -145,18 +102,25 @@ export function BookActionsCell(book: BookModel) {
                 onOpenChange={setDetailsOpen}
             />
         </>
-    )
+    );
 }
 
-export const statusFilterFn: FilterFn<BookModel> = (row, columnId, filterValue) => {
+
+export const statusFilterFn: FilterFn<BookModel> = (row, filterValue) => {
     if (!filterValue || filterValue === "all") return true;
     return row.original.status?.toUpperCase() === filterValue.toUpperCase();
 };
 
-export const categoryFilterFn: FilterFn<BookModel> = (row, columnId, filterValue) => {
+export const categoryFilterFn: FilterFn<BookModel> = (row, filterValue) => {
     if (!filterValue || filterValue === "all") return true;
 
     return row.original.categories?.some(
         (cat) => cat.id.toString() === filterValue || cat.name === filterValue
     ) ?? false;
 };
+
+export const sourceFilterFn: FilterFn<BookModel> = (row, filterValue) => {
+    if (!filterValue || filterValue === "all") return true;
+
+    return row.original.dataSource === filterValue.toUpperCase();
+}

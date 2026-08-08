@@ -16,19 +16,28 @@ import {
     TicketCheck
 } from "lucide-react";
 import { useState } from "react";
-
+import { getBookStatusConfig } from "@/constants/admin-dashboard/books/bookTableHelpers";
+import { ManageInventoryDialog } from "./ManageInventoryDialog";
 
 interface BookInventoryProps {
     book: BookModel
 }
 
 export function BookInventory({ book }: BookInventoryProps) {
-    const bookStatus = book.status;
-    const statusVariant = bookStatus === "AVAILABLE"
-        ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800"
-        : "destructive";
+    const [openDialog, setOpenDialog] = useState(false);
+    const bookStatus = getBookStatusConfig(book.status);
+
     const [quantity, setQuantity] = useState<number>(() => book.copies ?? 0);
     const [remaining, setRemaining] = useState<number>(() => book.copiesAvailable ?? 0);
+
+    const handleInventoryUpdated = (
+        newQuantity: number,
+        newRemaining: number
+    ) => {
+        setQuantity(newQuantity);
+        setRemaining(newRemaining);
+    };
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -53,7 +62,7 @@ export function BookInventory({ book }: BookInventoryProps) {
                     />
 
                     <DropdownMenuContent className="w-60! p-2">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setOpenDialog(true)}>
                             <EditIcon className="mr-2 h-4 w-4" />
                             Manage Inventory
                         </DropdownMenuItem>
@@ -64,13 +73,13 @@ export function BookInventory({ book }: BookInventoryProps) {
 
             <CardContent className="space-y-6">
                 <div
-                    className={`rounded-xl border p-4 ${statusVariant}`}
+                    className={`rounded-xl border p-4 ${bookStatus?.variant}`}
                 >
                     <Badge variant="secondary">
                         {book.status}
                     </Badge>
                     <p className="mt-2 text-sm font-medium">
-                        Book is available for checkout.
+                        {bookStatus?.description}
                     </p>
                 </div>
 
@@ -107,6 +116,14 @@ export function BookInventory({ book }: BookInventoryProps) {
                 </div>
             </CardContent>
 
+            <ManageInventoryDialog
+                originalQuantity={quantity}
+                originalRemaining={remaining}
+                bookId={book.id}
+                open={openDialog}
+                onOpenChange={setOpenDialog}
+                onUpdated={handleInventoryUpdated}
+            />
         </Card>
     )
 }
