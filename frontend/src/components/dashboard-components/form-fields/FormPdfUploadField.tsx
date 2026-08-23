@@ -28,7 +28,12 @@ export function FormPdfUploadField<TFieldValues extends FieldValues>({
     initialPdfFilename,
 }: FormPdfUploadFieldProps<TFieldValues>) {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { control, setValue } = useFormContext<TFieldValues>();
+    const { control, setValue, setError, clearErrors } =
+        useFormContext<TFieldValues>();
+
+    const PDFSizeMB = 10;
+    const MAX_PDF_SIZE = PDFSizeMB * 1024 * 1024;
+
 
     const {
         field: { onChange, value },
@@ -47,15 +52,35 @@ export function FormPdfUploadField<TFieldValues extends FieldValues>({
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0] || null;
-        onChange(selectedFile);
 
-        if (selectedFile) {
-            setDisplayName(selectedFile.name);
-            if (removeName) {
-                setValue(removeName, false as any);
-            }
-        } else {
+        if (!selectedFile) {
+            onChange(null);
             setDisplayName(initialPdfFilename || null);
+            return;
+        }
+
+        if (selectedFile.size > MAX_PDF_SIZE) {
+            setError(name, {
+                type: "validate",
+                message: `PDF file is too large. The maximum allowed size is ${PDFSizeMB} MB.`,
+            });
+
+            onChange(null);
+            setDisplayName(initialPdfFilename || null);
+
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+
+            return;
+        }
+
+        clearErrors(name);
+        onChange(selectedFile);
+        setDisplayName(selectedFile.name);
+
+        if (removeName) {
+            setValue(removeName, false as any);
         }
     };
 
@@ -122,7 +147,7 @@ export function FormPdfUploadField<TFieldValues extends FieldValues>({
                         onClick={() => fileInputRef.current?.click()}
                         className="
                             flex
-                            min-h-[180px]
+                            min-h-45
                             flex-col
                             w-full
                             items-center

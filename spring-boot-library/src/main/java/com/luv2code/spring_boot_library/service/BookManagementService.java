@@ -107,7 +107,6 @@ public class BookManagementService {
             book.setImagePublicId(null);
             book.setImg(DEFAULT_BOOK_IMAGE_URL); // Reset to default
         }
-
         if (image != null && !image.isEmpty()) {
             var upload = cloudinaryService.uploadImage(image);
             book.setImg(upload.url());
@@ -125,7 +124,6 @@ public class BookManagementService {
             book.setBookUrl(null);
             book.setPdfPublicId(null);
         }
-
         if (pdf != null && !pdf.isEmpty()) {
             var upload = cloudinaryService.uploadPdf(pdf);
             book.setBookUrl(upload.url());

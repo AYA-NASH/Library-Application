@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDateTime;
+
 public sealed interface MessageDtos {
 
     record NewMessageRequest(
@@ -36,7 +38,8 @@ public sealed interface MessageDtos {
             Long id,
             String userEmail,
             String title,
-            String question
+            String question,
+            LocalDateTime createdAt
     ) implements MessageDtos {
     }
 }

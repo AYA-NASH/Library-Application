@@ -1,13 +1,3 @@
-export interface MessageModel {
-    title: string;
-    question: string;
-    id?: number;
-    userEmail?: string;
-    adminEmail?: string;
-    response?: string;
-    closed?: boolean;
-}
-
 export interface MessageResponse {
     id: number,
     title: string,
@@ -26,7 +16,8 @@ export interface AdminMessageView {
     id: number,
     userEmail: string,
     title: string,
-    question: string
+    question: string,
+    createdAt: string,
 }
 
 export interface AdminReplyRequest {
