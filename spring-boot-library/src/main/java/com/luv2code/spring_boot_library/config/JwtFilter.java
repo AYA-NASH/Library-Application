@@ -1,6 +1,7 @@
 package com.luv2code.spring_boot_library.config;
 
 import com.luv2code.spring_boot_library.entity.UserPrincipal;
+import com.luv2code.spring_boot_library.service.ActiveUserTracker;
 import com.luv2code.spring_boot_library.service.JwtService;
 import com.luv2code.spring_boot_library.service.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
@@ -25,6 +26,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private ActiveUserTracker activeUserTracker;
 
     @Autowired
     private MyUserDetailsService userDetailsService;
@@ -53,6 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    activeUserTracker.updateActiveUser(email);
                 }
             }
         } catch (io.jsonwebtoken.ExpiredJwtException ex) {
