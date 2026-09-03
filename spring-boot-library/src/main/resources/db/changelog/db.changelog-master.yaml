@@ -1,7 +1,11 @@
 databaseChangeLog:
-    - include:
-        file: db/changelog/changes/001-initial-schema.yaml
-    - include:
-        file: db/changelog/changes/002-seed-orchestrator.yaml
-    - include:
-        file: db/changelog/changes/003-add-messages-timestamps.yaml
+  - include:
+      file: db/changelog/changes/001-initial-schema.yaml
+  - include:
+      file: db/changelog/changes/002-seed-orchestrator.yaml
+  - include:
+      file: db/changelog/changes/003-add-messages-timestamps.yaml
+  - include:
+      file: db/changelog/changes/004-create-digital-reads-history.yaml
+  - include:
+      file: db/changelog/seeds/seed-digital-reads.yaml

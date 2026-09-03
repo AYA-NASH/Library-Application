@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-digital-reads-history
+      author: ayana
+
+      changes:
+        - createTable:
+            tableName: digital_read_history
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_drh_user
+                    references: users(id)
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    foreignKeyName: df_dr_book
+                    references: book(id)
+                  name: book_id
+                  type: BIGINT
+              - column:
+                  name: read_date
+                  type: date
