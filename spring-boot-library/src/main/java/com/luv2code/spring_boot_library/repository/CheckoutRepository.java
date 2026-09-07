@@ -32,9 +32,7 @@ public interface CheckoutRepository extends JpaRepository<Checkout, Long> {
     // Check if any book is overdue without fetching the list
     boolean existsByUserEmailAndReturnDateBefore(String email, LocalDate now);
 
-    @Modifying
-    @Query("delete from Checkout c where c.book.id = :bookId")
-    void deleteAllByBookId(@RequestParam("bookId") Long bookId);
-
     long count();
+
+    boolean existsByBookId(Long bookId);
 }

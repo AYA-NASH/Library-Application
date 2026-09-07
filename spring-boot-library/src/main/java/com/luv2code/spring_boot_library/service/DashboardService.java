@@ -1,6 +1,7 @@
 package com.luv2code.spring_boot_library.service;
 
 import com.luv2code.spring_boot_library.dto.DashboardDtos;
+import com.luv2code.spring_boot_library.dto.projection.CategoryCountProjection;
 import com.luv2code.spring_boot_library.dto.projection.DateCountProjection;
 import com.luv2code.spring_boot_library.repository.BookRepository;
 import com.luv2code.spring_boot_library.repository.CheckoutRepository;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -55,5 +58,41 @@ public class DashboardService {
                         digitalMap.getOrDefault(date, 0L)
                 ))
                 .toList();
+    }
+
+    public List<DashboardDtos.TopCategoriesTrends> getTopCategories(
+            LocalDate startDate, LocalDate endDate
+    ) {
+        List<CategoryCountProjection> physicalCount = historyRepository
+                .findPhysicalCategoryTrends(startDate, endDate);
+
+        List<CategoryCountProjection> digitalCount = digitalReadHistoryRepository
+                .findDigitalCategoryTrends(startDate, endDate);
+
+        Map<String, Long> physicalMap = physicalCount.stream()
+                .collect(Collectors.toMap(
+                        CategoryCountProjection::getCategory,
+                        CategoryCountProjection::getCount,
+                        Long::sum
+                ));
+
+        Map<String, Long> digitalMap = digitalCount.stream()
+                .collect(Collectors.toMap(
+                        CategoryCountProjection::getCategory,
+                        CategoryCountProjection::getCount,
+                        Long::sum
+                ));
+
+        Set<String> allCategories = Stream.concat(physicalCount.stream(), digitalCount.stream())
+                .map(CategoryCountProjection::getCategory)
+                .collect(Collectors.toSet());
+
+        return allCategories.stream()
+                .map(category -> new DashboardDtos.TopCategoriesTrends(
+                        category,
+                        physicalMap.getOrDefault(category, 0L),
+                        digitalMap.getOrDefault(category, 0L)
+                ))
+                .collect(Collectors.toList());
     }
 }

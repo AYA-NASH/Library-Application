@@ -26,10 +26,6 @@ public interface LoanMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "checkoutDate", source = "checkoutDate")
     @Mapping(target = "returnedDate", expression = "java(java.time.LocalDate.now())")
-    @Mapping(target = "title", source = "book.title")
-    @Mapping(target = "author", source = "book.author")
-    @Mapping(target = "description", source = "book.description")
-    @Mapping(target = "img", source = "book.img")
     History toHistoryEntity(Checkout checkout);
 
 }

@@ -14,7 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -136,6 +135,12 @@ public class GlobalExceptionHandler {
     }
 
     // ---------- General client errors ----------
+    @ExceptionHandler(BookCurrentlyCheckedOutException.class)
+    public ResponseEntity<ErrorsDto.ApiErrorResponse> handleBookCurrentlyCheckedOut(
+            BookCurrentlyCheckedOutException ex, HttpServletRequest request) {
+        return build(HttpStatus.CONFLICT, "Bad Request", ex.getMessage(), request, null);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorsDto.ApiErrorResponse> handleIllegalArgument(
             IllegalArgumentException ex, HttpServletRequest request
@@ -146,8 +151,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalServiceException.class)
     public ResponseEntity<ErrorsDto.ApiErrorResponse> handleExternalException(
             ExternalServiceException ex, HttpServletRequest request
-    ){
-        return build( HttpStatus.SERVICE_UNAVAILABLE,
+    ) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE,
                 "Service Unavailable",
                 ex.getMessage(),
                 request,

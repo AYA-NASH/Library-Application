@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-add-book-soft-delete
+      author: ayana
+
+      changes:
+        - addColumn:
+            tableName: book
+            columns:
+              - column:
+                  name: deleted_at
+                  type: DATETIME

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,17 +19,27 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/metrics")
-    public ResponseEntity<DashboardDtos.MainSummaryDTO> getMainSummaryMetrics(){
+    public ResponseEntity<DashboardDtos.MainSummaryDTO> getMainSummaryMetrics() {
         return ResponseEntity.ok(dashboardService.getMainSummaryMetrics());
     }
 
     @GetMapping("/physical-digital-activity")
     public List<DashboardDtos.PhysicalDigitalReads> getActivities(
             @RequestParam(defaultValue = "90") int days
-    ){
+    ) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(days);
 
         return dashboardService.getActivityChartData(startDate, endDate);
+    }
+
+    @GetMapping("/category-trends")
+    public List<DashboardDtos.TopCategoriesTrends> getTrends(
+            @RequestParam(defaultValue = "30") int days
+    ) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(days);
+
+        return dashboardService.getTopCategories(startDate, endDate);
     }
 }

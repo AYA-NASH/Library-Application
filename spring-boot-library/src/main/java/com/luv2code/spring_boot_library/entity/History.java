@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.time.LocalDate;
 
@@ -22,17 +24,10 @@ public class History {
     @JoinColumn(name = "user_id", nullable = false)
     private AppUser user;
 
-    @Column(name = "title")
-    private String title;
-
-    @Column(name = "author")
-    private String author;
-
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
-    @Column(name = "img", columnDefinition = "MEDIUMTEXT")
-    private String img;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Book book;
 
     @Column(name = "checkout_date")
     private LocalDate checkoutDate;

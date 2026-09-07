@@ -9,3 +9,7 @@ databaseChangeLog:
       file: db/changelog/changes/004-create-digital-reads-history.yaml
   - include:
       file: db/changelog/seeds/seed-digital-reads.yaml
+  - include:
+      file: db/changelog/changes/005-add-book-soft-delete.yaml
+  - include:
+      file: db/changelog/changes/006-update-history-book-link.yaml

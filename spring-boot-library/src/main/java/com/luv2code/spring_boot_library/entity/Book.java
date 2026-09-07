@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,6 +16,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "book")
+@SQLDelete(sql = "UPDATE book SET deleted_at = NOW() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +57,9 @@ public class Book {
 
     @Column(name = "preview_url")
     private String previewUrl;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     @ManyToMany
     @JoinTable(

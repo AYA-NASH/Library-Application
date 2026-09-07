@@ -4,6 +4,7 @@ import com.luv2code.spring_boot_library.dto.BookDtos;
 import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.entity.BookSource;
 import com.luv2code.spring_boot_library.entity.Category;
+import com.luv2code.spring_boot_library.exception.BookCurrentlyCheckedOutException;
 import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.BookMapper;
 import com.luv2code.spring_boot_library.repository.BookRepository;
@@ -73,6 +74,14 @@ public class BookManagementService {
     }
 
     public void deleteBook(Long bookId) {
+        // Guard check: prevent deletion if a user currently holds a copy
+        boolean isCurrentlyCheckedOut = checkoutRepository.existsByBookId(bookId);
+        if(isCurrentlyCheckedOut){
+            throw new BookCurrentlyCheckedOutException(
+                    "Cannot delete book with ID " + bookId + ". It currently has active checkouts."
+            );
+        }
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found"));
 
@@ -84,7 +93,6 @@ public class BookManagementService {
             cloudinaryService.deleteFile(book.getPdfPublicId(), "raw");
         }
 
-        checkoutRepository.deleteAllByBookId(bookId);
         reviewRepository.deleteAllByBookId(bookId);
 
         bookRepository.deleteById(bookId);

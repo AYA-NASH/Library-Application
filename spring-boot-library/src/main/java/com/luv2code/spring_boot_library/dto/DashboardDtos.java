@@ -14,7 +14,14 @@ public sealed interface DashboardDtos {
     record PhysicalDigitalReads(
             LocalDate date,
             long physicalBorrows,
-            long DigitalReads
+            long digitalReads
+    ) implements DashboardDtos {
+    }
+
+    record TopCategoriesTrends(
+            String category,
+            Long physicalTrends,
+            Long digitalTrends
     ) implements DashboardDtos {
     }
 }

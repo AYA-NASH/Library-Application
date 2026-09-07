@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-update-history-book-link
+      author: ayana
+
+      changes:
+        - addColumn:
+            tableName: history
+            columns:
+              - column:
+                  name: book_id
+                  type: BIGINT
+
+        - update:
+            tableName: history
+            columns:
+              - column:
+                  name: book_id
+                  valueComputed: (SELECT b.id FROM book b WHERE b.title = history.title LIMIT 1)
+        - delete:
+            tableName: history
+            where: book_id IS NULL
+
+        - addNotNullConstraint:
+            tableName: history
+            columnName: book_id
+            columnDataType: BIGINT
+
+        - addForeignKeyConstraint:
+            baseTableName: history
+            baseColumnNames: book_id
+            constraintName: fk_history_book
+            referencedTableName: book
+            referencedColumnNames: id
+
+        - dropColumn:
+            tableName: history
+            columnName: title
+
+        - dropColumn:
+            tableName: history
+            columnName: author
+
+        - dropColumn:
+            tableName: history
+            columnName: description
+
+        - dropColumn:
+            tableName: history
+            columnName: img
