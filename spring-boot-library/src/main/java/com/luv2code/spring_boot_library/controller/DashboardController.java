@@ -42,4 +42,11 @@ public class DashboardController {
 
         return dashboardService.getTopCategories(startDate, endDate);
     }
+
+    @GetMapping("/inventory-summary")
+    public DashboardDtos.InventorySummary getInventorySummary(
+            @RequestParam(defaultValue = "2") int lowStockThreshold
+    ) {
+        return dashboardService.getInventorySummary(lowStockThreshold);
+    }
 }

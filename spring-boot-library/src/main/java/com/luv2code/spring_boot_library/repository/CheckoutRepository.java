@@ -4,11 +4,9 @@ import com.luv2code.spring_boot_library.entity.Checkout;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -35,4 +33,9 @@ public interface CheckoutRepository extends JpaRepository<Checkout, Long> {
     long count();
 
     boolean existsByBookId(Long bookId);
+
+    @Query("SELECT COUNT(c.id) " +
+            "FROM Checkout c " +
+            "WHERE CURRENT_DATE > c.returnDate")
+    long countOverdueLoans();
 }

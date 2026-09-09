@@ -24,4 +24,31 @@ public sealed interface DashboardDtos {
             Long digitalTrends
     ) implements DashboardDtos {
     }
+
+    record InventorySummary(
+            Alerts alerts,
+            Composition catalogComposition,
+            Utilization shelfUtilization
+    ) implements DashboardDtos {
+    }
+
+    record Alerts(
+            long overdueLoans,
+            long outOfStock,
+            long lowStock
+    ) {
+    }
+
+    record Composition(
+            long physicalOnly,
+            long digitalOnly,
+            long hybrid
+    ) {
+    }
+
+    record Utilization(
+            long totalCopies,
+            long availableCopies
+    ) {
+    }
 }

@@ -95,4 +95,31 @@ public class DashboardService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    public DashboardDtos.InventorySummary getInventorySummary(int minThreshold) {
+        long overdueLoans = checkoutRepository.countOverdueLoans();
+        long outOfStockBooks = bookRepository.countOutOfStockBooks();
+        long lowStockBooks = bookRepository.countLowStockBooks(minThreshold);
+
+        DashboardDtos.Alerts alerts = new DashboardDtos.Alerts(
+                overdueLoans, outOfStockBooks, lowStockBooks
+        );
+
+        long physicalOnly = bookRepository.countPhysical();
+        long digitalOnly = bookRepository.countDigital();
+        long hybrid = bookRepository.countHybrid();
+
+        DashboardDtos.Composition composition = new DashboardDtos.Composition(
+                physicalOnly, digitalOnly, hybrid
+        );
+
+        long totalCopies = bookRepository.sumTotalCopies();
+        long availableCopies = bookRepository.sumAvailableCopies();
+
+        DashboardDtos.Utilization utilization = new DashboardDtos.Utilization(
+                totalCopies, availableCopies
+        );
+
+        return new DashboardDtos.InventorySummary(alerts, composition, utilization);
+    }
 }
