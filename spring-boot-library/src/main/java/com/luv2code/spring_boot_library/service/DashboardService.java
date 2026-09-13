@@ -1,6 +1,7 @@
 package com.luv2code.spring_boot_library.service;
 
 import com.luv2code.spring_boot_library.dto.DashboardDtos;
+import com.luv2code.spring_boot_library.dto.projection.BookReadCountProjection;
 import com.luv2code.spring_boot_library.dto.projection.CategoryCountProjection;
 import com.luv2code.spring_boot_library.dto.projection.DateCountProjection;
 import com.luv2code.spring_boot_library.repository.BookRepository;
@@ -11,9 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -121,5 +120,66 @@ public class DashboardService {
         );
 
         return new DashboardDtos.InventorySummary(alerts, composition, utilization);
+    }
+
+    public List<DashboardDtos.TopBook> getTopBooks(LocalDate startDate, LocalDate endDate) {
+        List<BookReadCountProjection> digitalReads = digitalReadHistoryRepository
+                .countDigitalBookReadsByDate(startDate, endDate);
+
+        List<BookReadCountProjection> physicalReads = historyRepository
+                .countPhysicalBookReadsByDate(startDate, endDate);
+
+        class BookAggregator {
+            String title;
+            String author;
+            long physical = 0;
+            long digital = 0;
+
+            BookAggregator(String title, String author) {
+                this.title = title;
+                this.author = author;
+            }
+
+            long getTotal() {
+                return physical + digital;
+            }
+        }
+
+        Map<Long, BookAggregator> mergedBooks = new HashMap<>();
+
+        physicalReads.forEach(p -> {
+            BookAggregator agg = mergedBooks.computeIfAbsent(
+                    p.getBookId(), k -> new BookAggregator(p.getTitle(), p.getAuthor())
+            );
+            agg.physical += p.getCount();
+        });
+
+        digitalReads.forEach(d -> {
+            BookAggregator agg = mergedBooks.computeIfAbsent(
+                    d.getBookId(), k -> new BookAggregator(d.getTitle(), d.getAuthor())
+            );
+            agg.digital += d.getCount();
+        });
+
+        long grandTotalReads = mergedBooks.values().stream()
+                .mapToLong(BookAggregator::getTotal)
+                .sum();
+        return mergedBooks.values().stream()
+                .sorted(Comparator.comparingLong(BookAggregator::getTotal).reversed())
+                .limit(10)
+                .map(agg -> {
+                    double rawPercentage = grandTotalReads == 0 ? 0.0 : (agg.getTotal() * 100.0) / grandTotalReads;
+                    double roundedPercentage = Math.round(rawPercentage * 100.0) / 100.0;
+
+                    return new DashboardDtos.TopBook(
+                            agg.title,
+                            agg.author,
+                            agg.physical,
+                            agg.digital,
+                            agg.getTotal(),
+                            roundedPercentage
+                    );
+                })
+                .collect(Collectors.toList());
     }
 }

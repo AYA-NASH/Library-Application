@@ -51,4 +51,14 @@ public sealed interface DashboardDtos {
             long availableCopies
     ) {
     }
+
+    record TopBook(
+            String title,
+            String author,
+            long physicalReads,
+            long digitalReads,
+            long totalReads,
+            double percentage
+    ) implements DashboardDtos {
+    }
 }

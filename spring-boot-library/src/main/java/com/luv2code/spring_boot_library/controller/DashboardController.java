@@ -49,4 +49,14 @@ public class DashboardController {
     ) {
         return dashboardService.getInventorySummary(lowStockThreshold);
     }
+
+    @GetMapping("/top-books")
+    public List<DashboardDtos.TopBook> getTopBooks(
+            @RequestParam(defaultValue = "30") int days
+    ) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(days);
+
+        return dashboardService.getTopBooks(startDate, endDate);
+    }
 }

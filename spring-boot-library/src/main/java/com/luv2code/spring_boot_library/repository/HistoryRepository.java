@@ -1,5 +1,6 @@
 package com.luv2code.spring_boot_library.repository;
 
+import com.luv2code.spring_boot_library.dto.projection.BookReadCountProjection;
 import com.luv2code.spring_boot_library.dto.projection.CategoryCountProjection;
 import com.luv2code.spring_boot_library.dto.projection.DateCountProjection;
 import com.luv2code.spring_boot_library.entity.History;
@@ -27,13 +28,24 @@ public interface HistoryRepository extends JpaRepository<History, Long> {
     );
 
     @Query(value = "SELECT c.name AS category, COUNT(h.id) AS count " +
-            "FROM history h "+
+            "FROM history h " +
             "JOIN book_category bc ON h.book_id = bc.book_id " +
-            "JOIN category c ON c.id = bc.category_id "+
-            "WHERE h.checkout_date BETWEEN :startDate AND :endDate "+
+            "JOIN category c ON c.id = bc.category_id " +
+            "WHERE h.checkout_date BETWEEN :startDate AND :endDate " +
             "GROUP BY c.name"
             , nativeQuery = true)
     List<CategoryCountProjection> findPhysicalCategoryTrends(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query(value = "SELECT b.id AS bookId, b.title AS title, b.author AS author, COUNT(h.id) AS count " +
+            "FROM history h " +
+            "JOIN book b ON h.book_id = b.id " +
+            "WHERE h.checkout_date BETWEEN :startDate AND :endDate " +
+            "GROUP BY b.id, b.title, b.author",
+            nativeQuery = true)
+    List<BookReadCountProjection> countPhysicalBookReadsByDate(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );

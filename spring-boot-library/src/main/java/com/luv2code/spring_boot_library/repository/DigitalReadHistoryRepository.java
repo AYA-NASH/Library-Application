@@ -1,5 +1,6 @@
 package com.luv2code.spring_boot_library.repository;
 
+import com.luv2code.spring_boot_library.dto.projection.BookReadCountProjection;
 import com.luv2code.spring_boot_library.dto.projection.CategoryCountProjection;
 import com.luv2code.spring_boot_library.dto.projection.DateCountProjection;
 import com.luv2code.spring_boot_library.entity.DigitalReadHistory;
@@ -33,6 +34,17 @@ public interface DigitalReadHistoryRepository extends JpaRepository<DigitalReadH
             "GROUP BY c.name"
             , nativeQuery = true)
     List<CategoryCountProjection> findDigitalCategoryTrends(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query(value = "SELECT b.id AS bookId, b.title AS title, b.author AS author, COUNT(d.id) AS count " +
+            "FROM digital_read_history d " +
+            "JOIN book b ON d.book_id = b.id " +
+            "WHERE d.read_date BETWEEN :startDate AND :endDate " +
+            "GROUP BY b.id, b.title, b.author",
+            nativeQuery = true)
+    List<BookReadCountProjection> countDigitalBookReadsByDate(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
