@@ -1,7 +1,9 @@
 package com.luv2code.spring_boot_library.service;
 
+import com.luv2code.spring_boot_library.dto.DashboardDtos;
 import com.luv2code.spring_boot_library.dto.PaymentDtos;
 import com.luv2code.spring_boot_library.entity.Payment;
+import com.luv2code.spring_boot_library.event.ActivityOccurredEvent;
 import com.luv2code.spring_boot_library.exception.ExternalServiceException;
 import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.PaymentMapper;
@@ -15,11 +17,13 @@ import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +35,8 @@ public class PaymentService {
 
     private final PaymentMapper paymentMapper;
     private final PaymentRepository paymentRepository;
-    
+    private final ApplicationEventPublisher eventPublisher;
+
     @Value("${stripe.key.secret}")
     private String secretKey;
 
@@ -96,6 +101,15 @@ public class PaymentService {
         payment.setLateFees(0L);
         payment.setLastPaymentCompletionKey(idempotencyKey);
         paymentRepository.save(payment);
+
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.TRANSACTIONAL,
+                DashboardDtos.ActionType.FEE_PAID,
+                payment.getUser().getEmail(),
+                "Balance: $0",
+                LocalDateTime.now()
+        );
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 
     @Transactional(readOnly = true)

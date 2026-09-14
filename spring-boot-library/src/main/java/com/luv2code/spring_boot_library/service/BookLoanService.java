@@ -1,21 +1,25 @@
 package com.luv2code.spring_boot_library.service;
 
+import com.luv2code.spring_boot_library.dto.DashboardDtos;
 import com.luv2code.spring_boot_library.dto.LoanDtos;
 import com.luv2code.spring_boot_library.entity.AppUser;
 import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.entity.Checkout;
 import com.luv2code.spring_boot_library.entity.Payment;
+import com.luv2code.spring_boot_library.event.ActivityOccurredEvent;
 import com.luv2code.spring_boot_library.exception.DuplicateResourceException;
 import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.LoanMapper;
 import com.luv2code.spring_boot_library.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Service
@@ -29,6 +33,7 @@ public class BookLoanService {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final LoanMapper loanMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public Page<LoanDtos.ShelfResponse> currentLoans(String userEmail, Pageable pageable) {
@@ -53,6 +58,16 @@ public class BookLoanService {
         checkout.setReturnDate(LocalDate.now().plusDays(7));
 
         checkoutRepository.save(checkout);
+
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.CIRCULATION,
+                DashboardDtos.ActionType.CHECKOUT_BORROW,
+                userEmail,
+                book.getTitle(),
+                LocalDateTime.now()
+        );
+
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
 
         return loanMapper.toShelfResponse(checkout);
     }
@@ -79,6 +94,16 @@ public class BookLoanService {
         bookRepository.save(book);
 
         checkoutRepository.delete(checkout);
+
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.CIRCULATION,
+                DashboardDtos.ActionType.CHECKOUT_RETURN,
+                userEmail,
+                book.getTitle(),
+                LocalDateTime.now()
+        );
+
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 
     public void renewLoan(String userEmail, Long bookId) {
@@ -91,6 +116,16 @@ public class BookLoanService {
 
         checkout.setReturnDate(LocalDate.now().plusDays(7));
         checkoutRepository.save(checkout);
+
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.CIRCULATION,
+                DashboardDtos.ActionType.CHECKOUT_RENEW,
+                userEmail,
+                checkout.getBook().getTitle(),
+                LocalDateTime.now()
+        );
+
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 
     public int countCheckouts(String userEmail) {
@@ -136,5 +171,16 @@ public class BookLoanService {
                 });
         payment.setLateFees(payment.getLateFees() + feeToAdd);
         paymentRepository.save(payment);
+
+        String target =String.format("Assessed Fee: $%.2f", feeToAdd / 100.0);
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.TRANSACTIONAL,
+                DashboardDtos.ActionType.FEE_LATE,
+                user.getEmail(),
+                target,
+                LocalDateTime.now()
+        );
+
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 }

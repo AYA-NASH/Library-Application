@@ -1,9 +1,11 @@
 package com.luv2code.spring_boot_library.service;
 
+import com.luv2code.spring_boot_library.dto.DashboardDtos;
 import com.luv2code.spring_boot_library.dto.ReviewDto;
 import com.luv2code.spring_boot_library.entity.AppUser;
 import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.entity.Review;
+import com.luv2code.spring_boot_library.event.ActivityOccurredEvent;
 import com.luv2code.spring_boot_library.exception.DuplicateResourceException;
 import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.ReviewMapper;
@@ -11,10 +13,13 @@ import com.luv2code.spring_boot_library.repository.BookRepository;
 import com.luv2code.spring_boot_library.repository.ReviewRepository;
 import com.luv2code.spring_boot_library.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -25,6 +30,7 @@ public class ReviewService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final ReviewMapper reviewMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void postReview(Long userId, Long bookId, ReviewDto.ReviewRequest request) {
         AppUser user = userRepository.findById(userId)
@@ -39,6 +45,15 @@ public class ReviewService {
         review.setBook(book);
 
         reviewRepository.save(review);
+
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.COMMUNITY,
+                DashboardDtos.ActionType.REVIEW_POSTED,
+                user.getEmail(),
+                book.getTitle(),
+                LocalDateTime.now()
+        );
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 
     public Boolean userReviewListed(Long userId, Long bookId) {

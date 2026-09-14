@@ -1,9 +1,11 @@
 package com.luv2code.spring_boot_library.service;
 
 import com.luv2code.spring_boot_library.dto.BookDtos;
+import com.luv2code.spring_boot_library.dto.DashboardDtos;
 import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.entity.BookSource;
 import com.luv2code.spring_boot_library.entity.Category;
+import com.luv2code.spring_boot_library.event.ActivityOccurredEvent;
 import com.luv2code.spring_boot_library.exception.BookCurrentlyCheckedOutException;
 import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.BookMapper;
@@ -12,10 +14,12 @@ import com.luv2code.spring_boot_library.repository.CategoryRepository;
 import com.luv2code.spring_boot_library.repository.CheckoutRepository;
 import com.luv2code.spring_boot_library.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +36,7 @@ public class BookManagementService {
     private final CategoryRepository categoryRepository;
     private final CloudinaryService cloudinaryService;
     private final BookMapper bookMapper;
-
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional(readOnly = true)
     public BookDtos.BookFileMetadata getBookEditInfo(Long bookId) {
@@ -51,6 +55,16 @@ public class BookManagementService {
         handlePdfLogic(book, pdf, false);
 
         bookRepository.save(book);
+
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.INVENTORY,
+                DashboardDtos.ActionType.BOOK_ADDED,
+                "ADMIN",
+                book.getTitle(),
+                LocalDateTime.now()
+        );
+
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 
     public void updateBookData(
@@ -76,7 +90,7 @@ public class BookManagementService {
     public void deleteBook(Long bookId) {
         // Guard check: prevent deletion if a user currently holds a copy
         boolean isCurrentlyCheckedOut = checkoutRepository.existsByBookId(bookId);
-        if(isCurrentlyCheckedOut){
+        if (isCurrentlyCheckedOut) {
             throw new BookCurrentlyCheckedOutException(
                     "Cannot delete book with ID " + bookId + ". It currently has active checkouts."
             );
@@ -96,6 +110,16 @@ public class BookManagementService {
         reviewRepository.deleteAllByBookId(bookId);
 
         bookRepository.deleteById(bookId);
+
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.INVENTORY,
+                DashboardDtos.ActionType.BOOK_DELETED,
+                "ADMIN",
+                book.getTitle(),
+                LocalDateTime.now()
+        );
+
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 
     private Set<Category> fetchAndValidateCategories(Set<Long> ids) {

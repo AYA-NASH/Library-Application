@@ -4,15 +4,18 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.luv2code.spring_boot_library.dto.DashboardDtos;
 import com.luv2code.spring_boot_library.dto.UserDtos;
 import com.luv2code.spring_boot_library.entity.AppUser;
+import com.luv2code.spring_boot_library.event.ActivityOccurredEvent;
 import com.luv2code.spring_boot_library.exception.DuplicateResourceException;
 import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.exception.UnauthenticatedException;
 import com.luv2code.spring_boot_library.mapper.UserMapper;
 import com.luv2code.spring_boot_library.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,20 +24,20 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
 import java.util.Collections;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-    @Autowired
-    private UserRepository userRepo;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
+
+    private final UserRepository userRepo;
+    private final UserMapper userMapper;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${google.client.id:}")
     private String clientId;
@@ -55,6 +58,16 @@ public class UserService {
         AppUser user = userMapper.toEntity(request);
         user.setPassword(encoder.encode(request.password()));
         userRepo.save(user);
+
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.USER_MANAGEMENT,
+                DashboardDtos.ActionType.USER_REGISTRATION,
+                user.getEmail(),
+                "New Account",
+                LocalDateTime.now()
+        );
+
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 
     public UserDtos.LoginResponse verify(UserDtos.LoginRequest loginRequest) {

@@ -2,6 +2,8 @@ package com.luv2code.spring_boot_library.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.luv2code.spring_boot_library.dto.DashboardDtos;
+import com.luv2code.spring_boot_library.event.ActivityOccurredEvent;
 import com.luv2code.spring_boot_library.exception.CloudinaryDeleteException;
 import com.luv2code.spring_boot_library.exception.CloudinaryUploadException;
 import com.luv2code.spring_boot_library.exception.ExternalServiceException;
@@ -9,9 +11,11 @@ import com.luv2code.spring_boot_library.exception.InvalidFileTypeException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Service
@@ -26,6 +30,7 @@ public class CloudinaryService {
             "image/webp"
     );
     private final Cloudinary cloudinary;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Retry(name = "cloudinaryService")
     @CircuitBreaker(name = "cloudinaryService", fallbackMethod = "uploadImageFallback")
@@ -103,22 +108,32 @@ public class CloudinaryService {
         }
     }
 
-    public boolean isEnabled() {
-        return cloudinary != null;
-    }
-
     private UploadResult uploadImageFallback(MultipartFile image, Throwable t) {
+        publishSystemEvent();
         throw new ExternalServiceException("Image upload service is temporarily unavailable. Please try again.");
     }
 
     private UploadResult uploadPdfFallback(MultipartFile pdf, Throwable t) {
+        publishSystemEvent();
         throw new ExternalServiceException("PDF upload service is temporarily unavailable. Please try again.");
     }
 
     private void deleteFileFallback(String publicId, String resourceType, Throwable t) {
+        publishSystemEvent();
         throw new ExternalServiceException("File deletion service is temporarily unavailable. Please try again.");
     }
 
     public record UploadResult(String url, String publicId) {
+    }
+
+    private void publishSystemEvent(){
+        DashboardDtos.RecentActivity activity = new DashboardDtos.RecentActivity(
+                DashboardDtos.EventCategory.SYSTEM,
+                DashboardDtos.ActionType.JOB_FAILED,
+                "Cloudinary Service",
+                "broken Connection",
+                LocalDateTime.now()
+        );
+        eventPublisher.publishEvent(new ActivityOccurredEvent(activity));
     }
 }
