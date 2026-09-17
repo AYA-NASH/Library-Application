@@ -1,6 +1,7 @@
 package com.luv2code.spring_boot_library.controller;
 
 import com.luv2code.spring_boot_library.dto.DashboardDtos;
+import com.luv2code.spring_boot_library.service.ActivityLogService;
 import com.luv2code.spring_boot_library.service.DashboardService;
 import com.luv2code.spring_boot_library.service.SseService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 public class DashboardController {
     private final DashboardService dashboardService;
     private final SseService sseService;
+    private final ActivityLogService activityLogService;
 
     @GetMapping("/metrics")
     public ResponseEntity<DashboardDtos.MainSummaryDTO> getMainSummaryMetrics() {
@@ -67,5 +69,10 @@ public class DashboardController {
     @GetMapping(path = "/activity-stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamActivity() {
         return sseService.subscribe();
+    }
+
+    @GetMapping("/activity-history")
+    public List<DashboardDtos.RecentActivity> getActivityHistory() {
+        return activityLogService.getRecentHistory();
     }
 }

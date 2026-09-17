@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/changes/005-add-book-soft-delete.yaml
   - include:
       file: db/changelog/changes/006-update-history-book-link.yaml
+  - include:
+      file: db/changelog/changes/007-create-activity-log-table.yaml

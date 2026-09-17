@@ -3,6 +3,7 @@ package com.luv2code.spring_boot_library;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
@@ -10,10 +11,11 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @SpringBootApplication
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 @EnableScheduling
+@EnableAsync
 public class SpringBootLibraryApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SpringBootLibraryApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootLibraryApplication.class, args);
+    }
 
 }
