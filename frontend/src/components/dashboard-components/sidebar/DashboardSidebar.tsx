@@ -19,7 +19,7 @@ export function DashboardSidebar() {
             <SidebarContent className="p-3">
                 <SidebarGroup>
                     <SidebarGroupLabel>
-                        Library Application
+                        <Link to={"/"}> Library Application </Link>
                     </SidebarGroupLabel>
                 </SidebarGroup>
 

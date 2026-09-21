@@ -7,7 +7,6 @@ import RequireAuth from "./Auth/RquireAuth";
 import { ShelfPage } from "./Layouts/ShelfPage/ShelfPage";
 import { MessagesPage } from "./Layouts/MessagesPage/MessagesPage";
 import { PaymentPage } from "./Layouts/PaymentPage/PaymentPage";
-import { ManageLibraryPage } from "./Layouts/ManageLibraryPage/ManageLibraryPage";
 import SignupPage from "./Layouts/AuthPage/SignupPage";
 import { BookCheckoutPage } from "./Layouts/BookCheckoutPage/BookCheckoutPage";
 import { ReviewListPage } from "./Layouts/BookCheckoutPage/ReviewListPage/ReviewListPage";
@@ -56,13 +55,7 @@ export const router = createBrowserRouter([
 
                 ]
             },
-            {
-                element: <RequireAuth role="ADMIN" />,
-                children: [
-                    { path: "admin", element: <ManageLibraryPage /> },
 
-                ]
-            },
             { path: "*", element: <NotFoundPage /> },
 
         ]

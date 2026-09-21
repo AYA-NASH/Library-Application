@@ -58,8 +58,8 @@ function Navbar() {
 
                             {isAdmin() &&
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/admin">
-                                        Admin
+                                    <Link className="nav-link" to="/admin-dashboard">
+                                        Dashboard
                                     </Link>
                                 </li>
                             }
