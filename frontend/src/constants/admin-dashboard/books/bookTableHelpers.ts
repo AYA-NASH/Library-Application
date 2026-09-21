@@ -3,8 +3,8 @@ import { TableFilterConfig } from "../TableFilterConfig";
 import { CategoryDetails } from "@/models/CategoryModel";
 import { useMemo } from "react";
 import { BookSummaryResponse } from "@/models/Admin";
-import { SummaryCardItem } from "@/models/dashboard/SummaryCard";
 import { AlertTriangle, BookOpen, FileText, Library } from "lucide-react";
+import { SummaryCardItem } from "@/models/MainDashboard";
 
 export function useBookFilters(
     books: BookModel[],

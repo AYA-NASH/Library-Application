@@ -12,28 +12,28 @@ export const useMainSummary = () => {
 
 export const usePhysicalDigitalActivities = (days?: number) => {
     return useQuery({
-        queryKey: ["physical-digital-activity"],
-        queryFn: () => dashboardService.getPhysicalDigitalActivities(days)
+        queryKey: ["physical-digital-activity", days],
+        queryFn: () => dashboardService.getPhysicalDigitalActivities(days),
     });
 }
 
 export const useCategoriesTrends = (days?: number) => {
     return useQuery({
-        queryKey: ["category-trends"],
+        queryKey: ["category-trends", days],
         queryFn: () => dashboardService.getCategoriesTrends(days)
     });
 }
 
 export const useInventorySummary = (lowStock?: number) => {
     return useQuery({
-        queryKey: ["inventory-summary"],
+        queryKey: ["inventory-summary", lowStock],
         queryFn: () => dashboardService.getInventorySummary(lowStock)
     })
 }
 
 export const useTopBooks = (days?: number) => {
     return useQuery({
-        queryKey: ["top-books"],
+        queryKey: ["top-books", days],
         queryFn: () => dashboardService.getTopBooks(days)
     })
 }

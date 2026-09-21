@@ -9,6 +9,13 @@ export type SummaryCardItem = {
     trend?: string;
 }
 
+export type MainSummaryMetrics = {
+    totalBooks: string;
+    activeLoans: string;
+    activeMembers: string;
+    totalRevenue: string;
+}
+
 export type PhysicalDigitalReads = {
     date: string;
     physicalBorrows: number;
@@ -23,23 +30,23 @@ export type TopCategoriesTrends = {
 
 export type InventorySummary = {
     alerts: InventoryAlerts;
-    composition: InventoryComposition;
-    utilization: InventoryUtilization;
+    catalogComposition: InventoryComposition;
+    shelfUtilization: InventoryUtilization;
 }
 
-type InventoryAlerts = {
+export type InventoryAlerts = {
     overdueLoans: number;
     outOfStock: number;
     lowStock: number;
 }
 
-type InventoryComposition = {
+export type InventoryComposition = {
     physicalOnly: number;
     digitalOnly: number;
     hybrid: number;
 }
 
-type InventoryUtilization = {
+export type InventoryUtilization = {
     totalCopies: number;
     availableCopies: number;
 }
