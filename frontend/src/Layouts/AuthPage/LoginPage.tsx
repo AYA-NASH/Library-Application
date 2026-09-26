@@ -1,116 +1,125 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import GoogleAuthButton from "../Utils/GoogleAuthButton";
+import { useForm, useController, Control } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
-import { useForm, SubmitHandler } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuthActions } from "../../api/hooks/useAuthActions";
 import { parseApiError } from "../../errors/parseApiError";
+import GoogleAuthButton from "../Utils/GoogleAuthButton";
 
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-interface LoginFormInputs {
-    email: string;
-    password: string;
+const formSchema = z.object({
+    email: z.string().min(1, "Enter your email.").email("Invalid email format."),
+    password: z.string().min(1, "Enter your password."),
+});
+
+type LoginFormInputs = z.infer<typeof formSchema>;
+
+interface FormInputProps {
+    name: keyof LoginFormInputs;
+    control: Control<LoginFormInputs>;
+    label: string;
+    type?: string;
+    placeholder?: string;
 }
 
-const formSchema: yup.ObjectSchema<LoginFormInputs> = yup.object({
-    email: yup.string().required("Enter your email").email("Invalid email format"),
-    password: yup.string().required("Enter your password"),
-})
+function FormInput({ name, control, label, type = "text", placeholder }: FormInputProps) {
+    const { 
+        field, 
+        fieldState: { invalid, error } 
+    } = useController({ name, control });
+
+    return (
+        <Field data-invalid={invalid}>
+            <FieldLabel htmlFor={name}>{label}</FieldLabel>
+            <Input 
+                id={name} 
+                type={type} 
+                placeholder={placeholder} 
+                aria-invalid={invalid} 
+                {...field} 
+            />
+            {invalid && error && <FieldError errors={[error]} />}
+        </Field>
+    );
+}
 
 const LoginPage = () => {
     const { login, isLoggingIn } = useAuthActions();
+    const [serverError, setServerError] = useState("");
 
-
-    const [serverError, setserverError] = useState("");
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<LoginFormInputs>({
-        resolver: yupResolver(formSchema),
+    const { handleSubmit, control } = useForm<LoginFormInputs>({
+        resolver: zodResolver(formSchema),
+        defaultValues: { email: "", password: "" },
     });
 
-    const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
-        setserverError("");
+    const onSubmit = async (data: LoginFormInputs) => {
+        setServerError("");
         try {
             await login(data);
-        } catch (err: any) {
-            const apiError = parseApiError(err);
-            setserverError(apiError.message);
+        } catch (err: unknown) { 
+            setServerError(parseApiError(err).message);
         }
     };
 
-
     return (
-        <div
-            className="d-flex justify-content-center align-items-center bg-light"
-            style={{ minHeight: "100vh" }}
-        >
-            <div
-                className="card p-4 shadow rounded-4"
-                style={{ width: "100%", maxWidth: "420px" }}
-            >
-                <div className="card-body">
-                    <h3 className="text-center mb-4 text-primary fw-bold">
-                        Welcome Back
-                    </h3>
-                    <p className="text-center text-muted mb-4">
-                        Please sign in to continue
-                    </p>
-                    <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex min-h-screen items-center justify-center bg-background px-4">
+            <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-md">
+                <h2 className="mb-1 text-center text-2xl font-bold tracking-tight text-foreground">
+                    Welcome Back
+                </h2>
+                <p className="mb-6 text-center text-sm text-muted-foreground">
+                    Sign in to continue to your account
+                </p>
 
-                        <div className="mb-3">
-                            <label htmlFor="email" className="form-label">Email address</label>
-                            <input
-                                type="text"
-                                id="email"
-                                className={`form-control form-control-lg rounded-3 ${errors.email ? "is-invalid" : ""}`}
-                                placeholder="Enter your email"
-                                {...register("email")}
-                            />
-                            {errors.email && (
-                                <div className="invalid-feedback d-block text-center">{errors.email.message}</div>
-                            )}
-                        </div>
+                <form
+                    className="flex flex-col gap-4"
+                    onSubmit={handleSubmit(onSubmit)}
+                    noValidate
+                >
+                    <FormInput 
+                        name="email" 
+                        control={control} 
+                        label="Email address" 
+                        placeholder="Enter your email" 
+                    />
+                    <FormInput 
+                        name="password" 
+                        control={control} 
+                        label="Password" 
+                        type="password" 
+                        placeholder="Enter your password" 
+                    />
 
-                        <div className="mb-4">
-                            <label htmlFor="password" className="form-label">Password</label>
-                            <input
-                                type="password"
-                                id="password"
-                                className={`form-control form-control-lg rounded-3 ${errors.password ? "is-invalid" : ""}`}
-                                placeholder="Enter your password"
-                                {...register("password")}
-                            />
-                            {errors.password && (
-                                <div className="invalid-feedback d-block text-center">{errors.password.message}</div>
-                            )}
-                        </div>
+                    {serverError && (
+                        <p className="rounded-lg bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
+                            {serverError}
+                        </p>
+                    )}
 
-                        {serverError && (
-                            <div className="alert alert-danger py-2 text-center">{serverError}</div>
-                        )}
+                    <Button type="submit" className="w-full" disabled={isLoggingIn}>
+                        {isLoggingIn ? "Signing in…" : "Sign In"}
+                    </Button>
+                </form>
 
-                        <div className="d-grid mb-3">
-                            <button type="submit" className="btn btn-primary btn-lg rounded-3" disabled={isLoggingIn}>
-                                {isLoggingIn ? "Signing in..." : "Sign In"}
-                            </button>
-                        </div>
-                    </form>
-                    <GoogleAuthButton />
-                    <p
-                        className="text-center text-muted mt-3 mb-0"
-                        style={{ fontSize: "0.9rem" }}
-                    >
-                        Need an account?{" "}
-                        <Link to="/signup" className="text-decoration-none">
-                            Sign up
-                        </Link>
-                    </p>
+                <div className="relative my-5 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-xs text-muted-foreground">or continue with</span>
+                    <div className="h-px flex-1 bg-border" />
                 </div>
+
+                <GoogleAuthButton />
+
+                <p className="mt-5 text-center text-sm text-muted-foreground">
+                    Need an account?{" "}
+                    <Link to="/signup" className="font-medium text-primary underline-offset-4 hover:underline">
+                        Sign up
+                    </Link>
+                </p>
             </div>
         </div>
     );

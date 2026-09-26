@@ -1,171 +1,159 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useForm, useController, Control } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+import { useAuthActions } from "../../api/hooks/useAuthActions";
+import { parseApiError } from "../../errors/parseApiError";
 import GoogleAuthButton from "../Utils/GoogleAuthButton";
 
-import { useForm, SubmitHandler } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useAuthActions } from "../../api/hooks/useAuthActions";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-import { parseApiError } from "../../errors/parseApiError";
+const formSchema = z
+    .object({
+        username: z
+            .string()
+            .min(1, "Add your name.")
+            .min(3, "Username must be at least 3 characters long."),
+        email: z.string().min(1, "Add your email address.").email("Invalid email format."),
+        password: z
+            .string()
+            .min(1, "Enter your password.")
+            .min(4, "Password must be at least 4 characters long.")
+            .max(20, "Password must not exceed 20 characters.")
+            .regex(/^\S*$/, "Password cannot contain spaces."),
+        confirmPassword: z.string().min(1, "Confirm your password."),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords don't match.",
+        path: ["confirmPassword"],
+    });
 
+type SignupFormInputs = z.infer<typeof formSchema>;
 
-interface SignupFormInputs {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
+// Note: If you extracted this into a shared UI component from the Login page, 
+// you can import it here instead of redefining it. 
+// You would just need to make it generic: <T extends FieldValues>
+interface FormInputProps {
+    name: keyof SignupFormInputs;
+    control: Control<SignupFormInputs>;
+    label: string;
+    type?: string;
+    placeholder?: string;
 }
 
-const formSchema: yup.ObjectSchema<SignupFormInputs> = yup.object({
-  username: yup
-    .string()
-    .required("Add your name.")
-    .min(3, "Username must be at least 3 characters long."),
-  email: yup
-    .string()
-    .required("Add your email address.")
-    .email("Invalid email format."),
-  password: yup
-    .string()
-    .required("Enter your password.")
-    .min(4, "Password must be at least 4 characters long.")
-    .max(20, "Password must not exceed 20 characters.")
-    .matches(/^\S*$/, "Password cannot contain spaces."),
-  confirmPassword: yup
-    .string()
-    .required("Confirm your password.")
-    .oneOf([yup.ref("password")], "Passwords don't match."),
-});
+function FormInput({ name, control, label, type = "text", placeholder }: FormInputProps) {
+    const { 
+        field, 
+        fieldState: { invalid, error } 
+    } = useController({ name, control });
+
+    return (
+        <Field data-invalid={invalid}>
+            <FieldLabel htmlFor={name}>{label}</FieldLabel>
+            <Input 
+                id={name} 
+                type={type} 
+                placeholder={placeholder} 
+                aria-invalid={invalid} 
+                {...field} 
+            />
+            {invalid && error && <FieldError errors={[error]} />}
+        </Field>
+    );
+}
 
 const SignupPage = () => {
-  const { register: userRegister, isRegistering } = useAuthActions();
-  const [serverError, setServerError] = useState("");
+    const { register: userRegister, isRegistering } = useAuthActions();
+    const [serverError, setServerError] = useState("");
 
-  const submitRegister: SubmitHandler<SignupFormInputs> = async (data) => {
-    setServerError("");
-    try {
-      await userRegister(data);
-    } catch (err: any) {
-      const apiError = parseApiError(err);
-      setServerError(apiError.message);
-    }
-  };
+    const { handleSubmit, control } = useForm<SignupFormInputs>({
+        resolver: zodResolver(formSchema),
+        defaultValues: { username: "", email: "", password: "", confirmPassword: "" },
+    });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<SignupFormInputs>({
-    resolver: yupResolver(formSchema),
-  });
+    const onSubmit = async (data: SignupFormInputs) => {
+        setServerError("");
+        try {
+            await userRegister(data);
+        } catch (err: unknown) {
+            setServerError(parseApiError(err).message);
+        }
+    };
 
-  return (
-    <div
-      className="d-flex justify-content-center align-items-center bg-light">
-      <div
-        className="card p-4 shadow rounded-4"
-        style={{ width: "100%", maxWidth: "480px" }}
-      >
-        <div className="card-body">
-          <h3 className="text-center mb-3 text-success fw-bold">
-            Create Your Account
-          </h3>
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-background px-4">
+            <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-8 shadow-md">
+                <h2 className="mb-1 text-center text-2xl font-bold tracking-tight text-foreground">
+                    Create Your Account
+                </h2>
+                <p className="mb-6 text-center text-sm text-muted-foreground">
+                    Sign up to get started
+                </p>
 
-          <form onSubmit={handleSubmit(submitRegister)}>
+                <form
+                    className="flex flex-col gap-4"
+                    onSubmit={handleSubmit(onSubmit)}
+                    noValidate
+                >
+                    <FormInput 
+                        name="email" 
+                        control={control} 
+                        label="Email" 
+                        placeholder="Enter your email" 
+                    />
+                    <FormInput 
+                        name="username" 
+                        control={control} 
+                        label="Username" 
+                        placeholder="Choose a username" 
+                    />
+                    <FormInput 
+                        name="password" 
+                        control={control} 
+                        label="Password" 
+                        type="password" 
+                        placeholder="Create a password" 
+                    />
+                    <FormInput 
+                        name="confirmPassword" 
+                        control={control} 
+                        label="Confirm Password" 
+                        type="password" 
+                        placeholder="Confirm your password" 
+                    />
 
-            <div className="mb-3">
-              <label className="form-label">Email</label>
-              <input
-                type="email"
-                className={`form-control form-control-lg rounded-3 ${errors.email ? "is-invalid" : ""
-                  }`}
-                placeholder="Enter your email"
-                {...register("email")}
-              />
-              {errors.email && (
-                <div className="invalid-feedback d-block text-center">
-                  {errors.email.message}
+                    {serverError && (
+                        <p className="rounded-lg bg-destructive/10 px-3 py-2 text-center text-sm text-destructive">
+                            {serverError}
+                        </p>
+                    )}
+
+                    <Button type="submit" className="w-full" disabled={isRegistering}>
+                        {isRegistering ? "Creating Account…" : "Sign Up"}
+                    </Button>
+                </form>
+
+                <div className="relative my-5 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-xs text-muted-foreground">or continue with</span>
+                    <div className="h-px flex-1 bg-border" />
                 </div>
-              )}
+
+                <GoogleAuthButton />
+
+                <p className="mt-5 text-center text-sm text-muted-foreground">
+                    Already have an account?{" "}
+                    <Link to="/login" className="font-medium text-primary underline-offset-4 hover:underline">
+                        Login here
+                    </Link>
+                </p>
             </div>
-
-            <div className="mb-3">
-              <label className="form-label">Username</label>
-              <input
-                type="text"
-                className={`form-control form-control-lg rounded-3 ${errors.username ? "is-invalid" : ""
-                  }`}
-                placeholder="Choose a username"
-                {...register("username")}
-              />
-              {errors.username && (
-                <div className="invalid-feedback d-block text-center">
-                  {errors.username.message}
-                </div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Password</label>
-              <input
-                type="password"
-                className={`form-control form-control-lg rounded-3 ${errors.password ? "is-invalid" : ""
-                  }`}
-                placeholder="Create a password"
-                {...register("password")}
-              />
-              {errors.password && (
-                <div className="invalid-feedback d-block text-center">
-                  {errors.password.message}
-                </div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Confirm Password</label>
-              <input
-                type="password"
-                className={`form-control form-control-lg rounded-3 ${errors.confirmPassword ? "is-invalid" : ""
-                  }`}
-                placeholder="Confirm your password"
-                {...register("confirmPassword")}
-              />
-              {errors.confirmPassword && (
-                <div className="invalid-feedback d-block text-center">
-                  {errors.confirmPassword.message}
-                </div>
-              )}
-            </div>
-
-            {serverError && (
-              <div className="alert alert-danger py-2 text-center">
-                {serverError}
-              </div>
-            )}
-
-            <div className="d-grid">
-              <button
-                type="submit"
-                className="btn btn-success btn-lg rounded-3"
-                disabled={isRegistering}
-              >
-                {isRegistering ? "Creating Account..." : "Sign Up"}
-              </button>
-            </div>
-          </form>
-
-          <GoogleAuthButton />
-
-          <p className="text-center text-muted mt-4" style={{ fontSize: "0.9rem" }}>
-            Already have an account?{" "}
-            <a href="/login" className="text-decoration-none">
-              Login here
-            </a>
-          </p>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default SignupPage;
