@@ -24,7 +24,7 @@ export function ThemeToggle() {
             variant="outline"
             size="icon"
             onClick={() => setIsDark(!isDark)}
-            className="h-9 w-9 border-border bg-background hover:bg-accent text-foreground"
+            className="h-9 w-9 hover:text-primary"
             aria-label="Toggle theme"
         >
             {isDark ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}

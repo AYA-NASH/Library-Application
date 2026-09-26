@@ -7,7 +7,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 export default function AppLayout() {
     return (
-        <div className="bootstrap-scope">
+        // <div className="bootstrap-scope">
             <div className="d-flex flex-column min-vh-100">
                 <Navbar key={1} />
 
@@ -16,7 +16,7 @@ export default function AppLayout() {
                 </main>
 
                 <Footer />
-            </div>
+            {/* </div> */}
         </div>
     )
 }
