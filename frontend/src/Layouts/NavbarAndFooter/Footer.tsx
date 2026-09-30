@@ -1,26 +1,26 @@
 import { Link } from "react-router-dom";
 
-const mainColor = {
-    backgroundColor: "#0f0f0f",
-};
 export const Footer = () => {
     return (
-        <div style={mainColor}>
-            <footer
-                className="container d-flex flex-wrap justify-content-between align-items-center py-5"
-                style={mainColor}
-            >
-                <p className="col-md-4 mb-0 text-white">
-                    @ Eample Library App, Inc
+        <div className="bg-neutral-950 text-neutral-300 mt-auto">
+            <footer className="mx-auto flex flex-col items-center justify-between gap-4 px-4 py-8 md:flex-row md:px-8">
+                <p className="text-sm">
+                    &copy; {new Date().getFullYear()} BookVerse, Inc.
                 </p>
-                <ul className="nav navbar-dark col-md-4 jsutify-content-end">
-                    <li className="nav-item">
-                        <Link to={'/'} className="nav-link px-2 text-white">
+                <ul className="flex items-center gap-6">
+                    <li>
+                        <Link 
+                            to="/" 
+                            className="text-sm font-medium transition-colors hover:text-primary focus:text-primary focus:outline-none"
+                        >
                             Home
                         </Link>
                     </li>
-                    <li className="nav-item">
-                        <Link to="search" className="nav-link px-2 text-white">
+                    <li>
+                        <Link 
+                            to="/search" 
+                            className="text-sm font-medium transition-colors hover:text-primary focus:text-primary focus:outline-none"
+                        >
                             Search Books
                         </Link>
                     </li>

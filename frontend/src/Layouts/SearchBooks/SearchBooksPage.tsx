@@ -1,90 +1,92 @@
 import { useState } from "react";
-import { Pagination } from "../Utils/Pagination";
-import { SearchBooks } from "./SearchBooks";
 import { useBooks } from "../../api/hooks/BookHooks/useBooks";
 import { BookFilterBar } from "../Utils/BookFilterBar";
 import { useCategoriesReferences } from "../../api/hooks/BookHooks/useCategories";
 import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
+import { BookSearchCard } from "./BookSearchCard";
+import { ColumnFiltersState, PaginationState } from "@tanstack/react-table";
+import { useDashboardTable } from "@/hooks/useDashboardTable";
+import { bookSearchColumns } from "./components/bookSearchColumns";
+import { PaginationSection } from "../Utils/PagintationSection";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Link } from "react-router-dom";
 
-type SearchParams = {
-    text?: string;
-    categoryId?: number;
-};
 
 export const SearchBooksPage = () => {
+    const [pagination, setPagination] = useState<PaginationState>({
+        pageIndex: 0,
+        pageSize: 5
+    });
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [searchParams, setSearchParams] = useState<SearchParams>({});
+    // where tanstack table will store the title, and categoryID filters.
+    // e.g. {id:"categoryId", value: 5} or {id: "title", value: "Design patterns"}
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-    const booksPerPage = 5;
+    const titleFilter = (columnFilters.find(f => f.id === "title")?.value as string) || undefined; // e.g. "Design Patterns"
+    const categoryFilterRaw = columnFilters.find(f => f.id === "categoryId")?.value;
+    const categoryFilter =
+        typeof categoryFilterRaw === "number" && !isNaN(categoryFilterRaw)
+            ? categoryFilterRaw
+            : undefined; // e.g. 5
+
+    const { data, isLoading, isError, error, refetch } = useBooks(
+        pagination.pageIndex + 1,
+        pagination.pageSize,
+        titleFilter,
+        categoryFilter
+    );
+
+    const books = data?.content ?? [];
+
+    const table = useDashboardTable({
+        data: books,
+        columns: bookSearchColumns,
+        pageCount: data?.totalPages ?? -1,
+        pagination,
+        onPaginationChange: setPagination,
+        columnFilters,
+        onColumnFiltersChange: setColumnFilters,
+        manualPagination: true,
+        manualFiltering: true
+    });
 
     const { data: options, isLoading: isCategoriesLoading } = useCategoriesReferences();
 
-    const { data, isLoading, isError, error, refetch } = useBooks(
-        currentPage,
-        booksPerPage,
-        searchParams.text,
-        searchParams.categoryId
-    );
-
-    const handleSearch = (params: SearchParams) => {
-        setCurrentPage(1);
-        setSearchParams(params);
-    };
-
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
-    if (isLoading) return <SpinnerLoading />
-    if (isError) return <ApiErrorDisplay error={error} title="Failed to load books" onRetry={() => refetch()} />;
-
-
-    const books = data?.content ?? [];
     const totalElements = data?.totalElements ?? 0;
-    const totalPages = data?.totalPages ?? 0;
-
-    const lastItem =
-        currentPage * booksPerPage <= totalElements
-            ? currentPage * booksPerPage
-            : totalElements;
 
     return (
-        <div className="container mt-5">
+        <div className=" mt-5 px-6">
             <BookFilterBar
+                table={table}
                 categories={options ?? []}
-                initialCategoryId={searchParams.categoryId}
-                initialText={searchParams.text}
-                onSearch={handleSearch}
                 isLoading={isCategoriesLoading}
             />
 
+            {isLoading && <SpinnerLoading />}
+            {isError && <ApiErrorDisplay error={error} title="Failed to load books" onRetry={() => refetch()} />}
+
             {totalElements > 0 ? (
                 <>
-                    <div className="mt-3">
-                        <h5>Number of results: ({totalElements})</h5>
+                    <div className="text-muted-foreground text-sm">
+                        <p>Found {totalElements} results</p>
                     </div>
-                    <p>
-                        {currentPage * booksPerPage - booksPerPage + 1} to{" "}
-                        {lastItem} of {totalElements} items
-                    </p>
-                    {books.map((book) => (
-                        <SearchBooks book={book} key={book.id} />
+
+                    {table.getRowModel().rows.map((row) => (
+                        <BookSearchCard book={row.original} key={row.original.id} />
                     ))}
-                    {totalPages > 1 && (
-                        <Pagination
-                            currentPage={currentPage}
-                            paginate={paginate}
-                            totalPages={totalPages}
-                        />
-                    )}
+
+                    <PaginationSection table={table} />
                 </>
             ) : (
-                <div className="m-5">
-                    <h3>Can't find what you are looking for?</h3>
-                    <a className="btn btn-dark text-white btn-md px-4 fw-bold" href="#">
-                        Library Services
-                    </a>
-                </div>
+                <Card className="text-center my-20 py-20">
+                    <CardTitle className="text-4xl">Can't find what you are looking for?</CardTitle>
+                    <CardDescription>
+                        <Link to="/service" className="text-primary underline hover:text-primary/80 cursor-pointer text-xl">
+                            Contact Library Services
+                        </Link>
+                    </CardDescription>
+                </Card>
             )}
         </div>
     );

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
-import { Pagination } from "../../Utils/Pagination";
+import { Pagination } from "../../Utils/PaginationLegacy";
 import { useUserMessages } from "../../../api/hooks/LibraryServiceHooks/useMessage";
 
 import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";

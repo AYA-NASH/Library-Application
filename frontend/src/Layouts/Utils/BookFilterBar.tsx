@@ -1,92 +1,145 @@
 import { useEffect, useState } from "react";
-import Select from "react-select";
 import { CategoryReference } from "../../models/CategoryModel";
+import { BookModel } from "@/models/BookModel";
+import { Table } from "@tanstack/react-table";
+import { Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 
 
 type BookFilterBarProps = {
+    table: Table<BookModel>
     categories: CategoryReference[];
-    initialCategoryId?: number;
-    initialText?: string;
-    onSearch: (params: { text?: string; categoryId?: number }) => void;
     isLoading?: boolean;
 };
 
 export const BookFilterBar: React.FC<BookFilterBarProps> = ({
+    table,
     categories,
-    initialCategoryId,
-    initialText = "",
-    onSearch,
     isLoading = false,
 }) => {
-    const [searchText, setSearchText] = useState(initialText);
-    const [selectedCategory, setSelectedCategory] = useState<CategoryReference | null>(null);
+    const titleColumn = table.getColumn("title");
+    const categoryColumn = table.getColumn("categoryId");
 
+    const currentTitleFilter = (titleColumn?.getFilterValue() as string) ?? ""; // e.g. "Design Patterns"
+    const currentCategoryFilter = categoryColumn?.getFilterValue() as number | undefined; // e.g. 5
+
+    const [localSearchText, setLocalSearchText] = useState(currentTitleFilter);
+
+    const hasActiveFilters = currentTitleFilter !== "" || currentCategoryFilter !== undefined;
+
+    // Sync local state if table state resets externally
     useEffect(() => {
-        setSearchText(initialText);
-    }, [initialText]);
+        setLocalSearchText(currentTitleFilter);
+    }, [currentTitleFilter]);
 
-    useEffect(() => {
-        const found = categories.find((cat) => cat.id === initialCategoryId);
-        setSelectedCategory(found || null);
-    }, [initialCategoryId, categories]);
-
-    const triggerSearch = (text: string, category: CategoryReference | null) => {
-        onSearch({
-            text: text.trim() || undefined,
-            categoryId: category?.id,
-        });
-    };
-
+    // Handlers push data back to the Table state
     const handleSearchClick = () => {
-        triggerSearch(searchText, selectedCategory);
+        titleColumn?.setFilterValue(localSearchText.trim() || undefined);
     };
 
-    const handleCategoryChange = (selectedOption: CategoryReference | null) => {
-        setSelectedCategory(selectedOption);
-        triggerSearch(searchText, selectedOption);
+    const handleCategoryChange = (value: string | null) => {
+        categoryColumn?.setFilterValue(!value || value === "all" ? undefined : Number(value));
     };
 
+    const handleResetFilters = () => {
+        setLocalSearchText("");
+        titleColumn?.setFilterValue(undefined);
+        categoryColumn?.setFilterValue(undefined);
+    };
     return (
-        <div className="row mb-3 align-items-end g-3">
-            <div className="col-md-6">
-                <div className="d-flex">
-                    <input
-                        type="search"
-                        className="form-control me-2"
-                        placeholder="Search for a book..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                handleSearchClick();
+        <div className="mb-8 flex flex-col md:flex-row gap-6 md:items-end">
+
+            {/* Search Input Section */}
+            <div className="flex w-full flex-1 flex-col gap-2 md:max-w-md">
+                <Label htmlFor="title-search" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Search by Title
+                </Label>
+                <div className="relative flex items-center">
+                    <Input
+                        id="title-search"
+                        type="text"
+                        placeholder="e.g. Design Patterns..."
+                        value={localSearchText}
+                        onChange={(e) => {
+                            const newValue = e.target.value;
+                            setLocalSearchText(newValue);
+
+                            if (newValue.trim() === "") {
+                                titleColumn?.setFilterValue(undefined);
                             }
                         }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") handleSearchClick();
+                        }}
+                        className="w-full pr-12"
                     />
-                    <button
-                        className="btn btn-outline-success"
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={handleSearchClick}
+                        aria-label="Search"
+                        className="absolute right-0 text-muted-foreground hover:text-foreground"
                     >
-                        Search
-                    </button>
+                        <Search className="h-4 w-4" />
+                    </Button>
                 </div>
             </div>
 
-            <div className="col-md-4">
+            <div className="hidden max-h-full w-px bg-border md:block" />
+
+            {/* Category Select Section */}
+            <div className="flex w-full flex-col gap-2 md:w-64">
+                <Label htmlFor="category-select" className="text-xs font-semibold tracking-wider text-muted-foreground">
+                    OR Browse by Category
+                </Label>
                 <Select
-                    options={categories}
-                    getOptionLabel={(option: CategoryReference) => option.name}
-                    getOptionValue={(option: CategoryReference) => option.id.toString()}
-                    value={selectedCategory}
-                    onChange={(selectedOption) =>
-                        handleCategoryChange(selectedOption as CategoryReference | null)
-                    }
-                    isClearable
-                    placeholder="Search by category..."
-                    classNamePrefix="react-select"
-                    isLoading={isLoading}
-                />
+                    disabled={isLoading}
+                    value={currentCategoryFilter ? String(currentCategoryFilter) : "all"}
+                    onValueChange={handleCategoryChange}
+                >
+                    <SelectTrigger id="category-select" className="w-full bg-background">
+                        <SelectValue>
+                            {currentCategoryFilter
+                                ? (categories?.find((c) => c.id === currentCategoryFilter)?.name ?? "All Categories")
+                                : (isLoading ? "Loading…" : "All Categories")}
+                        </SelectValue>
+                    </SelectTrigger>
+
+                    <SelectContent className="max-h-75">
+                        <SelectGroup>
+                            <SelectItem value="all">All Categories</SelectItem>
+                            {categories?.map((category) => (
+                                <SelectItem key={category.id} value={String(category.id)}>
+                                    {category.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
             </div>
+
+            {hasActiveFilters && (
+                <Button
+                    variant="ghost"
+                    onClick={handleResetFilters}
+                    className="w-full text-muted-foreground hover:text-foreground md:w-auto"
+                >
+                    <X className="mr-2 h-4 w-4" />
+                    Reset
+                </Button>
+            )}
         </div>
     );
 };

@@ -14,10 +14,10 @@ export default function AppLayout() {
     );
 
     return (
-        <div className="d-flex flex-column min-vh-100">
+        <div className="flex flex-col min-h-screen">
             {!hideNavbar && <Navbar key={1} />}
 
-            <main className="grow">
+            <main className="flex-1 bg-background">
                 <Outlet />
             </main>
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
-import { Pagination } from "../../Utils/Pagination";
+import { Pagination } from "../../Utils/PaginationLegacy";
 import { Review } from "../../Utils/Review";
 import { useReviews } from "../../../api/hooks/BookHooks/useReviews";
 

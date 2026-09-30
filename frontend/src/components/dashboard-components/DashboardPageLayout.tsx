@@ -1,7 +1,7 @@
-import { SummaryCardItem } from "@/models/dashboard/SummaryCard";
 import { TopNavigationBar } from "./TopNavigationBar";
 import { SummaryCardsGrid } from "./summary-cards/SummaryCardsGrid";
 import { ContentHeaders } from "./ContentHeaders";
+import { SummaryCardItem } from "@/models/MainDashboard";
 
 interface DashboardPageLayoutProps {
     children: React.ReactNode;

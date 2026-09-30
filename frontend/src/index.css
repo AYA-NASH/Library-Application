@@ -172,4 +172,19 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /*
+   * Theme transition — smooths the instant flash when toggling .dark on <html>.
+   * Scoped to colour-related properties only so hover/focus animations are
+   * not affected. Disabled for users who prefer reduced motion.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    *,
+    *::before,
+    *::after {
+      transition-property: color, background-color, border-color;
+      transition-duration: 200ms;
+      transition-timing-function: ease;
+    }
+  }
 }

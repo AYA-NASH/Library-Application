@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Link } from "react-router-dom";
-import { Pagination } from "../../Utils/Pagination";
+import { Pagination } from "../../Utils/PaginationLegacy";
 import { useGetUserBooksHistory } from "../../../api/hooks/BookHooks/useHistory";
 import { HistoryItem } from "./HistoryItem";
 import { HistoryModel } from "../../../models/HistoryModel";

@@ -21,7 +21,10 @@ interface UseDashboardTableProps<TData, TValue> {
     pageCount?: number;
     pagination?: PaginationState;
     onPaginationChange?: OnChangeFn<PaginationState>;
+    columnFilters?: ColumnFiltersState;
+    onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
     manualPagination?: boolean;
+    manualFiltering?: boolean;
 }
 
 export function useDashboardTable<TData, TValue>({
@@ -31,10 +34,13 @@ export function useDashboardTable<TData, TValue>({
     pageCount,
     pagination: externalPagination,
     onPaginationChange,
+    columnFilters: externalColumnFilters,
+    onColumnFiltersChange,
     manualPagination = false,
+    manualFiltering = false,
 }: UseDashboardTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [internalColumnFilters, setInternalColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     const [globalFilter, setGlobalFilter] = useState("");
@@ -46,12 +52,15 @@ export function useDashboardTable<TData, TValue>({
     const pagination = externalPagination ?? internalPagination;
     const handlePaginationChange = onPaginationChange ?? setInternalPagination;
 
+    const columnFilters = externalColumnFilters ?? internalColumnFilters;
+    const handleColumnFiltersChange = onColumnFiltersChange ?? setInternalColumnFilters;
+
     const table = useReactTable({
         data,
         columns,
         pageCount: manualPagination ? pageCount : undefined,
         manualPagination,
-        
+        manualFiltering,
         state: {
             sorting,
             columnFilters,
@@ -62,7 +71,7 @@ export function useDashboardTable<TData, TValue>({
         },
 
         onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
+        onColumnFiltersChange: handleColumnFiltersChange,
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
         onGlobalFilterChange: setGlobalFilter,

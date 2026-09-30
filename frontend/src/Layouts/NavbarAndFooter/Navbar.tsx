@@ -93,11 +93,11 @@ function Navbar() {
                     <NavbarProfileMenu authenticatedLinks={authenticatedLinks} />
 
                 ) : (
-                    <Button className="p-4 font-bold" render={
-                        <Link to="/login">
-                            Sign In
-                        </Link>
-                    } />
+                    <Button
+                        className="p-4 font-bold"
+                        nativeButton={false}
+                        render={<Link to="/login">Sign In</Link>}
+                    />
                 )}
             </div>
 

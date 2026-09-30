@@ -34,7 +34,6 @@ export const bookService = {
             dataSource: b.dataSource,
             status: b.status
         }));
-        console.log("Fetch Books: ", transformedContent)
         return {
             content: transformedContent,
             totalPages: response.data.page.totalPages,
