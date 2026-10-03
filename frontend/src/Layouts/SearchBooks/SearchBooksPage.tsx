@@ -4,7 +4,7 @@ import { BookFilterBar } from "../Utils/BookFilterBar";
 import { useCategoriesReferences } from "../../api/hooks/BookHooks/useCategories";
 import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
-import { BookSearchCard } from "./BookSearchCard";
+import { BookCard } from "../Utils/BookCard";
 import { ColumnFiltersState, PaginationState } from "@tanstack/react-table";
 import { useDashboardTable } from "@/hooks/useDashboardTable";
 import { bookSearchColumns } from "./components/bookSearchColumns";
@@ -73,7 +73,7 @@ export const SearchBooksPage = () => {
                     </div>
 
                     {table.getRowModel().rows.map((row) => (
-                        <BookSearchCard book={row.original} key={row.original.id} />
+                        <BookCard book={row.original} key={row.original.id} />
                     ))}
 
                     <PaginationSection table={table} />

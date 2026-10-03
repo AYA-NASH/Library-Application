@@ -1,62 +1,50 @@
 import { useState } from "react";
-import { StarsReview } from "./StarsReview";
+import { StarRating } from "./StarRating";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
-export const LeaveAReview: React.FC<{ submitReview: any}> = (props) =>{
-    const [starInput, setStarInput] = useState(0);
+interface LeaveAReviewProps {
+    submitReview: (rating: number, reviewText: string) => void;
+}
 
-    const [displayInput, setDisplayInput] = useState(false);
-    const [reviewDescription, setReviewDescription] = useState('');
+export const LeaveAReview: React.FC<LeaveAReviewProps> = ({
+    submitReview,
+}) => {
+    const [reviewText, setReviewText] = useState('');
+    const [rating, setRating] = useState(0);
 
-    function starValue(value: number){
-        setStarInput(value);
-        setDisplayInput(true);
-    }
+    return (
+        <Card className="mx-auto w-full max-w-md">
+            <CardContent className="space-y-5">
+                <div className="flex flex-col items-center gap-3">
+                    <h3 className="text-sm font-semibold">Write a Review</h3>
+                    <StarRating editable={true} rating={rating} onRatingChange={setRating} />
+                </div>
 
-    return(
-        <div className="dropdown" style={{cursor: 'pointer'}}>
-            <h5 className="dropdown-toggle" id="dropdownMenuButton1" data-bs-toggle="dropdown">
-                Leave a review ?
-            </h5>
+                <div className="space-y-2">
+                    <Label htmlFor="review-text" className="text-sm">
+                        Your review
+                    </Label>
+                    <Textarea
+                        id="review-text"
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                        placeholder="Tell us what you think..."
+                        rows={3}
+                    />
+                </div>
 
-            <ul id="submitReviewRating" className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <i><button onClick={()=> starValue(0)} className="dropdown-item">0 star</button></i>
-                <i><button onClick={()=> starValue(0.5)} className="dropdown-item">0.5 star</button></i>
-                <i><button onClick={()=> starValue(1)} className="dropdown-item">1 star</button></i>
-                <i><button onClick={()=> starValue(1.5)} className="dropdown-item">1.5 star</button></i>
-                <i><button onClick={()=> starValue(2)} className="dropdown-item">2 star</button></i>
-                <i><button onClick={()=> starValue(2.5)} className="dropdown-item">2.5 star</button></i>
-                <i><button onClick={()=> starValue(3)} className="dropdown-item">3 star</button></i>
-                <i><button onClick={()=> starValue(3.5)} className="dropdown-item">3.5 star</button></i>
-                <i><button onClick={()=> starValue(4)} className="dropdown-item">4 star</button></i>
-                <i><button onClick={()=> starValue(4.5)} className="dropdown-item">4.5 star</button></i>
-                <i><button onClick={()=> starValue(5)} className="dropdown-item">5 star</button></i>
-            </ul>
-            <StarsReview rating={starInput} size={32}/>
 
-            {displayInput && 
-                <form method="POST" action="#">
-                    <hr/>
-                    
-                    <div className="mb-3">
-                        <label className="form-label">Description</label>
-                        <textarea className="form-control" 
-                                    id="submitReviewDescription"
-                                    placeholder="optional"
-                                    rows={3}
-                                    onChange={e=> setReviewDescription(e.target.value)}>
-                                
-                        </textarea>
-                    </div>
-
-                    <div>
-                        <button type="button" 
-                                className="btn btn-primary mt-3"
-                                onClick={()=> props.submitReview(starInput, reviewDescription)}>
-                                    Submit Review
-                        </button>
-                    </div>
-                </form>
-            }
-        </div>
+                <Button disabled={rating === 0}
+                    size="sm"
+                    className="w-full"
+                    onClick={() => submitReview(rating, reviewText)}
+                >
+                    Submit Review
+                </Button>
+            </CardContent>
+        </Card>
     );
 }

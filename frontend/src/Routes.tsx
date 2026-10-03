@@ -8,7 +8,7 @@ import { ShelfPage } from "./Layouts/ShelfPage/ShelfPage";
 import { MessagesPage } from "./Layouts/MessagesPage/MessagesPage";
 import { PaymentPage } from "./Layouts/PaymentPage/PaymentPage";
 import SignupPage from "./Layouts/AuthPage/SignupPage";
-import { BookCheckoutPage } from "./Layouts/BookCheckoutPage/BookCheckoutPage";
+import { BookPage } from "./Layouts/BookCheckoutPage/BookPage";
 import { ReviewListPage } from "./Layouts/BookCheckoutPage/ReviewListPage/ReviewListPage";
 import { SearchBooksPage } from "./Layouts/SearchBooks/SearchBooksPage";
 import { ReaderPreviewPage } from "./Layouts/PDFReader/ReaderPreviewPage";
@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
             { path: "login", element: <LoginPage /> },
             { path: "signup", element: <SignupPage /> },
             { path: "search", element: <SearchBooksPage /> },
-            { path: "checkout/:bookId", element: <BookCheckoutPage /> },
+            { path: "checkout/:bookId", element: <BookPage /> },
             { path: "reviewList/:bookId", element: <ReviewListPage /> },
 
             {

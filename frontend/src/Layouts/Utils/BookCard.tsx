@@ -4,11 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BookModel } from "@/models/BookModel";
 import { ArrowRight, Feather } from "lucide-react";
 import { Link } from "react-router-dom";
+import { StarRating } from "./StarRating";
 
 interface cardProps {
-    book: BookModel
+    book: BookModel,
+    showRate?: boolean;
+    stars?: number;
 }
-export function BookSearchCard({ book }: cardProps) {
+export function BookCard({ book, showRate, stars }: cardProps) {
     return (
         <Card className="my-4">
             <CardContent className="flex flex-col gap-6 p-6 md:flex-row">
@@ -48,22 +51,24 @@ export function BookSearchCard({ book }: cardProps) {
                         </div>
                     </div>
 
-                    <div className="mt-6 flex md:justify-end">
-                        <Button
-                            size="lg"
-                            className="w-full font-bold md:w-auto"
-                            nativeButton={false}
-                            render={
-                                <Link to={`/checkout/${book.id}`} className="flex items-center gap-2">
-                                    View Details
-                                    <ArrowRight className="h-4 w-4" />
-                                </Link>
-                            }
-                        />
-                    </div>
+                    {(showRate && stars) ? (
+                        <StarRating rating={stars}/>    
+                    ) : (
+                        <div className="mt-6 flex md:justify-end">
+                            <Button
+                                size="lg"
+                                className="w-full font-bold md:w-auto"
+                                nativeButton={false}
+                                render={
+                                    <Link to={`/checkout/${book.id}`} className="flex items-center gap-2">
+                                        View Details
+                                        <ArrowRight className="h-4 w-4" />
+                                    </Link>
+                                }
+                            />
+                        </div>
+                    )}
                 </div>
-
-
             </CardContent>
         </Card>
     );
