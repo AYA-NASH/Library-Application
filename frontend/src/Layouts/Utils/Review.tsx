@@ -1,35 +1,43 @@
-import { FC } from "react";
 import { ReviewModel } from "../../models/ReviewModel";
-import { StarsReview } from "./StarsReview";
+import { StarRating } from "./StarRating";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-export const Review: FC<{ review: ReviewModel }> = (props) => {
-    const { userEmail, reviewDescription, rating } = { ...props.review };
+interface ReviewProps {
+    review: ReviewModel;
+}
 
-    const date = new Date(props.review.date);
+export function Review({ review }: ReviewProps) {
+    const formattedDate = new Date(review.date).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+    });
 
-    const dateRender =
-        date.toLocaleString("en-us", { month: "long" }) +
-        " " +
-        date.getDate() +
-        " " +
-        date.getFullYear();
+    const initial = review.userEmail ? review.userEmail.charAt(0).toUpperCase() : "U";
+
     return (
-        <div>
-            <div className="col-8">
-                <h5>{userEmail}</h5>
-                <div className="row">
-                    <div className="col">{dateRender}</div>
-
-                    <div className="col">
-                        <StarsReview rating={rating} size={16} />
-                    </div>
-
-                    <div className="mt-2">
-                        <p>{reviewDescription}</p>
+        <div className="flex flex-col space-y-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex min-w-0 items-center gap-3">
+                    <Avatar className="h-9 w-9 shrink-0">
+                        <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                            {initial}
+                        </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                        <h5 className="truncate font-medium text-sm text-foreground">{review.userEmail}</h5>
+                        <span className="text-xs text-muted-foreground">{formattedDate}</span>
                     </div>
                 </div>
+
+                <div className="shrink-0 pl-12 sm:pl-0">
+                    <StarRating rating={review.rating} size={16} />
+                </div>
             </div>
-            <hr />
+
+            <p className="text-sm text-foreground leading-relaxed break-words sm:ml-12">
+                {review.reviewDescription}
+            </p>
         </div>
     );
-};
+}

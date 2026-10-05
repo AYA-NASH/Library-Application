@@ -2,9 +2,11 @@ package com.luv2code.spring_boot_library.service;
 
 import com.luv2code.spring_boot_library.dto.BookDtos;
 import com.luv2code.spring_boot_library.dto.BookDtos.BookResponse;
+import com.luv2code.spring_boot_library.entity.Book;
 import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.BookMapper;
 import com.luv2code.spring_boot_library.repository.BookRepository;
+import com.luv2code.spring_boot_library.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class BookCatalogService {
+    public final ReviewRepository reviewRepository;
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
@@ -23,10 +26,16 @@ public class BookCatalogService {
                 .map(bookMapper::toResponse);
     }
 
-    public BookResponse getBookById(Long bookId){
-        return bookRepository.findById(bookId)
-                .map(bookMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("No book found with ID: " + bookId));
+    public BookResponse getBookById(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("No book found with ID: " + bookId)
+                );
+
+        Double averageRating = reviewRepository.getAverageBookRating(bookId);
+
+        return bookMapper.toResponse(book)
+                .withAverageRating(averageRating);
     }
 
     public Page<BookResponse> searchBooksByTitle(String title, Pageable pageable) {

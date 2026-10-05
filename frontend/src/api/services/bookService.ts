@@ -32,7 +32,8 @@ export const bookService = {
             categories: b.categories,
             img: b.imgUrl,
             dataSource: b.dataSource,
-            status: b.status
+            status: b.status,
+            averageRating: b.averageRating ?? null
         }));
         return {
             content: transformedContent,
@@ -56,6 +57,7 @@ export const bookService = {
             categories: b.categories,
             dataSource: b.dataSource,
             img: b.imgUrl,
+            averageRating: b.averageRating ?? null
         };
     },
 

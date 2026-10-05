@@ -1,18 +1,25 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { SpinnerLoading } from "../Utils/SpinnerLoading";
 import { CheckoutAndReviewBox } from "./CheckoutAndReviewBox";
 import { useBookDetails } from "../../api/hooks/BookHooks/useBooks";
-import { useIsBookReviewedByUser, useReviews } from "../../api/hooks/BookHooks/useReviews";
+import { useIsBookReviewedByUser } from "../../api/hooks/BookHooks/useReviews";
 import { ApiErrorDisplay } from "../Utils/ApiErrorDisplay";
 import { BookCard } from "../Utils/BookCard";
+import { BookReviewSection } from "./components/BookReviewsSection";
 
 export const BookPage = () => {
 
     const { bookId } = useParams<{ bookId: string }>();
 
-    const { data: book, isLoading: isLoadingBook, isError: isBookError, error: bookError, refetch: refetchBook } = useBookDetails(bookId || "");    // Review Sates:
-    const { data: reviewsPage, isLoading: isLoadingReview } = useReviews(bookId || "", 0, 3);
+    const {
+        data: book,
+        isLoading: isLoadingBook,
+        isError: isBookError,
+        error: bookError,
+        refetch: refetchBook
+    } = useBookDetails(bookId || "");
+
     const { data: isReviewLeft, isLoading: isLoadingUserReview } = useIsBookReviewedByUser(bookId || "");
 
     const [isDigitalUnlocked] = useState(true);
@@ -20,14 +27,7 @@ export const BookPage = () => {
     // Payment
     // const [displayError, setDisplayError] = useState(false);
 
-    const totalStars = useMemo(() => {
-        const reviews = reviewsPage?.content || [];
-        if (reviews.length === 0) return 0;
-        const total = reviews.reduce((acc, r) => acc + r.rating, 0);
-        return Number((Math.round((total / reviews.length) * 2) / 2).toFixed(1));
-    }, [reviewsPage]);
-
-    if (isLoadingBook || isLoadingReview || isLoadingUserReview) {
+    if (isLoadingBook || isLoadingUserReview) {
         return <SpinnerLoading />;
     }
 
@@ -36,19 +36,26 @@ export const BookPage = () => {
     }
 
     return (
-        <div className="mx-auto px-4 py-10">
-            <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
-                <div className="w-full lg:flex-1">
-                    <BookCard book={book} showRate={true} stars={totalStars} />
-                    {/* Future LatestReviews component goes here, flowing under the book details */}
-                    {/* <LatestReviews reviews={reviewsPage?.content || []} bookId={book.id} /> */}
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:py-10">
+
+            <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr]">
+
+                <div className="lg:col-start-1 lg:row-start-1">
+                    <BookCard book={book} showRate={true} stars={book.averageRating} />
                 </div>
-                
-                <CheckoutAndReviewBox
-                    book={book}
-                    isDigitalUnlocked={isDigitalUnlocked}
-                    isReviewLeft={!!isReviewLeft}
-                />
+
+                <aside className="lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:sticky lg:top-8 h-fit">
+                    <CheckoutAndReviewBox
+                        book={book}
+                        isDigitalUnlocked={isDigitalUnlocked}
+                        isReviewLeft={!!isReviewLeft}
+                    />
+                </aside>
+
+                <div className="lg:col-start-1 lg:row-start-2 pt-4 lg:pt-0">
+                    <BookReviewSection bookId={book.id} />
+                </div>
+
             </div>
         </div>
     );

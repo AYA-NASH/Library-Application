@@ -9,16 +9,16 @@ import { StarRating } from "./StarRating";
 interface cardProps {
     book: BookModel,
     showRate?: boolean;
-    stars?: number;
+    stars?: number | null;
 }
 export function BookCard({ book, showRate, stars }: cardProps) {
     return (
-        <Card className="my-4">
+        <Card>
             <CardContent className="flex flex-col gap-6 p-6 md:flex-row">
                 <img
                     src={book.img}
                     alt={`Cover of ${book.title}`}
-                    className="h-75 w-full shrink-0 rounded-lg object-cover shadow-sm md:h-auto md:w-56"
+                    className="aspect-2/3 w-44 shrink-0 self-center rounded-lg object-cover shadow-sm sm:w-52 md:w-56 md:self-start"
                 />
                 <div className="flex flex-1 flex-col justify-between">
                     <div>
@@ -51,8 +51,13 @@ export function BookCard({ book, showRate, stars }: cardProps) {
                         </div>
                     </div>
 
-                    {(showRate && stars) ? (
-                        <StarRating rating={stars}/>    
+                    {showRate ? (
+                        <div className="mt-6 flex items-center gap-3">
+                            <StarRating rating={stars} />
+                            <span className="text-sm text-muted-foreground">
+                                {stars != null ? `${stars.toFixed(1)} / 5` : "No ratings yet"}
+                            </span>
+                        </div>
                     ) : (
                         <div className="mt-6 flex md:justify-end">
                             <Button

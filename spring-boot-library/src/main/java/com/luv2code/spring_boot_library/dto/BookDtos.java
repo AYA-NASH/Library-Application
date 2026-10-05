@@ -2,9 +2,9 @@ package com.luv2code.spring_boot_library.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.luv2code.spring_boot_library.entity.BookSource;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Set;
 
@@ -49,8 +49,24 @@ public sealed interface BookDtos {
             Integer copies,
             @Schema(example = "7")
             Integer copiesAvailable,
-            String status
+            String status,
+            Double averageRating
     ) implements BookDtos {
+        public BookResponse withAverageRating(Double averageRating) {
+            return new BookResponse(
+                    id,
+                    title,
+                    author,
+                    description,
+                    imgUrl,
+                    categories,
+                    dataSource,
+                    copies,
+                    copiesAvailable,
+                    status,
+                    averageRating
+            );
+        }
     }
 
     record DigitalAccessResponse(
@@ -65,6 +81,6 @@ public sealed interface BookDtos {
             long totalPhysicalCopies,
             long digitalBooks,
             long outOfStock
-    ) implements  BookDtos{
+    ) implements BookDtos {
     }
 }

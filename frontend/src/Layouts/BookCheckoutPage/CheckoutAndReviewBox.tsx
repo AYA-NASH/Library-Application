@@ -25,24 +25,21 @@ export function CheckoutAndReviewBox({
     isReviewLeft,
 }: CheckoutAndReviewBoxProps) {
     const isAuthenticated = useAuthStore((state) => !!state.token);
+    const { mutate: checkout } = useCheckout();
 
     if (!book) return null;
-    // const [displayError, setDisplayError] = useState(false);
 
-    const { mutate: checkout } = useCheckout();
     const handleCheckout = () => {
         checkout(book.id!, {
             onError: (err) => {
                 const apiError = parseApiError(err);
                 toast.error(apiError.message);
-                // setDisplayError(true);
             },
-            // onSuccess: () => setDisplayError(false)
         });
     };
     return (
-        <Card className="w-full lg:w-[25%] lg:max-w-sm border-0 shadow-sm rounded-2xl h-fit">
-            <CardContent className="p-6 space-y-5">
+        <Card className="w-full">
+            <CardContent className="p-4 sm:p-6 space-y-5">
 
                 <PreviewActionBox
                     bookId={book.id!}
@@ -57,7 +54,7 @@ export function CheckoutAndReviewBox({
                         Borrow or Buy
                     </h5>
                     {!isAuthenticated && (
-                        <Button size="lg" className="w-full m-4"
+                        <Button size="lg" className="mt-4 h-auto w-full py-2 whitespace-normal"
                             nativeButton={false}
                             render={
                                 <Link to="/login">

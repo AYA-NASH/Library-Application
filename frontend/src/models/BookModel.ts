@@ -9,6 +9,8 @@ export class BookModel {
     categories?: { id: number; name: string }[];
     dataSource: string;
     img?: string;
+    /** Calculated by the backend; null when the book has no reviews yet. */
+    averageRating: number | null;
 
     constructor(id: number, title: string,
         status: string,
@@ -16,7 +18,9 @@ export class BookModel {
         copies: number,
         copiesAvailable: number,
         dataSource: string, img: string,
+        averageRating: number | null,
         categories?: { id: number; name: string }[],
+        
     ) {
 
         this.id = id;
@@ -29,5 +33,6 @@ export class BookModel {
         this.categories = categories;
         this.dataSource = dataSource;
         this.img = img;
+        this.averageRating = averageRating;
     }
 };

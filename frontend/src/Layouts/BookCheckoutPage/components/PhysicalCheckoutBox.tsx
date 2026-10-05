@@ -26,11 +26,11 @@ export function PhysicalCheckoutBox({ book, checkoutBook }: PhysicalCheckoutProp
 
         if (isCheckedout) {
             return (
-                <Alert className="mt-4 bg-green-50 text-green-900 border-green-200">
+                <Alert className="mt-4 bg-green-50 text-green-900 border">
                     <CheckCircle className="h-4 w-4 stroke-green-600" />
                     <AlertTitle>Already Borrowed</AlertTitle>
                     <AlertDescription className="mt-2">
-                        <Button variant="outline" size="sm" >
+                        <Button variant="ghost" size="sm" >
                             <Link to="/loans">Check Status</Link>
                         </Button>
                     </AlertDescription>
