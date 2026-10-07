@@ -9,7 +9,6 @@ import { MessagesPage } from "./Layouts/MessagesPage/MessagesPage";
 import { PaymentPage } from "./Layouts/PaymentPage/PaymentPage";
 import SignupPage from "./Layouts/AuthPage/SignupPage";
 import { BookPage } from "./Layouts/BookCheckoutPage/BookPage";
-import { ReviewListPage } from "./Layouts/BookCheckoutPage/ReviewListPage/ReviewListPage";
 import { SearchBooksPage } from "./Layouts/SearchBooks/SearchBooksPage";
 import { ReaderPreviewPage } from "./Layouts/PDFReader/ReaderPreviewPage";
 import { ReaderAccessPage } from "./Layouts/PDFReader/ReaderAccessPage";
@@ -40,7 +39,6 @@ export const router = createBrowserRouter([
             { path: "signup", element: <SignupPage /> },
             { path: "search", element: <SearchBooksPage /> },
             { path: "checkout/:bookId", element: <BookPage /> },
-            { path: "reviewList/:bookId", element: <ReviewListPage /> },
 
             {
                 element: <RequireAuth />,
@@ -66,7 +64,7 @@ export const router = createBrowserRouter([
         children: [
             { index: true, element: <MainPage /> },
             { path: "books", element: <Books /> },
-            {path: "categories", element: <Categories />},
+            { path: "categories", element: <Categories /> },
             { path: "messages", element: <Messages /> },
         ]
     },

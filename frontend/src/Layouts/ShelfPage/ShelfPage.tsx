@@ -1,62 +1,22 @@
-import { useState } from "react";
-import { HistoryPage } from "./components/HistoryPage";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loans } from "./components/Loans";
+import { HistoryPage } from "./components/HistoryPage";
 
-export const ShelfPage = () => {
-  console.log("Shelf Page")
-  const [historyClick, setHistoryClick] = useState(false);
-  return (
-    <div className="container">
-      <div className="mt-3">
-        <nav>
-          <div className="nav nav-tabs" id="nav-tab" role="tablist">
-            <button
-              className="nav-link active"
-              id="nav-loans-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#nav-loans"
-              type="button"
-              role="tab"
-              aria-controls="nav-loans"
-              aria-selected="true"
-              onClick={()=> setHistoryClick(false)}
-            >
-              Loans
-            </button>
-            <button
-              className="nav-link"
-              id="nav-history-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#nav-history"
-              type="button"
-              role="tab"
-              aria-controls="nav-history"
-              aria-selected="false"
-              onClick={()=> setHistoryClick(true)}
-            >
-              Your History
-            </button>
-          </div>{" "}
-        </nav>
-        <div className="tab-content" id="nav-tabContent">
-          <div
-            className="tab-pane fade show active"
-            id="nav-loans"
-            role="tabpanel"
-            aria-labelledby="nav-loans-tab"
-          >
-            <Loans/>
-          </div>
-          <div
-            className="tab-pane fade"
-            id="nav-history"
-            role="tabpanel"
-            aria-labelledby="nav-history-tab"
-          >
-            {historyClick ? <HistoryPage /> : <></>}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+export function ShelfPage() {
+    return (
+        <Tabs defaultValue="loans" className="w-full m-10">
+            <TabsList variant="line">
+                <TabsTrigger value="loans">Current Loans</TabsTrigger>
+                <TabsTrigger value="history">Your History</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="loans">
+                <Loans />
+            </TabsContent>
+
+            <TabsContent value="history">
+                <HistoryPage />
+            </TabsContent>
+        </Tabs>
+    );
+}

@@ -13,7 +13,7 @@ interface cardProps {
 }
 export function BookCard({ book, showRate, stars }: cardProps) {
     return (
-        <Card>
+        <Card className="my-2">
             <CardContent className="flex flex-col gap-6 p-6 md:flex-row">
                 <img
                     src={book.img}

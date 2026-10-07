@@ -8,7 +8,7 @@ import { BookCard } from "../Utils/BookCard";
 import { ColumnFiltersState, PaginationState } from "@tanstack/react-table";
 import { useDashboardTable } from "@/hooks/useDashboardTable";
 import { bookSearchColumns } from "./components/bookSearchColumns";
-import { PaginationSection } from "../Utils/PagintationSection";
+import { PaginationSection } from "./components/PagintationSection";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 

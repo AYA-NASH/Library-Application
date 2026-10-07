@@ -35,7 +35,7 @@ export function Review({ review }: ReviewProps) {
                 </div>
             </div>
 
-            <p className="text-sm text-foreground leading-relaxed break-words sm:ml-12">
+            <p className="text-sm text-foreground leading-relaxed wrap-break-word sm:ml-12">
                 {review.reviewDescription}
             </p>
         </div>

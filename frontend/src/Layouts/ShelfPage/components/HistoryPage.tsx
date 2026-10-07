@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Link } from "react-router-dom";
-import { Pagination } from "../../Utils/PaginationLegacy";
+// import { Pagination } from "../../Utils/PaginationLegacy";
 import { useGetUserBooksHistory } from "../../../api/hooks/BookHooks/useHistory";
 import { HistoryItem } from "./HistoryItem";
 import { HistoryModel } from "../../../models/HistoryModel";
@@ -47,7 +47,7 @@ export const HistoryPage: React.FC = () => {
                 <HistoryItem key={history.id} history={history} isMobile={isMobile} />
             ))}
 
-            {histories.totalPages > 1 && (
+            {/* {histories.totalPages > 1 && (
                 <div className="mt-4">
                     <Pagination
                         currentPage={currentPage}
@@ -55,7 +55,7 @@ export const HistoryPage: React.FC = () => {
                         paginate={paginate}
                     />
                 </div>
-            )}
+            )} */}
         </div>
     );
 };

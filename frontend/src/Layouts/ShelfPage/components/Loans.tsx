@@ -1,36 +1,22 @@
-import { useState } from "react";
+import { SpinnerLoading } from "@/Layouts/Utils/SpinnerLoading";
+import { ApiErrorDisplay } from "@/Layouts/Utils/ApiErrorDisplay";
+import { SimplePagination } from "@/Layouts/Utils/Pagination";
+import { EmptyState } from "@/Layouts/Utils/EmptyState";
+import { useCurrentLoans } from "@/api/hooks/BookHooks/useLoans";
+import { LoanCard } from "./LoanCard";
 import { Link } from "react-router-dom";
-import { ShelfCurrentLoans } from "../../../models/ShelfCurrentLoans";
-import { SpinnerLoading } from "../../Utils/SpinnerLoading";
-import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
-import { parseApiError } from "../../../errors/parseApiError";
-
-import { useCurrentLoans, useRenewLoan, useReturnBook } from "../../../api/hooks/BookHooks/useLoans";
-import { toast } from "sonner";
-import { LoanItem } from "./LoanItem";
-import { useIsMobile } from "../../Utils/useIsMobile";
+import { useState } from "react";
 
 export const Loans = () => {
-    const isMobile = useIsMobile();
+    const [page, setPage] = useState(1);
+    const pageSize = 5;
 
-    const { data: shelfCurrentLoans,
+    const {
+        data: shelfCurrentLoans,
         isLoading: isLoadingUserLoans,
         isError,
         error: httpError
-    } = useCurrentLoans(1, 10);
-
-    const { mutate: returnBookMutation } = useReturnBook();
-    const { mutate: renewLoanMutation } = useRenewLoan();
-
-    const [checkout, setCheckout] = useState(false);
-
-
-    const [lateReturnMessage, setLateReturnMessage] = useState<string | null>(null);
-
-    const lateReturnMsg = () => {
-        setLateReturnMessage("You returned a late book. Please visit the Fees page to pay your fees before checking out new books.");
-        setTimeout(() => setLateReturnMessage(null), 5000); // auto-hide after 5s
-    };
+    } = useCurrentLoans(page, pageSize);
 
     if (isLoadingUserLoans) {
         return <SpinnerLoading />;
@@ -40,73 +26,48 @@ export const Loans = () => {
         return <ApiErrorDisplay error={httpError} title="Failed to load loans" />;
     }
 
-    async function returnBook(shelfCurrentLoan: ShelfCurrentLoans) {
-        const bookId = shelfCurrentLoan.book.id;
-        const isLate = shelfCurrentLoan.daysLeft < 0;
-        returnBookMutation(bookId, {
-            onSuccess: () => {
-                setCheckout(!checkout);
-                if (isLate) lateReturnMsg();
-                toast.success(`${shelfCurrentLoan.book.title} is returned`);
-            }, onError: (err) => {
-                const apiError = parseApiError(err);
-                toast.error(apiError.message);
-            }
-        }
-        );
-    }
+    const loans = shelfCurrentLoans?.content || [];
+    const totalPages = shelfCurrentLoans?.totalPages || 0;
 
-    async function renewLoan(bookId: number) {
-        renewLoanMutation(bookId, {
-            onSuccess: () => {
-                setCheckout(!checkout);
-                toast.success("you renewed checkout due-date, remeber to return it back in next 7-days");
-            }, onError: (err) => {
-                const apiError = parseApiError(err);
-                toast.error(apiError.message);
-            }
-        }
-        );
-    }
-
-    if (!shelfCurrentLoans || shelfCurrentLoans.content.length === 0) {
+    if (loans.length === 0) {
         return (
-            <div className="container mt-5 text-center">
-                <div className="p-5 bg-light rounded-3">
-                    <h3>Currently no loans</h3>
-                    <p>Looks like you haven't borrowed anything yet.</p>
-                    <Link className="btn btn-dark btn-lg" to="/search">Explore Library</Link>
-                </div>
+            <div className="mt-28 mx-4">
+                <EmptyState
+                    title="Currently No Loans"
+                    description="Looks like you haven't borrowed anything yet."
+                    action={
+                        <Link to="/search">Explore Library</Link>
+                    }
+                />
             </div>
         );
     }
 
     return (
-        <div className="container">
-            {lateReturnMessage && (
-                <div className="alert alert-danger mt-3" role="alert">
-                    {lateReturnMessage}
+        <div className="w-full max-w-7xl overflow-hidden mx-auto">
+
+            <h5 className="my-6 text-foreground text-lg font-medium">Current Loans ({shelfCurrentLoans?.totalElements}):</h5>
+
+            {loans.map((loan) => (
+                <div key={loan.book.id} className="mb-6">
+                    <LoanCard loan={loan} />
+                </div>
+            ))}
+
+            {page === shelfCurrentLoans?.totalPages && (
+                <div className="bg-card border rounded-2xl p-4">
+                    <Link to="/search" className="text-md text-muted-foreground hover:text-accent-foreground">
+                        ← Borrow something else?
+                    </Link>
                 </div>
             )}
 
-            <h5 className="mt-4">Current Loans:</h5>
-            <hr />
-
-            {shelfCurrentLoans.content.map((loan) => (
-                <div key={loan.book.id}>
-                    <LoanItem
-                        loan={loan}
-                        isMobile={isMobile}
-                        returnBook={returnBook}
-                        renewLoan={renewLoan}
-                    />
-                    <hr className="d-lg-none" />
-                </div>
-            ))}
-            <div className="card-footer bg-white border-top-0 py-3">
-                <Link to="/search" className="text-decoration-none text-muted hover-dark">
-                    ← Borrow something else?
-                </Link>
+            <div className="mt-8 mb-4">
+                <SimplePagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={setPage}
+                />
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
-import { Pagination } from "../../Utils/PaginationLegacy";
+// import { Pagination } from "../../Utils/PaginationLegacy";
 import { useUserMessages } from "../../../api/hooks/LibraryServiceHooks/useMessage";
 
 import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
@@ -65,11 +65,11 @@ export const Messages = () => {
                     <h5 className="mt-3 text-muted">No messages found in your history.</h5>
                 </div>
             )}
-            <Pagination
+            {/* <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 paginate={paginate}
-            />
+            /> */}
         </div>
     );
 };
