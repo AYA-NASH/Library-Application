@@ -61,9 +61,6 @@ export function CategoryTrends() {
         return "Last 3 months";
     };
 
-    console.log("Chart Data: ", chartData);
-    console.log("Chart Config: ", chartConfig);
-
     return (
         <Card data-chart={id} className="flex flex-col">
             <ChartStyle id={id} config={chartConfig} />

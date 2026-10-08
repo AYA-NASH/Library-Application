@@ -21,7 +21,7 @@ export function EmptyState({
             <CardHeader className="flex flex-col items-center gap-2">
                 <CardTitle className="text-xl">
                     {Icon && (
-                        <Icon className="h-12 w-12 text-muted-foreground/50" />
+                        <Icon className="h-12 w-12 text-muted-foreground/50 inline p-2" />
                     )}
                     {title}
                 </CardTitle>

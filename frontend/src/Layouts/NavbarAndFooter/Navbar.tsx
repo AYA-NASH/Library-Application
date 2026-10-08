@@ -1,106 +1,52 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
 import Logo from "@/assets/Logo";
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-    navigationMenuTriggerStyle
-} from "@/components/ui/navigation-menu";
-import { NavbarProfileMenu } from "./NavbarProfileMenu";
-import { NavigationLink } from "@/types/navigation";
+import { NavbarProfileMenu } from "./components/NavbarProfileMenu";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-
-const publicNavigations: NavigationLink[] = [
-    { title: "Home", href: "/" },
-    { title: "Browse Books", href: "/search" }
-];
-
-const authenticatedLinks: NavigationLink[] = [
-    { title: "Profile", href: "#" },
-    { title: "My Shelf", href: "/shelf" },
-    { title: "Fees", href: "/fees" },
-];
-
-const adminLinks: NavigationLink[] = [
-    {
-        title: "System Dashboard",
-        description: "Check System Performance and Manage different Library Aspects",
-        href: "/admin-dashboard"
-    }
-];
+import { DesktopNav } from "./components/DesktopNav";
+import { MobileNav } from "./components/MobileNav";
+import { authenticatedLinks } from "./navConfig";
 
 function Navbar() {
-    const isAdmin = useAuthStore((state) => state.user?.role === 'ADMIN');
+    const isAdmin = useAuthStore((state) => state.user?.role === "ADMIN");
     const isAuthenticated = useAuthStore((state) => !!state.token);
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     return (
-        <nav className="bg-background flex items-center justify-between px-12 py-2">
-            <div className="flex gap-2">
-                <Link to="/" className="shadow-xl">
-                    <Logo />
-                </Link>
-                <NavigationMenu>
-                    <NavigationMenuList>
-                        {publicNavigations.map(item => (
-                            <NavigationMenuItem key={item.href}>
-                                <NavigationMenuLink
-                                    className={`${navigationMenuTriggerStyle()} 
-                                            hover:text-accent-foreground
-                                        `}
-                                    render={<Link to={item.href}>{item.title}</Link>}
-                                />
-                            </NavigationMenuItem>
-                        ))}
+        <nav className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+            <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center gap-6">
+                    <Link to="/" className="flex items-center gap-2">
+                        <Logo />
+                    </Link>
+                    <DesktopNav isAdmin={isAdmin} />
+                </div>
 
-                        {isAdmin && (
-                            <NavigationMenuItem>
-                                <NavigationMenuTrigger className="hover:text-accent-foreground hover:cursor-pointer"> Admin Actions </NavigationMenuTrigger>
-                                <NavigationMenuContent>
-                                    {adminLinks.map(item => (
-                                        <NavigationMenuLink className="m-2 p-4 hover:text-accent-foreground"
-                                            key={item.href}
-                                            render={
-                                                <Link to={item.href}>
-                                                    <div className="flex flex-col gap-1 text-sm">
-                                                        <div className="leading-none font-medium">
-                                                            {item.title}
-                                                        </div>
-                                                        <div className="line-clamp-2 text-muted-foreground">
-                                                            {item.description}
-                                                        </div>
-                                                    </div>
+                <div className="flex items-center gap-2 sm:gap-3">
+                    <ThemeToggle />
 
-                                                </Link>
-                                            }
-                                        />
-                                    ))}
-
-                                </NavigationMenuContent>
-                            </NavigationMenuItem>
+                    <div className="hidden md:flex items-center">
+                        {isAuthenticated ? (
+                            <NavbarProfileMenu authenticatedLinks={authenticatedLinks} />
+                        ) : (
+                            <Button
+                                className="font-bold"
+                                nativeButton={false}
+                                render={<Link to="/login">Sign In</Link>}
+                            />
                         )}
-                    </NavigationMenuList>
-                </NavigationMenu>
-            </div>
-            <div className="flex items-center gap-2">
-                <ThemeToggle />
-                {isAuthenticated ? (
-                    <NavbarProfileMenu authenticatedLinks={authenticatedLinks} />
+                    </div>
 
-                ) : (
-                    <Button
-                        className="p-4 font-bold"
-                        nativeButton={false}
-                        render={<Link to="/login">Sign In</Link>}
+                    <MobileNav
+                        isOpen={mobileOpen}
+                        onOpenChange={setMobileOpen}
+                        isAuthenticated={isAuthenticated}
+                        isAdmin={isAdmin}
                     />
-                )}
+                </div>
             </div>
-
         </nav>
     );
 }

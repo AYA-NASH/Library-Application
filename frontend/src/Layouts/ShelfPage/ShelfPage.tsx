@@ -4,19 +4,24 @@ import { HistoryPage } from "./components/HistoryPage";
 
 export function ShelfPage() {
     return (
-        <Tabs defaultValue="loans" className="w-full m-10">
-            <TabsList variant="line">
-                <TabsTrigger value="loans">Current Loans</TabsTrigger>
-                <TabsTrigger value="history">Your History</TabsTrigger>
-            </TabsList>
+        <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+            <Tabs defaultValue="loans" className="w-full">
+                <TabsList
+                    variant="line"
+                    className="w-full justify-start overflow-x-auto overflow-y-hidden scrollbar-none [&::-webkit-scrollbar]:hidden"
+                >
+                    <TabsTrigger value="loans">Current Loans</TabsTrigger>
+                    <TabsTrigger value="history">Your History</TabsTrigger>
+                </TabsList>
 
-            <TabsContent value="loans">
-                <Loans />
-            </TabsContent>
+                <TabsContent value="loans" className="mt-6">
+                    <Loans />
+                </TabsContent>
 
-            <TabsContent value="history">
-                <HistoryPage />
-            </TabsContent>
-        </Tabs>
+                <TabsContent value="history" className="mt-6">
+                    <HistoryPage />
+                </TabsContent>
+            </Tabs>
+        </div>
     );
 }

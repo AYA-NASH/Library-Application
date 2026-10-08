@@ -1,61 +1,67 @@
 import { useState } from "react";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
 import { Link } from "react-router-dom";
-// import { Pagination } from "../../Utils/PaginationLegacy";
+import { History } from "lucide-react";
 import { useGetUserBooksHistory } from "../../../api/hooks/BookHooks/useHistory";
 import { HistoryItem } from "./HistoryItem";
-import { HistoryModel } from "../../../models/HistoryModel";
-import { useIsMobile } from "../../Utils/useIsMobile";
 
 import { ApiErrorDisplay } from "../../Utils/ApiErrorDisplay";
+import { EmptyState } from "@/Layouts/Utils/EmptyState";
+import { SimplePagination } from "@/Layouts/Utils/Pagination";
 
 export const HistoryPage: React.FC = () => {
-    const isMobile = useIsMobile();
     const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 5;
+
     const {
         data: histories,
-        isLoading: isLoadingHistory,
+        isLoading,
         isError,
         error: httpError,
         refetch
-    } = useGetUserBooksHistory(currentPage, 2);
+    } = useGetUserBooksHistory(currentPage, pageSize);
 
-    if (isLoadingHistory) return <SpinnerLoading />;
+    if (isLoading) return <SpinnerLoading />;
 
     if (isError) {
         return <ApiErrorDisplay error={httpError} title="Failed to load history" onRetry={() => refetch()} />;
     }
 
-    if (!histories || histories.content.length === 0) {
+    const historyList = histories?.content || [];
+    const totalPages = histories?.totalPages || 0;
+
+    if (historyList.length === 0) {
         return (
-            <div className="container mt-5 text-center">
-                <h3>Currently no history</h3>
-                <Link className="btn btn-dark mt-2" to="/search">
-                    Search for new book
-                </Link>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
+                <EmptyState
+                    icon={History}
+                    title="No reading history"
+                    description="You haven't borrowed and returned any books yet."
+                    action={
+                        <Link to="/search">Explore Library</Link>
+                    }
+                />
             </div>
         );
     }
 
-    const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
     return (
-        <div className="container mt-4">
-            <h5 className="fw-bold mb-4">Recent History:</h5>
+        <div className="w-full">
+            <h5 className="mb-6 text-foreground text-lg font-medium">Recent History: {histories?.totalElements}</h5>
 
-            {histories.content.map((history: HistoryModel) => (
-                <HistoryItem key={history.id} history={history} isMobile={isMobile} />
-            ))}
+            <div className="flex flex-col gap-6">
+                {historyList.map((history) => (
+                    <HistoryItem key={history.id} history={history} />
+                ))}
+            </div>
 
-            {/* {histories.totalPages > 1 && (
-                <div className="mt-4">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={histories.totalPages}
-                        paginate={paginate}
-                    />
-                </div>
-            )} */}
+            <div className="mt-8 mb-4">
+                <SimplePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+            </div>
         </div>
     );
 };

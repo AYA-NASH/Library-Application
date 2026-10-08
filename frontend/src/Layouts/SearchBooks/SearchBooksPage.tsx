@@ -56,7 +56,7 @@ export const SearchBooksPage = () => {
     const totalElements = data?.totalElements ?? 0;
 
     return (
-        <div className=" mt-5 px-6">
+        <div className="w-full max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
             <BookFilterBar
                 table={table}
                 categories={options ?? []}

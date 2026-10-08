@@ -28,7 +28,7 @@ export function PhysicalCheckoutBox({ book, checkoutBook }: PhysicalCheckoutProp
             return (
                 <Alert className="mt-4 bg-green-50 text-green-900 border">
                     <CheckCircle className="h-4 w-4 stroke-green-600" />
-                    <AlertTitle>Already Borrowed</AlertTitle>
+                    <AlertTitle>Borrowed</AlertTitle>
                     <AlertDescription className="mt-2">
                         <Button variant="ghost" size="sm" >
                             <Link to="/loans">Check Status</Link>

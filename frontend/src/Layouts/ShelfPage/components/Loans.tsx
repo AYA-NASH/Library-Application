@@ -44,9 +44,8 @@ export const Loans = () => {
     }
 
     return (
-        <div className="w-full max-w-7xl overflow-hidden mx-auto">
-
-            <h5 className="my-6 text-foreground text-lg font-medium">Current Loans ({shelfCurrentLoans?.totalElements}):</h5>
+        <div className="w-full">
+            <h5 className="mb-6 text-foreground text-lg font-medium">Current Loans ({shelfCurrentLoans?.totalElements}):</h5>
 
             {loans.map((loan) => (
                 <div key={loan.book.id} className="mb-6">
