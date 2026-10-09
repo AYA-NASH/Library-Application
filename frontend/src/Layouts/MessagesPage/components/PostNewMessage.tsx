@@ -1,65 +1,154 @@
-import { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { MessageSquareText, Send } from "lucide-react";
+
 import { useAddUserMessage } from "../../../api/hooks/LibraryServiceHooks/useMessage";
 
-export const PostNewMessage = () => {
-    const [title, setTitle] = useState("");
-    const [question, setQuestion] = useState("");
-    const [displayWarning, setDisplayWarning] = useState(false);
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+} from "@/components/ui/card";
+import {
+    Field,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
+const messageSchema = z.object({
+    title: z.string().trim().min(1, "Subject is required."),
+    question: z.string().trim().min(1, "Description is required."),
+});
+
+type MessageFormValues = z.infer<typeof messageSchema>;
+
+export const PostNewMessage = () => {
     const { mutate: addMessage, isPending } = useAddUserMessage();
 
-    function submitNewQuestion() {
-        if (title.trim() !== "" && question.trim() !== "") {
-            addMessage({ title, question }, {
-                onSuccess: () => {
-                    setTitle("");
-                    setQuestion("");
-                    setDisplayWarning(false);
-                }
-            });
-        } else {
-            setDisplayWarning(true);
-        }
+    const form = useForm<MessageFormValues>({
+        resolver: zodResolver(messageSchema),
+        defaultValues: {
+            title: "",
+            question: "",
+        },
+    });
+
+    function submitNewQuestion(values: MessageFormValues) {
+        addMessage(
+            {
+                title: values.title,
+                question: values.question,
+            },
+            {
+                onSuccess: () => form.reset(),
+            }
+        );
     }
 
     return (
-        <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
-            <div className="card-header bg-white border-bottom py-3">
-                <h5 className="mb-0 fw-semibold text-primary">Submit a New Inquiry</h5>
-                <small className="text-muted">Our admin team typically responds within 24 hours.</small>
-            </div>
-            <div className="card-body p-4">
-                <form>
-                    <div className="mb-4">
-                        <label className="form-label fw-bold text-secondary small text-uppercase">Subject</label>
-                        <input
-                            type="text"
-                            className="form-control form-control-lg border-2"
-                            placeholder="What can we help you with?"
-                            onChange={(e) => setTitle(e.target.value)}
-                            value={title}
-                        />
+        <Card className="overflow-hidden border-border/60 shadow-sm">
+            <CardHeader className="gap-3 border-b border-border/60 bg-muted/30 px-5 py-5 sm:px-6">
+                <div className="flex items-center gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <MessageSquareText className="size-5" />
                     </div>
-                    <div className="mb-4">
-                        <label className="form-label fw-bold text-secondary small text-uppercase">Detailed Description</label>
-                        <textarea
-                            className="form-control border-2"
-                            rows={5}
-                            placeholder="Please provide as much detail as possible..."
-                            onChange={(e) => setQuestion(e.target.value)}
-                            value={question}
-                        />
+
+                    <div className="space-y-1">
+                        <CardTitle className="text-lg">
+                            Submit a New Inquiry
+                        </CardTitle>
+                        <CardDescription>
+                            Have a question or need assistance? Send our team a message.
+                        </CardDescription>
                     </div>
-                    <button
-                        type="button"
-                        className="btn btn-primary btn-lg px-5 rounded-pill shadow-sm"
-                        onClick={submitNewQuestion}
-                        disabled={isPending}
-                    >
-                        {isPending ? "Sending Ticket..." : "Post Message"}
-                    </button>
+                </div>
+
+                <p className="text-xs text-muted-foreground sm:pl-13">
+                    Our administration team typically responds within 24 hours.
+                </p>
+            </CardHeader>
+
+            <CardContent className="p-5 sm:p-6">
+                <form
+                    onSubmit={form.handleSubmit(submitNewQuestion)}
+                    className="space-y-5"
+                >
+                    <FieldGroup className="gap-5">
+                        <Controller
+                            name="title"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor={field.name}>
+                                        Subject
+                                    </FieldLabel>
+
+                                    <Input
+                                        {...field}
+                                        id={field.name}
+                                        placeholder="What can we help you with?"
+                                        aria-invalid={fieldState.invalid}
+                                        disabled={isPending}
+                                    />
+
+                                    {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                    )}
+                                </Field>
+                            )}
+                        />
+
+                        <Controller
+                            name="question"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid}>
+                                    <FieldLabel htmlFor={field.name}>
+                                        Detailed description
+                                    </FieldLabel>
+
+                                    <Textarea
+                                        {...field}
+                                        id={field.name}
+                                        placeholder="Please provide details to help us understand your inquiry..."
+                                        rows={5}
+                                        className="resize-y"
+                                        aria-invalid={fieldState.invalid}
+                                        disabled={isPending}
+                                    />
+
+                                    {fieldState.invalid && (
+                                        <FieldError errors={[fieldState.error]} />
+                                    )}
+                                </Field>
+                            )}
+                        />
+                    </FieldGroup>
+
+                    <div className="flex justify-end border-t border-border/60 pt-4">
+                        <Button type="submit" disabled={isPending}>
+                            {isPending ? (
+                                <>
+                                    <span className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent" />
+                                    Sending...
+                                </>
+                            ) : (
+                                <>
+                                    <Send className="size-4" />
+                                    Post Message
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </form>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 };

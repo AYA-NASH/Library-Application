@@ -1,10 +1,19 @@
 import { Link } from "react-router-dom";
+import { PartyPopper } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "../../Utils/EmptyState";
 
 export const NoFeesEmptyState = () => (
-    <div className="text-center py-5">
-        <div className="display-1 mb-4">🎉</div>
-        <h2 className="fw-bold">No fees yet!</h2>
-        <p className="text-muted mb-4">Your account is in good standing. Keep returning those books on time!</p>
-        <Link className="btn btn-dark rounded-pill px-5" to="/search">Explore Library</Link>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
+        <EmptyState
+            icon={PartyPopper}
+            title="No fees yet!"
+            description="Your account is in good standing. Keep returning those books on time!"
+            action={
+                <Button variant="default" className="px-8">
+                    <Link to="/search">Explore Library</Link>
+                </Button>
+            }
+        />
     </div>
 );

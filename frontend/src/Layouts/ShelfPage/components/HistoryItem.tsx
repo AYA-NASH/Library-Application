@@ -23,8 +23,8 @@ export function HistoryItem({ history }: HistoryItemProps) {
 
                 <div className="flex flex-1 min-w-0 flex-col justify-between">
                     <div>
-                        <h3 className="text-lg sm:text-xl font-bold tracking-tight break-words">{history.title}</h3>
-                        <p className="mt-1 text-sm font-medium text-muted-foreground break-words">{history.author}</p>
+                        <h3 className="text-lg sm:text-xl font-bold tracking-tight wrap-break-word">{history.title}</h3>
+                        <p className="mt-1 text-sm font-medium text-muted-foreground wrap-break-word">{history.author}</p>
 
                         <p className="mt-3 sm:mt-4 text-sm text-foreground/90 line-clamp-3 leading-relaxed break-words [overflow-wrap:anywhere]">
                             {history.description}

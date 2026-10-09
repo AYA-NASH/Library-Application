@@ -67,8 +67,8 @@ export function LoanCard({ loan }: LoanCardProps) {
                         className="h-auto w-24 sm:w-32 shrink-0 rounded object-cover shadow-sm self-center sm:self-start"
                     />
                     <div className="text-center sm:text-left min-w-0 flex-1">
-                        <h3 className="text-lg sm:text-xl font-bold tracking-tight break-words">{book.title}</h3>
-                        <p className="mt-1 text-sm text-muted-foreground break-words">{book.author}</p>
+                        <h3 className="text-lg sm:text-xl font-bold tracking-tight wrap-break-word">{book.title}</h3>
+                        <p className="mt-1 text-sm text-muted-foreground wrap-break-word">{book.author}</p>
                     </div>
                 </div>
                 <div className="flex flex-col gap-3 w-full lg:w-72 xl:w-80 shrink-0">
