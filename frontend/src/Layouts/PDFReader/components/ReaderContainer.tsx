@@ -6,32 +6,42 @@ import { ReaderToolbar } from "./ReaderToolbar";
 import PdfViewer from "./PdfViewer";
 import { useBlobCleanup } from "./useBlobCleanup";
 
+interface ReaderContainerProps {
+    fileUrl: string;
+}
 
-
-const ReaderContainer = ({ fileUrl }: { fileUrl: string }) => {
+const ReaderContainer = ({ fileUrl }: ReaderContainerProps) => {
     const {
-        currentPage, totalPages, setTotalPages,
-        scrollMode, goToPage
+        currentPage,
+        totalPages,
+        setTotalPages,
+        scrollMode,
+        goToPage,
     } = useReader();
 
     const viewerRef = useRef<HTMLDivElement>(null);
 
     useBlobCleanup(fileUrl);
-    
     useReaderKeyboard();
 
     useEffect(() => {
-        if (scrollMode && viewerRef.current) {
-            const pageElement = viewerRef.current.querySelector(`[data-page-number="${currentPage}"]`);
-            pageElement?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
+        if (!scrollMode || !viewerRef.current) return;
+
+        const pageElement = viewerRef.current.querySelector(
+            `[data-page-number="${currentPage}"]`,
+        );
+
+        pageElement?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
     }, [currentPage, scrollMode]);
 
     return (
-        <div className="reader-container">
+        <div className="flex min-w-0 flex-col gap-4">
             <ReaderToolbar />
 
-            <div className="viewer-wrapper border border-light rounded shadow-sm bg-dark p-1 mb-4 overflow-hidden">
+            <div className="overflow-hidden rounded-lg border border-border bg-muted/30 p-1 shadow-sm">
                 <PdfViewer
                     ref={viewerRef}
                     fileUrl={fileUrl}
@@ -46,6 +56,6 @@ const ReaderContainer = ({ fileUrl }: { fileUrl: string }) => {
             </div>
         </div>
     );
-}
+};
 
 export default ReaderContainer;

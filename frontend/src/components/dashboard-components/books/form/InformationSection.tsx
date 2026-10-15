@@ -5,7 +5,7 @@ import { FormInputField } from "@/components/dashboard-components/form-fields/Fo
 import { FormStepperField } from "@/components/dashboard-components/form-fields/FormStepperField";
 import { FormMultiSelectField } from "@/components/dashboard-components/form-fields/FormMultiSelectField";
 import { Separator } from "@base-ui/react";
-import { FileText } from "react-bootstrap-icons";
+import { FileText } from "lucide-react";
 import { FormTextareaField } from "../../form-fields/FormTextareaField";
 
 interface InformationSectionProps {

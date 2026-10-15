@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { messageService } from "../../services/messageService";
 import { AdminReplyRequest, userCreateMessageRequest } from "../../../models/MessageModel";
@@ -31,6 +31,7 @@ export const useAdminOpenMessages = (page: number, size: number) => {
     return useQuery({
         queryKey: ["messages", "admin", "open", page, size],
         queryFn: () => messageService.getAdminOpenedMessages(page, size),
+        placeholderData: keepPreviousData,
     });
 };
 

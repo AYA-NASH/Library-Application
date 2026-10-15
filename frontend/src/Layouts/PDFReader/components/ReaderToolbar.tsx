@@ -1,55 +1,107 @@
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+
 import { useReader } from "./ReaderContext";
 
 export const ReaderToolbar = () => {
     const {
-        currentPage, totalPages, maxAllowedPage,
-        goToPage, nextPage, prevPage,
-        scrollMode, setScrollMode
+        currentPage,
+        totalPages,
+        maxAllowedPage,
+        goToPage,
+        nextPage,
+        prevPage,
+        scrollMode,
+        setScrollMode,
     } = useReader();
 
+    const pageLimit = maxAllowedPage > 0 ? maxAllowedPage : totalPages;
+
+    const handlePageChange = (value: string) => {
+        if (value === "") return;
+
+        const page = Number(value);
+
+        if (Number.isInteger(page) && page >= 1) {
+            goToPage(page);
+        }
+    };
+
     return (
-        <div className="d-flex justify-content-between align-items-center mb-3 p-2 bg-white rounded shadow-sm border border-light">
-            <div className="d-flex align-items-center gap-3">
-                {/* Scroll Toggle */}
-                <div className="form-check form-switch mb-0">
-                    <input
-                        className="form-check-input"
-                        type="checkbox"
-                        role="switch"
-                        id="scrollModeSwitch"
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 shadow-sm">
+            <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                    <Switch
+                        id="reader-scroll-mode"
                         checked={scrollMode}
-                        onChange={(e) => setScrollMode(e.target.checked)}
+                        onCheckedChange={setScrollMode}
+                        aria-label="Continuous scroll mode"
                     />
-                    <label className="form-check-label small text-muted" htmlFor="scrollModeSwitch">
-                        Continuous Scroll
+                    <label
+                        htmlFor="reader-scroll-mode"
+                        className="cursor-pointer text-sm text-muted-foreground"
+                    >
+                        Continuous scroll
                     </label>
                 </div>
 
-                {/* Jump to Page (Only if not scrolling) */}
                 {!scrollMode && (
-                    <div className="d-flex align-items-center gap-2 border-start ps-3">
-                        <span className="small text-muted">Go to:</span>
-                        <input
+                    <div className="flex items-center gap-2 border-l border-border pl-4">
+                        <label
+                            htmlFor="reader-page-input"
+                            className="text-sm text-muted-foreground"
+                        >
+                            Go to page
+                        </label>
+
+                        <Input
+                            id="reader-page-input"
                             type="number"
-                            className="form-control form-control-sm"
-                            style={{ width: 60 }}
+                            min={1}
+                            max={pageLimit || undefined}
                             value={currentPage}
-                            onChange={(e) => goToPage(Number(e.target.value))}
+                            onChange={(event) =>
+                                handlePageChange(event.target.value)
+                            }
+                            className="h-8 w-20"
+                            aria-label="Current page number"
                         />
                     </div>
                 )}
             </div>
 
-            {/* Navigation Arrows */}
             {!scrollMode && (
-                <div className="d-flex align-items-center gap-1">
-                    <button className="btn btn-sm btn-link" onClick={prevPage} disabled={currentPage <= 1}>&larr;</button>
-                    <span className="text-muted small fw-medium">
-                        {currentPage} / {maxAllowedPage || totalPages}
+                <div className="flex items-center gap-2">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={prevPage}
+                        disabled={currentPage <= 1}
+                        aria-label="Previous page"
+                    >
+                        <ArrowLeft className="size-4" />
+                    </Button>
+
+                    <span className="min-w-16 text-center text-sm font-medium tabular-nums text-muted-foreground">
+                        {currentPage} / {pageLimit || "—"}
                     </span>
-                    <button className="btn btn-sm btn-link" onClick={nextPage} disabled={currentPage >= maxAllowedPage}>&rarr;</button>
+
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={nextPage}
+                        disabled={pageLimit === 0 || currentPage >= pageLimit}
+                        aria-label="Next page"
+                    >
+                        <ArrowRight className="size-4" />
+                    </Button>
                 </div>
             )}
         </div>
     );
-}
+};

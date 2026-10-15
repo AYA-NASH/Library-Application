@@ -2,13 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import { readerService } from "../../services/readerService";
 
 export const useBookAccess = (bookId: number | string, mode: "full" | "preview") => {
+    const normalizedBookId = Number(bookId);
+    const isValidBookId = Number.isInteger(normalizedBookId) && normalizedBookId > 0;
+
     return useQuery({
         queryKey: ["book-access", bookId, mode],
         queryFn: () =>
             mode === "full"
                 ? readerService.getFullAccessUrl(bookId)
                 : readerService.getPreviewAccessUrl(bookId),
-        enabled: !!bookId,
+        enabled: isValidBookId,
         staleTime: 1000 * 60 * 5,
         retry: 1,
     });

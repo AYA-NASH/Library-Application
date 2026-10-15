@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useCallback, useRef } from "react";
 import { Document, Page } from "react-pdf";
 
 import "react-pdf/dist/Page/TextLayer.css";
@@ -14,76 +14,120 @@ interface PdfViewerProps {
 }
 
 const PdfViewer = forwardRef<HTMLDivElement, PdfViewerProps>(
-    ({ fileUrl, currentPage, renderMode, totalPages, onLoadSuccess, onVisiblePageChange }, ref) => {
+    (
+        {
+            fileUrl,
+            currentPage,
+            renderMode,
+            totalPages = 0,
+            onLoadSuccess,
+            onVisiblePageChange,
+        },
+        forwardedRef,
+    ) => {
+        const internalRef = useRef<HTMLDivElement>(null);
+        const lastReportedPage = useRef<number | null>(null);
 
-        const handleScroll = () => {
-            const container = ref && "current" in ref ? ref.current : (ref as unknown as HTMLDivElement);
-            if (!container || !totalPages) return;
+        const setContainerRef = (node: HTMLDivElement | null) => {
+            internalRef.current = node;
 
-            const pages = Array.from(container.querySelectorAll('[data-page-number]')) as HTMLElement[];
-            const containerRect = container.getBoundingClientRect();
-
-            // Find the first page that is visible at the top of the container
-            for (const page of pages) {
-                const rect = page.getBoundingClientRect();
-
-                // If the bottom of this page is below the top of the container,
-                // then this is the current page being viewed.
-                if (rect.bottom > containerRect.top + 50) {
-                    const pageNum = Number(page.getAttribute('data-page-number'));
-                    if (pageNum) {
-                        onVisiblePageChange?.(pageNum);
-                        break;
-                    }
-                }
+            if (typeof forwardedRef === "function") {
+                forwardedRef(node);
+            } else if (forwardedRef) {
+                forwardedRef.current = node;
             }
         };
 
+        const handleScroll = useCallback(() => {
+            const container = internalRef.current;
+
+            if (!container || !totalPages || !onVisiblePageChange) return;
+
+            const pages = container.querySelectorAll<HTMLElement>(
+                "[data-page-number]",
+            );
+            const containerTop = container.getBoundingClientRect().top + 50;
+
+            for (const page of pages) {
+                const rect = page.getBoundingClientRect();
+
+                if (rect.bottom > containerTop) {
+                    const pageNumber = Number(page.dataset.pageNumber);
+
+                    if (
+                        pageNumber > 0 &&
+                        pageNumber !== lastReportedPage.current
+                    ) {
+                        lastReportedPage.current = pageNumber;
+                        onVisiblePageChange(pageNumber);
+                    }
+
+                    break;
+                }
+            }
+        }, [totalPages, onVisiblePageChange]);
+
         return (
             <div
-                ref={ref}
-                className="pdf-viewer-container d-flex flex-column align-items-center"
-                style={{
-                    maxHeight: "80vh",
-                    overflowY: renderMode === "scroll" ? "auto" : "visible",
-                    backgroundColor: "#1a1a1a"
-                }}
+                ref={setContainerRef}
+                className={[
+                    "flex flex-col items-center bg-neutral-900",
+                    "max-h-[80vh] w-full",
+                    renderMode === "scroll"
+                        ? "overflow-y-auto overscroll-contain"
+                        : "overflow-visible",
+                ].join(" ")}
                 onScroll={renderMode === "scroll" ? handleScroll : undefined}
             >
                 <Document
                     file={fileUrl}
-                    onLoadSuccess={({ numPages }) => onLoadSuccess(numPages)}
-                    className="d-flex flex-column align-items-center"
+                    onLoadSuccess={({ numPages }) => {
+                        lastReportedPage.current = null;
+                        onLoadSuccess(numPages);
+                    }}
+                    loading={
+                        <p className="p-8 text-sm text-muted-foreground">
+                            Loading PDF...
+                        </p>
+                    }
+                    error={
+                        <p className="p-8 text-sm text-destructive">
+                            Unable to load the PDF. Please try again.
+                        </p>
+                    }
+                    className="flex flex-col items-center"
                 >
-                    {renderMode === "scroll" && totalPages
-                        ? Array.from({ length: totalPages }, (_, i) => (
+                    {renderMode === "scroll" && totalPages > 0 ? (
+                        Array.from({ length: totalPages }, (_, index) => (
                             <Page
-                                key={i}
-                                pageNumber={i + 1}
-                                data-page-number={i + 1}
-                                className="mb-3 shadow"
-                                loading={<div className="text-white p-5">Loading page...</div>}
+                                key={index + 1}
+                                pageNumber={index + 1}
+                                data-page-number={index + 1}
+                                className="mb-4 max-w-full shadow-md"
+                                loading={
+                                    <div className="p-8 text-sm text-muted-foreground">
+                                        Loading page {index + 1}...
+                                    </div>
+                                }
                             />
                         ))
-                        : (
-                            <Page
-                                pageNumber={currentPage}
-                                className="shadow"
-                                loading={<div className="text-white p-5">Loading page...</div>}
-                            />
-                        )}
+                    ) : (
+                        <Page
+                            pageNumber={currentPage}
+                            className="max-w-full shadow-md"
+                            loading={
+                                <div className="p-8 text-sm text-muted-foreground">
+                                    Loading page...
+                                </div>
+                            }
+                        />
+                    )}
                 </Document>
             </div>
         );
-    }
+    },
 );
 
+PdfViewer.displayName = "PdfViewer";
+
 export default PdfViewer;
-
-
-/*
-Document: loads the PDF
-
-Page: renders a single page (important for control)
-
-* */

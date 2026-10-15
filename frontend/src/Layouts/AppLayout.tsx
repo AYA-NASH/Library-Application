@@ -2,9 +2,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Footer } from "./NavbarAndFooter/Footer";
 import Navbar from "./NavbarAndFooter/Navbar";
 
-import "@/styles/bootstrap-scoped.scss";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
-
 const AUTH_ROUTES = ["/login", "/signup"];
 
 export default function AppLayout() {

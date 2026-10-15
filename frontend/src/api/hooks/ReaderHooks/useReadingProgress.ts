@@ -4,12 +4,20 @@ import { readerService } from "../../services/readerService";
 
 export const useReadingProgress = (bookId: number | undefined) => {
     const queryClient = useQueryClient();
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-    const { data: lastPage = 1, isLoading } = useQuery({
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    
+    const {
+        data: lastPage = 1,
+        isLoading,
+        error,
+        refetch,
+    } = useQuery({
         queryKey: ["reading-progress", bookId],
         queryFn: () => readerService.fetchUserReadingProgress(bookId!),
-        enabled: !!bookId,
+        enabled:
+            typeof bookId === "number" &&
+            Number.isInteger(bookId) &&
+            bookId > 0,
     });
 
     const { mutate: saveProgress } = useMutation({
@@ -27,5 +35,11 @@ export const useReadingProgress = (bookId: number | undefined) => {
         }, 2000); // Wait 2 seconds of inactivity before saving
     };
 
-    return { lastPage, isLoading, syncProgress };
+    return {
+        lastPage,
+        isLoading,
+        error,
+        refetch,
+        syncProgress,
+    };
 };
