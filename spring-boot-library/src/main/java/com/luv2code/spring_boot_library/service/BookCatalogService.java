@@ -7,6 +7,7 @@ import com.luv2code.spring_boot_library.exception.ResourceNotFoundException;
 import com.luv2code.spring_boot_library.mapper.BookMapper;
 import com.luv2code.spring_boot_library.repository.BookRepository;
 import com.luv2code.spring_boot_library.repository.ReviewRepository;
+import com.luv2code.spring_boot_library.specification.BookSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +23,11 @@ public class BookCatalogService {
     private final BookMapper bookMapper;
 
     public Page<BookResponse> getBooks(Pageable pageable) {
-        return bookRepository.findAll(pageable)
+        return getBooks(null, null, null, null, pageable);
+    }
+
+    public Page<BookResponse> getBooks(String text, Long categoryId, String status, String dataSource, Pageable pageable) {
+        return bookRepository.findAll(BookSpecifications.withFilters(text, categoryId, status, dataSource), pageable)
                 .map(bookMapper::toResponse);
     }
 

@@ -23,6 +23,8 @@ interface UseDashboardTableProps<TData, TValue> {
     onPaginationChange?: OnChangeFn<PaginationState>;
     columnFilters?: ColumnFiltersState;
     onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
+    globalFilter?: string;
+    onGlobalFilterChange?: (value: string) => void;
     manualPagination?: boolean;
     manualFiltering?: boolean;
 }
@@ -36,6 +38,8 @@ export function useDashboardTable<TData, TValue>({
     onPaginationChange,
     columnFilters: externalColumnFilters,
     onColumnFiltersChange,
+    globalFilter: externalGlobalFilter,
+    onGlobalFilterChange,
     manualPagination = false,
     manualFiltering = false,
 }: UseDashboardTableProps<TData, TValue>) {
@@ -43,11 +47,14 @@ export function useDashboardTable<TData, TValue>({
     const [internalColumnFilters, setInternalColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-    const [globalFilter, setGlobalFilter] = useState("");
+    const [internalGlobalFilter, setInternalGlobalFilter] = useState("");
     const [internalPagination, setInternalPagination] = useState<PaginationState>({
         pageIndex: 0,
         pageSize: 10,
     });
+
+    const globalFilter = externalGlobalFilter ?? internalGlobalFilter;
+    const handleGlobalFilterChange = onGlobalFilterChange ?? setInternalGlobalFilter;
 
     const pagination = externalPagination ?? internalPagination;
     const handlePaginationChange = onPaginationChange ?? setInternalPagination;
@@ -74,7 +81,7 @@ export function useDashboardTable<TData, TValue>({
         onColumnFiltersChange: handleColumnFiltersChange,
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
-        onGlobalFilterChange: setGlobalFilter,
+        onGlobalFilterChange: handleGlobalFilterChange,
         onPaginationChange: handlePaginationChange,
 
         getCoreRowModel: getCoreRowModel(),

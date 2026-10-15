@@ -1,6 +1,9 @@
 import React from "react";
 import type {
     ColumnDef,
+    ColumnFiltersState,
+    OnChangeFn,
+    PaginationState,
     Table,
 } from "@tanstack/react-table";
 import { flexRender } from "@tanstack/react-table";
@@ -29,8 +32,20 @@ interface DataTableProps<TData, TValue> {
     isError?: boolean;
     error?: Error | null;
     onRetry: () => void;
+    // server-side pagination
+    pagination?: PaginationState;
+    onPaginationChange?: OnChangeFn<PaginationState>;
+    pageCount?: number;
+    totalElements?: number;
+
     searchPlaceholder?: string;
     filters: TableFilterConfig[];
+    // server-side filters
+    globalFilter?: string;
+    onGlobalFilterChange?: (value: string) => void;
+    columnFilters?: ColumnFiltersState;
+    onColumnFiltersChange?: OnChangeFn<ColumnFiltersState>;
+
     searchFn?: (row: TData, search: string) => boolean;
     bulkActions?: (table: Table<TData>) => React.ReactNode;
 }
@@ -42,15 +57,35 @@ export function DataTable<TData, TValue>({
     isError,
     error,
     onRetry,
+    pagination,
+    onPaginationChange,
+    pageCount,
+    totalElements,
     searchPlaceholder,
     filters,
+    globalFilter,
+    onGlobalFilterChange,
+    columnFilters,
+    onColumnFiltersChange,
     searchFn,
     bulkActions,
 }: DataTableProps<TData, TValue>) {
+
+    const isServerSide = !!pagination;
+
     const table = useDashboardTable({
         data,
         columns,
         searchFn,
+        pagination,
+        onPaginationChange,
+        columnFilters,
+        onColumnFiltersChange,
+        globalFilter,
+        onGlobalFilterChange,
+        pageCount,
+        manualPagination: isServerSide,
+        manualFiltering: isServerSide
     });
 
     if (isLoading) {
@@ -144,7 +179,7 @@ export function DataTable<TData, TValue>({
                 </TanStackTable>
             </div>
 
-            <DataTablePagination table={table} />
+            <DataTablePagination table={table} totalElements={totalElements} />
         </div>
     );
 }

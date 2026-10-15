@@ -15,7 +15,7 @@ export function useBookFilters(
         const outOfStockCount = books.filter(b => b.status === "OUT_OF_STOCK" || b.status === "out_of_stock").length;
 
         const categoryOptions = categories.map((cat) => ({
-            value: cat.name,
+            value: String(cat.id),
             label: cat.name,
             count: cat.booksCount,
         }));

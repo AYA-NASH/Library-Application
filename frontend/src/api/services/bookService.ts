@@ -8,21 +8,34 @@ export interface PageResponse<T> {
 }
 
 export const bookService = {
-    getBooks: async (page: number, size: number, text?: string, categoryId?: number): Promise<PageResponse<BookModel>> => {
+    getBooks: async (
+        page: number,
+        size: number,
+        text?: string,
+        categoryId?: number,
+        status?: string,
+        dataSource?: string
+    ): Promise<PageResponse<BookModel>> => {
         let url = "/books/public/all";
         const params: any = { page: page - 1, size };
 
         if (text) {
-            url = "/books/public/search/findByTitleContaining";
-            params.title = text;
-        } else if (categoryId) {
-            url = "/books/public/search/findByCategoryId";
+            params.text = text;
+        }
+        if (categoryId) {
             params.categoryId = categoryId;
+        }
+        if (status && status !== "all") {
+            params.status = status;
+        }
+        if (dataSource && dataSource !== "all") {
+            params.dataSource = dataSource;
         }
 
         const response = await apiClient.get(url, { params });
 
-        const transformedContent = response.data.content.map((b: any) => ({
+        const content = response.data?.content ?? [];
+        const transformedContent = content.map((b: any) => ({
             id: b.id,
             title: b.title,
             author: b.author,
@@ -37,8 +50,8 @@ export const bookService = {
         }));
         return {
             content: transformedContent,
-            totalPages: response.data.page.totalPages,
-            totalElements: response.data.page.totalElements
+            totalPages: response.data.page?.totalPages ?? response.data.totalPages ?? 0,
+            totalElements: response.data.page?.totalElements ?? response.data.totalElements ?? 0
         };
     },
 

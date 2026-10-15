@@ -30,42 +30,45 @@ export function DataTableToolbar<TData>({
                 />
             </div>
 
-            {filters.map((filter) => (
-                <Select
-                    key={filter.id}
-                    value={
-                        (table
-                            .getColumn(filter.id)
-                            ?.getFilterValue() as string) ?? ""
-                    }
-                    onValueChange={(value) =>
-                        table
-                            .getColumn(filter.id)
-                            ?.setFilterValue(
-                                value === "all" ? undefined : value
-                            )
-                    }
-                >
-                    <SelectTrigger className="w-44">
-                        <SelectValue placeholder={filter.title} />
-                    </SelectTrigger>
+            {filters.map((filter) => {
+                const currentValue = (table.getColumn(filter.id)?.getFilterValue() as string) ?? "all";
+                const selectedOption = filter.options.find((opt) => opt.value === currentValue);
 
-                    <SelectContent>
-                        <SelectItem value="all">
-                            All
-                        </SelectItem>
+                return (
+                    <Select
+                        key={filter.id}
+                        value={currentValue}
+                        onValueChange={(value) =>
+                            table
+                                .getColumn(filter.id)
+                                ?.setFilterValue(
+                                    !value || value === "all" ? undefined : value
+                                )
+                        }
+                    >
+                        <SelectTrigger className="w-44">
+                            <SelectValue placeholder={filter.title}>
+                                {selectedOption ? selectedOption.label : filter.title}
+                            </SelectValue>
+                        </SelectTrigger>
 
-                        {filter.options.map((option) => (
-                            <SelectItem
-                                key={option.value}
-                                value={option.value}
-                            >
-                                {option.label}
+                        <SelectContent>
+                            <SelectItem value="all">
+                                All {filter.title}
                             </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            ))}
+
+                            {filter.options.map((option) => (
+                                <SelectItem
+                                    key={option.value}
+                                    value={option.value}
+                                >
+                                    {option.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                );
+            })}
         </div>
     );
 }

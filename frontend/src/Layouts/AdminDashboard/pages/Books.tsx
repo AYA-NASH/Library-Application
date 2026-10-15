@@ -7,23 +7,58 @@ import { DataTable } from "@/components/dashboard-components/table-components/Da
 import { Button } from "@/components/ui/button";
 import { BookColumns } from "@/constants/admin-dashboard/books/booksColumns";
 import { buildBooksSummaryCards, useBookFilters } from "@/constants/admin-dashboard/books/bookTableHelpers";
+import { useDebounce } from "@/hooks/useDebounce";
+import { ColumnFiltersState, OnChangeFn, PaginationState } from "@tanstack/react-table";
 
 import { Archive, FolderOutput, Plus, TrashIcon } from "lucide-react";
+import { useState } from "react";
 
 export function Books() {
-    const { data,
+    const [pagination, setPagination] = useState<PaginationState>({
+        pageIndex: 0,
+        pageSize: 5,
+    });
+    const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 400);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+    const statusFilter = columnFilters.find((f) => f.id === "status")?.value as string | undefined;
+    const categoryFilterStr = columnFilters.find((f) => f.id === "categories")?.value as string | undefined;
+    const categoryId = categoryFilterStr ? Number(categoryFilterStr) : undefined;
+    const dataSourceFilter = columnFilters.find((f) => f.id === "dataSource")?.value as string | undefined;
+
+    const {
+        data,
         isLoading: isLoadinBooks,
         isError: isErrorBooks,
         error,
-        refetch: refetchBooks
-    } = useBooks(1, 20);
+        refetch: refetchBooks,
+    } = useBooks(
+        pagination.pageIndex + 1,
+        pagination.pageSize,
+        debouncedSearch || undefined,
+        categoryId,
+        statusFilter,
+        dataSourceFilter
+    );
 
     const { data: categoriesData } = useCategories(1, 100);
 
-    const { data: bookSummary,
+    const {
+        data: bookSummary,
         isLoading: isLoadingSummary,
         isError: isErrorSummary,
     } = useFetchBookSummary();
+
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        setPagination((p) => ({ ...p, pageIndex: 0 }));
+    };
+
+    const handleColumnFiltersChange: OnChangeFn<ColumnFiltersState> = (updater) => {
+        setColumnFilters(updater);
+        setPagination((p) => ({ ...p, pageIndex: 0 }));
+    };
 
     const books = data?.content ?? [];
     const categories = categoriesData?.content;
@@ -40,7 +75,7 @@ export function Books() {
             contentSubDescription="Manage your library catalog"
             contentAction={
                 <BookFormModal trigger={
-                    <Button >
+                    <Button>
                         <Plus />
                         Add Book
                     </Button>
@@ -56,13 +91,14 @@ export function Books() {
                 onRetry={refetchBooks}
                 searchPlaceholder="Search by book title or author ..."
                 filters={filters}
-                searchFn={(book, search) => {
-                    const query = search.toLowerCase();
-                    const matchesTitle = book.title?.toLowerCase().includes(query) ?? false;
-                    const matchesAuthor = book.author?.toLowerCase().includes(query) ?? false;
-
-                    return matchesTitle || matchesAuthor;
-                }}
+                pagination={pagination}
+                onPaginationChange={setPagination}
+                pageCount={data?.totalPages ?? -1}
+                totalElements={data?.totalElements}
+                globalFilter={search}
+                onGlobalFilterChange={handleSearchChange}
+                columnFilters={columnFilters}
+                onColumnFiltersChange={handleColumnFiltersChange}
                 bulkActions={() => (
                     <div>
                         <Button variant="outline">
@@ -78,5 +114,5 @@ export function Books() {
                 )}
             />
         </DashboardPageLayout>
-    )
+    );
 }

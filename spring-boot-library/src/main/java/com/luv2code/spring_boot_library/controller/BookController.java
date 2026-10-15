@@ -31,14 +31,18 @@ public class BookController {
     private final BookCatalogService bookCatalogService;
 
     @GetMapping("/all")
-    @Operation(summary = "Get all books", description = "Retrieves a paginated list of all books in the library catalog.")
+    @Operation(summary = "Get all books", description = "Retrieves a paginated list of all books in the library catalog with optional filters.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of books"),
             @ApiResponse(responseCode = "400", description = "Invalid pageable parameters", content = @Content(schema = @Schema(implementation = ErrorsDto.ApiErrorResponse.class)))
     })
     public Page<BookDtos.BookResponse> getBooksPageable(
+            @RequestParam(required = false) @Parameter(description = "Search text for title or author") String text,
+            @RequestParam(required = false) @Parameter(description = "Category ID to filter by") Long categoryId,
+            @RequestParam(required = false) @Parameter(description = "Stock status (AVAILABLE, OUT_OF_STOCK)") String status,
+            @RequestParam(required = false) @Parameter(description = "Book source (INTERNAL, GOOGLE)") String dataSource,
             @Parameter(description = "Pagination and sorting information") Pageable pageable) {
-        return bookCatalogService.getBooks(pageable);
+        return bookCatalogService.getBooks(text, categoryId, status, dataSource, pageable);
     }
 
     @GetMapping("/{bookId}")
