@@ -6,9 +6,9 @@ const RequireAuth = ({ role }: { role?: string }) => {
     const isAdmin = useAuthStore((s) => s.isAdmin);
     const location = useLocation();
 
-    if (!isAuthenticated()) return <Navigate to={"/login"} state={{ from: location }} replace />
+    if (!isAuthenticated) return <Navigate to={"/login"} state={{ from: location }} replace />
 
-    if (role === "ADMIN" && !isAdmin()) return <Navigate to="/" replace />;
+    if (role === "ADMIN" && !isAdmin) return <Navigate to="/" replace />;
 
     return <Outlet />;
 };

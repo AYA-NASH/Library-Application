@@ -21,6 +21,7 @@ import { MainPage } from "./Layouts/AdminDashboard/pages/MainPage";
 import { Books } from "./Layouts/AdminDashboard/pages/Books";
 import { Messages } from "./Layouts/AdminDashboard/pages/Messages";
 import { Categories } from "./Layouts/AdminDashboard/pages/Categories";
+import GuestOnly from "./Auth/GuestOnly";
 
 export const router = createBrowserRouter([
     {
@@ -35,8 +36,13 @@ export const router = createBrowserRouter([
         ),
         children: [
             { index: true, element: <HomePage /> },
-            { path: "login", element: <LoginPage /> },
-            { path: "signup", element: <SignupPage /> },
+            {
+                element: <GuestOnly />,
+                children: [
+                    { path: "login", element: <LoginPage /> },
+                    { path: "signup", element: <SignupPage /> },
+                ]
+            },
             { path: "search", element: <SearchBooksPage /> },
             { path: "checkout/:bookId", element: <BookPage /> },
 
@@ -60,12 +66,17 @@ export const router = createBrowserRouter([
     },
     {
         path: "admin-dashboard",
-        element: <DashboardLayout />,
+        element: <RequireAuth role="ADMIN" />,
         children: [
-            { index: true, element: <MainPage /> },
-            { path: "books", element: <Books /> },
-            { path: "categories", element: <Categories /> },
-            { path: "messages", element: <Messages /> },
+            {
+                element: <DashboardLayout />,
+                children: [
+                    { index: true, element: <MainPage /> },
+                    { path: "books", element: <Books /> },
+                    { path: "categories", element: <Categories /> },
+                    { path: "messages", element: <Messages /> },
+                ]
+            }
         ]
     },
 ]);

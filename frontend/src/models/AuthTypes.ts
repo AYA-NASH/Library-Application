@@ -1,7 +1,8 @@
 export interface UserInfo {
-    username: string;
+    userId: number;
     email: string;
     role: string;
+    exp: number;
 }
 
 export interface LoginResponse {
