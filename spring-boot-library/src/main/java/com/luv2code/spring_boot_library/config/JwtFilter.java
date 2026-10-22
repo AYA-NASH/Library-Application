@@ -70,4 +70,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+
+        return path.equals("/api/register")
+                || path.equals("/api/login")
+                || path.equals("/api/google-login")
+                || path.equals("/api/refresh")
+                || path.equals("/api/logout");
+    }
 }

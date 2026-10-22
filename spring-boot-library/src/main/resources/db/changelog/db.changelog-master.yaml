@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/changes/006-update-history-book-link.yaml
   - include:
       file: db/changelog/changes/007-create-activity-log-table.yaml
+  - include:
+      file: db/changelog/changes/008-create-refresh-tokens.yaml

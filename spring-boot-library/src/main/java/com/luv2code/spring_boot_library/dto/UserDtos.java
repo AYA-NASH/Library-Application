@@ -33,6 +33,12 @@ public sealed interface UserDtos {
     ) implements UserDtos {
     }
 
+    record RefreshResponse(
+            String token,
+            UserInfo user
+    ) implements UserDtos {
+    }
+
     record GoogleUser(String email, String username) implements UserDtos {
     }
 }

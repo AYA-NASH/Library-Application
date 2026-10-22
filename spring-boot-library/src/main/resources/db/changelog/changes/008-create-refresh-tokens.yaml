@@ -1,0 +1,65 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-create-refresh-tokens
+      author: ayana
+      changes:
+        - createTable:
+            tableName: refresh_tokens
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_refresh_tokens
+                    nullable: false
+
+              - column:
+                  name: token_hash
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_refresh_tokens_token_hash
+
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: expiry_date
+                  type: DATETIME(6)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: revoked
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: revoked_at
+                  type: DATETIME(6)
+                  constraints:
+                    nullable: true
+
+        # Foreign key and index are separate *changes*, siblings of createTable (not columns).
+        - addForeignKeyConstraint:
+            baseTableName: refresh_tokens
+            baseColumnNames: user_id
+            constraintName: fk_refresh_tokens_user
+            referencedTableName: users
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - createIndex:
+            tableName: refresh_tokens
+            indexName: idx_refresh_tokens_user
+            columns:
+              - column:
+                  name: user_id

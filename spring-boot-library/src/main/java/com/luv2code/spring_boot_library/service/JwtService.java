@@ -19,8 +19,8 @@ public class JwtService {
     @Value("${app.jwt.secret:}")
     private String configuredSecret;
 
-    @Value("${app.jwt.expiration-ms:3600000}")
-    private long expirationMs; // default 1 hour
+    @Value("${app.jwt.expiration-ms:900000}")
+    private long expirationMs; // default 15 minutes
 
     public String generateToken(Long userId, String email, String role) {
         Map<String, Object> claims = new HashMap<>();
