@@ -4,8 +4,7 @@ const Logo = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
       className={`
-        flex size-16 shrink-0 flex-col items-center justify-center
-        rounded-full border border-primary
+        flex size-14 shrink-0 flex-col items-center justify-center
         text-primary
         transition-colors duration-300
         ${className || ""}
@@ -31,17 +30,6 @@ const Logo = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
         BOOKVERSE
       </span>
 
-      <span
-        className="
-          mt-px
-          text-[4px] font-medium
-          uppercase
-          tracking-[0.25em]
-          text-primary/80
-        "
-      >
-        Library Platform
-      </span>
     </div>
   );
 };

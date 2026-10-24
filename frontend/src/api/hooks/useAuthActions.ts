@@ -46,11 +46,17 @@ export const useAuthActions = () => {
         }
     });
 
-    const logout = () => {
-        clearAuth();
-        queryClient.clear();
-        toast.info("You have been logged out.");
-        navigate("/login", { replace: true });
+    const logout = async () => {
+        try {
+            await authService.logout();
+        } catch {
+
+        } finally {
+            clearAuth();
+            queryClient.clear();
+            toast.info("You have been logged out.");
+            navigate("/login", { replace: true });
+        }
     };
 
     return {

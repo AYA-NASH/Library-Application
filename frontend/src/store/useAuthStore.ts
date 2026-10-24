@@ -1,11 +1,16 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware'
 import { UserInfo } from '../models/AuthTypes';
 import { jwtDecode } from 'jwt-decode';
 
-const STORAGE_KEY = "auth-storage";
 
-let expiryTimer: ReturnType<typeof setTimeout> | null = null;
+const SESSION_FLAG_KEY = "has_session";
+let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+let onProactiveRefresh: (() => void) | null = null;
+
+// Allows client.ts to register the silent refresh callback without circular imports
+export function registerProactiveRefresh(callback: () => void) {
+    onProactiveRefresh = callback;
+}
 
 interface JwtPayload {
     userId: number;
@@ -19,8 +24,10 @@ interface AuthState {
     token: string | null;
     isAdmin: boolean;
     isAuthenticated: boolean;
+    isCheckingAuth: boolean;
     setAuth: (token: string) => void;
     clearAuth: () => void;
+    setCheckingAuth: (checking: boolean) => void;
 }
 
 // check if a token exists and if it is still valid.
@@ -38,103 +45,88 @@ export function isTokenValid(token: string | null): boolean {
     }
 }
 
-// schedule an automatic logout when token reaches 'exp'
-function scheduleExpiry(exp: number, onExpire: () => void) {
-    if (expiryTimer) clearTimeout(expiryTimer);
+function scheduleSilentRefresh(exp: number) {
+    if (refreshTimer) clearTimeout(refreshTimer);
 
-    const delayMs = exp * 1000 - Date.now();
+    const refreshBufferMs = 60_000; // 1 minute before expiry
+    const delayMs = exp * 1000 - Date.now() - refreshBufferMs;
 
     if (delayMs <= 0) {
-        onExpire();
+        onProactiveRefresh?.();
         return;
     }
 
-    expiryTimer = setTimeout(() => {
-        onExpire();
+    refreshTimer = setTimeout(() => {
+        onProactiveRefresh?.();
     }, delayMs);
 }
 
-export const useAuthStore = create<AuthState>()(
-    persist(
-        (set, get) => ({
+export const useAuthStore = create<AuthState>()((set, get) => ({
+    user: null,
+    token: null,
+    isAdmin: false,
+    isAuthenticated: false,
+    isCheckingAuth: typeof window !== "undefined" &&
+        localStorage.getItem(SESSION_FLAG_KEY) === "true",
+
+    setCheckingAuth: (checking: boolean) => set({ isCheckingAuth: checking }),
+
+    setAuth: (token: string) => {
+        try {
+            const decoded = jwtDecode<JwtPayload>(token);
+
+            if (!decoded.exp || decoded.exp * 1000 <= Date.now()) {
+                get().clearAuth();
+                return;
+            }
+
+            const user: UserInfo = {
+                userId: decoded.userId,
+                email: decoded.sub,
+                role: decoded.role,
+                exp: decoded.exp,
+            };
+
+            localStorage.setItem(SESSION_FLAG_KEY, "true");
+
+            set({
+                token,
+                user,
+                isAuthenticated: true,
+                isAdmin: user.role === "ADMIN",
+                isCheckingAuth: false,
+            });
+
+            scheduleSilentRefresh(decoded.exp);
+        } catch (error) {
+            console.error("Failed to parse incoming token", error);
+            get().clearAuth();
+        }
+    },
+
+    clearAuth: () => {
+        if (refreshTimer) {
+            clearTimeout(refreshTimer);
+            refreshTimer = null;
+        }
+        localStorage.removeItem(SESSION_FLAG_KEY);
+        set({
             user: null,
             token: null,
             isAuthenticated: false,
             isAdmin: false,
-
-            setAuth: (token: string) => {
-                try {
-                    const decoded = jwtDecode<JwtPayload>(token);
-
-                    // verify token isn't already expired
-                    if (!decoded.exp || decoded.exp * 1000 <= Date.now()) {
-                        get().clearAuth();
-                        return;
-                    }
-
-                    const user: UserInfo = {
-                        userId: decoded.userId,
-                        email: decoded.sub,
-                        role: decoded.role,
-                        exp: decoded.exp
-                    };
-
-                    set({
-                        token,
-                        user,
-                        isAuthenticated: true,
-                        isAdmin: user.role === 'ADMIN'
-                    });
-
-                    // Schedule proactive logout when exp arrives
-                    scheduleExpiry(decoded.exp, () => {
-                        get().clearAuth();
-                    });
-
-                } catch (error) {
-                    console.error("Failed to parse incoming token", error);
-                    get().clearAuth();
-                }
-            },
-
-            clearAuth: () => {
-                if (expiryTimer) {
-                    clearTimeout(expiryTimer);
-                    expiryTimer = null;
-                }
-                set({ user: null, token: null, isAuthenticated: false, isAdmin: false });
-            },
-
-        }),
-        {
-            name: STORAGE_KEY,
-            storage: createJSONStorage(() => localStorage),
-            onRehydrateStorage: () => (state) => {
-                if (!state) return;
-
-                // If stored token is missing or expired,
-                // wipe the state immediately
-                if (!state.token || !isTokenValid(state.token)) {
-                    state.clearAuth();
-                } else if (state.user?.exp) {
-                    // If valid, 
-                    // resume the proactive expiry countdown timer
-                    scheduleExpiry(state.user.exp, () => {
-                        state.clearAuth();
-                    });
-                }
-            }
-        }
-    )
-);
+            isCheckingAuth: false,
+        });
+    }
+}));
 
 if (typeof window !== "undefined") {
     window.addEventListener("storage", (event) => {
         if (
-            event.key === STORAGE_KEY ||
-            event.key === null
+            event.key === SESSION_FLAG_KEY &&
+            event.newValue !== "true"
         ) {
-            void useAuthStore.persist.rehydrate();
+            useAuthStore.getState().clearAuth();
         }
     });
-}
+} 
