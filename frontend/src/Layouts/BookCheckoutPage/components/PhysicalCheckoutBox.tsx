@@ -31,7 +31,7 @@ export function PhysicalCheckoutBox({ book, checkoutBook }: PhysicalCheckoutProp
                     <AlertTitle>Borrowed</AlertTitle>
                     <AlertDescription className="mt-2">
                         <Button variant="ghost" size="sm" >
-                            <Link to="/loans">Check Status</Link>
+                            <Link to="/shelf">Check Status</Link>
                         </Button>
                     </AlertDescription>
                 </Alert>
@@ -98,8 +98,8 @@ export function PhysicalCheckoutBox({ book, checkoutBook }: PhysicalCheckoutProp
 
             {/* Copy Count */}
             <p className="text-sm">
-                <strong className="font-medium">{book?.copiesAvailable}</strong> available of{" "}
-                <strong className="font-medium">{book?.copies}</strong> copies
+                <strong className="font-medium">{book?.copiesAvailable ?? 0}</strong> available of{" "}
+                <strong className="font-medium">{book?.copies ?? 0}</strong> copies
             </p>
 
             {isAuthenticated && renderCheckoutAction()}

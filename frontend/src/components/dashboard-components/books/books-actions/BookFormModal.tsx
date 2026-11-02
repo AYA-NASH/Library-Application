@@ -31,7 +31,7 @@ export function BookFormModal({
 
 
     const handleSubmit = async (formData: FormData) => {
-        if (!isAdmin()) {
+        if (!isAdmin) {
             toast.error("Unauthorized: Admin access required");
             return;
         }

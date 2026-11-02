@@ -14,6 +14,7 @@ public sealed interface DashboardDtos {
         FEE_PAID,
         FEE_LATE,
         REVIEW_POSTED,
+        DIGITAL_READ,
         JOB_FAILED
     }
 

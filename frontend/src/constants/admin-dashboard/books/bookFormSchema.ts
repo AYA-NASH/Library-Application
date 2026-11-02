@@ -17,7 +17,7 @@ export const bookFormSchema = z.object({
     description: z
         .string()
         .min(20, "Description must be at least 20 characters.")
-        .max(100, "Description must be at most 100 characters."),
+        .max(600, "Description must be at most 100 characters."),
     categoryIds: z
         .array(z.number())
         .min(1, "Select at least one category."),

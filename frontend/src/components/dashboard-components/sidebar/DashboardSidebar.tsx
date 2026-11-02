@@ -39,7 +39,8 @@ export function DashboardSidebar() {
                                 const isActive =
                                     item.url === "/admin-dashboard"
                                         ? location.pathname === item.url
-                                        : location.pathname.startsWith(item.url);
+                                        : location.pathname === item.url ||
+                                        location.pathname.startsWith(`${item.url}/`);
 
                                 return (
                                     <SidebarMenuItem key={item.title}>
@@ -69,7 +70,7 @@ export function DashboardSidebar() {
 
                     <div className="flex min-w-0 flex-col">
                         <span className="truncate text-sm font-semibold text-primary">
-                            {user?.username ?? "Admin"}
+                            {user?.email ?? "Admin"}
                         </span>
                         <span className="truncate text-xs text-muted-foreground">
                             {user?.email ?? "admin@bookverse.app"}

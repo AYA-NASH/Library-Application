@@ -55,7 +55,7 @@ export function DeleteCategory({
             open={open}
             onOpenChange={setOpen}
             title={`Delete "${categoryToDelete.name}"?`}
-            confirmText="Delete Book"
+            confirmText="Delete Category"
             description={renderDescription()}
             trigger={trigger}
             disabled={isCountingBooks || booksCount === undefined}

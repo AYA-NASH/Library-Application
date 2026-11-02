@@ -25,8 +25,8 @@ export function TopNavigationBar({
     const user = useAuthStore((s) => s.user);
     const { logout } = useAuthActions();
 
-    const initials = user?.username
-        ? user.username
+    const initials = user?.email
+        ? user.email
               .split(" ")
               .map((w) => w[0]?.toUpperCase())
               .slice(0, 2)
@@ -76,7 +76,7 @@ export function TopNavigationBar({
                                 </span>
                             </div>
                             <p className="truncate text-sm font-medium text-foreground">
-                                {user?.username ?? "Admin"}
+                                {user?.email ?? "Admin"}
                             </p>
                             <p className="truncate text-xs text-muted-foreground">
                                 {user?.email ?? ""}

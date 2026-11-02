@@ -62,7 +62,7 @@ export type TopBook = {
 
 export type RecentActivityLog = {
     eventCategory: "CIRCULATION" | "TRANSACTIONAL" | "SECURITY" | "INVENTORY" | "SYSTEM";
-    actionType: "CHECKOUT_BORROW" | "CHECKOUT_RETURN" | "CHECKOUT_RENEW" | "DIGITAL_READ" | "FEE_LATE" | "FEE_PAID" | "USER_REGISTRATION" | "JOB_FAILED"; 
+    actionType: "CHECKOUT_BORROW" | "CHECKOUT_RETURN" | "CHECKOUT_RENEW"  | "FEE_LATE" | "FEE_PAID" | "USER_REGISTRATION" | "JOB_FAILED"; 
     actor: string;
     target: string;
     timestamp: string;
